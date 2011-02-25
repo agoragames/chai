@@ -1,0 +1,13 @@
+#!/usr/bin/env python
+#-*- coding:utf-8 -*-
+import unittest2 as unittest
+import os
+import sys
+
+project_root = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
+
+loader = unittest.TestLoader()
+suite = loader.discover('tests', pattern='*_test.py', top_level_dir=project_root)
+
+unittest.TextTestRunner(verbosity=1).run(suite)
+

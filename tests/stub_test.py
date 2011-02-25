@@ -25,22 +25,6 @@ class StubTest(unittest.TestCase):
 
     self.assertRaises( UnsupportedStub, stub, Foo.prop)
 
-  def test_stub_class_with_attr_name(self):
-    class Foo(object):
-      class Bar(object): pass
-
-    res = stub(Foo, 'Bar')
-    self.assertTrue( isinstance(res,StubClass) )
-    # TODO: test that it caches once StubClass does stuff
-
-  def test_stub_class_with_obj_ref(self):
-    class Foo(object):
-      class Bar(object): pass
-
-    res = stub(Foo.Bar)
-    self.assertTrue( isinstance(res,StubClass) )
-    # TODO: test that it caches once StubClass does stuff
-
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):
       def bar(self): pass

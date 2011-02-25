@@ -44,9 +44,6 @@ def _stub_attr(obj, attr_name):
     else:
       return StubMethod(attr)
 
-  if isinstance(attr, type):
-    return StubClass(attr)
-
   # What an absurd type this is ....
   if type(attr).__name__ == 'method-wrapper':
     return StubMethodWrapper(attr)
@@ -78,9 +75,6 @@ def _stub_obj(obj):
       return StubUnboundMethod(obj)
     else:
       return StubMethod(obj)
-
-  if isinstance(obj, type):
-    return StubClass(obj)
 
   # What an absurd type this is ....
   if type(obj).__name__ == 'method-wrapper':
@@ -233,9 +227,3 @@ class StubWrapperDescriptor(Stub):
     Replace the original method.
     '''
     setattr( self._instance, self._attr, self._obj )
-
-class StubClass(Stub):
-  '''
-  Stub an actual class. Lots to do here like overriding attribute gets and
-  so on.
-  '''

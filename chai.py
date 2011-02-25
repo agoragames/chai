@@ -9,6 +9,7 @@ except ImportError:
   import unittest
 
 from exceptions import *
+from mock import Mock
 from stub import stub
 from collections import deque
 
@@ -59,3 +60,9 @@ class Chai(unittest.TestCase):
     stub for the object. See stub documentation for argument information.
     '''
     return self.stub(obj,attr).expect()
+
+  def mock(self):
+    '''
+    Return a mock object.
+    '''
+    return Mock()

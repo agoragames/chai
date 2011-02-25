@@ -21,6 +21,7 @@ class ArgumentsExpecationRule(ExpecationRule):
   def validate(self, *args, **kwargs):
     self.validate_args = args
     self.validate_kwargs = kwargs
+
     if self.args == args and self.kwargs == kwargs:
       self._passed = True
     return self._passed
@@ -28,8 +29,6 @@ class ArgumentsExpecationRule(ExpecationRule):
   def __str__(self):
     return "ArgumentsExpecationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
       (self.passed, self.args, self.validate_args, self.kwargs, self.validate_kwargs)
-  
-  
 
 class Expectation(object):
   '''

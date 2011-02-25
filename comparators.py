@@ -62,7 +62,7 @@ class StringContains(Comparator):
     self._search_string = search_string
   
   def test(self, value):
-    return self._search_string.find(value) > -1
+    return value.find(self._search_string) > -1
 
 class Regex(Comparator):
   '''
@@ -70,7 +70,7 @@ class Regex(Comparator):
   '''
   
   def __init__(self, pattern, flags=0):
-    self._regex = re.complie(pattern)
+    self._regex = re.compile(pattern)
   
   def test(self, value):
     return self._regex.search(value) is not None

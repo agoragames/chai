@@ -21,10 +21,18 @@ class Chai(unittest.TestCase):
 
   # Load in the comparators
   equals = Equals
+  almost_equals = AlmostEqual
   instance_of = InstanceOf
+  is_arg = Is
   any_of = Any
   all_of = All
   not_of = Not
+  matches = Regex
+  use_func = Function 
+  ignore_arg = Ignore
+  in_arg = In
+  contains = StringContains
+  
 
   def setUp(self):
     super(Chai,self).setUp()

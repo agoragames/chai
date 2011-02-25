@@ -42,13 +42,6 @@ class Expectation(object):
     self._stub = stub
     self._arguments_rule = ArgumentsExpecationRule()
 
-  @property
-  def is_met(self):
-    '''
-    Return whether this expectation has been met.
-    '''
-    return self._met
-
   def args(self, *args, **kwargs):
     """
     Creates a ArgumentsExpecationRule and adds it to the expectation
@@ -76,15 +69,17 @@ class Expectation(object):
     Returns the value for this expectation or raises the proper exception.
     """
     if hasattr(self, '_raises'):
+      # Handle exceptions
       if inspect.isclass(self._raises):
         raise self._raises()
       else:
         raise self._raises
     else:
+      # Return value or None
       return getattr(self, '_returns', None)
 
   def close(self, *args, **kwargs):
-    self._is_met = True
+    self._met = True
     
   def closed(self):
     return self._met
@@ -104,4 +99,4 @@ class Expectation(object):
         self._met = True
       else:
         self._met = False
-    return self
+    return self.return_value()

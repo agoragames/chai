@@ -15,9 +15,9 @@ def stub(obj, attr=None):
   can't determine the binding from the object.
   '''
   if attr:
-    return self._stub_attr(obj, attr)
+    return _stub_attr(obj, attr)
   else:
-    return self._stub_obj(obj)
+    return _stub_obj(obj)
 
 def _stub_attr(obj, attr_name):
   '''

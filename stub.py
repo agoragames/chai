@@ -46,12 +46,22 @@ class Stub(object):
     '''
     Add an expectation to this stub. Return the expectation
     '''
-    exp = Expectation(self._obj, self._attr)
+    exp = Expectation(self)
     self._expectations.append( exp )
     return exp
 
   def __call__(self, *args, **kwargs):
     handled = False
     for exp in self._exepctations:
-      handled = exp.call(*args, **kwargs)
-      if handled: break
+      res = exp.call(*args, **kwargs)
+      if res.is_met:
+        return res.return_value
+      else:
+        for rule in res.rules:
+          # Use result to raise some kinda of error
+          if rule.passed:
+            # These passed
+            pass
+          else:
+            # This failed
+            pass

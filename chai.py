@@ -8,6 +8,8 @@ try:
 except ImportError:
   import unittest
 
+import re
+
 from exception import *
 from mock import Mock
 from stub import stub
@@ -18,6 +20,15 @@ class Chai(unittest.TestCase):
   '''
   Base class for all tests
   '''
+
+  # When initializing, alias all the cAmElCaSe methods to more helpful ones
+  def __init__(self, *args, **kwargs):
+    super(Chai,self).__init__(*args, **kwargs)
+    for attr in dir(self):
+      if attr.startswith('assert') and attr!='assert_':
+        pieces = ['assert'] + re.findall('[A-Z][a-z]+', attr[5:])
+        name = '_'.join( [s.lower() for s in pieces] )
+        setattr(self, name, getattr(self,attr))
 
   # Load in the comparators
   equals = Equals

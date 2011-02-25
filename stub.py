@@ -94,7 +94,9 @@ class Stub(object):
     Assert that all expectations on the stub have been met.
     '''
     for exp in self._expectations:
-      exp.is_met
+      if not exp.closed():
+        # expectation was not met
+        pass
 
   def teardown(self):
     '''

@@ -21,16 +21,20 @@ class ArgumentsExpecationRule(ExpecationRule):
     self.kwargs = kwargs
   
   def validate(self, *args, **kwargs):
-    self.validate_args = args
-    self.validate_kwargs = kwargs
+    self.in_args = args
+    self.in_kwargs = kwargs
 
     if self.args == args and self.kwargs == kwargs:
       self._passed = True
     return self._passed
 
   def __str__(self):
-    return "ArgumentsExpecationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
-      (self.passed, self.args, self.validate_args, self.kwargs, self.validate_kwargs)
+    if hasattr(self, 'in_args') and hasattr(self, 'in_kwargs'):
+      return "ArgumentsExpecationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
+        (self._passed, self.args, self.in_args, self.kwargs, self.in_kwargs)
+        
+    return "ArgumentsExpecationRule: passed: %s, args: %s, kwargs: %s, " % \
+      (self._passed, self.args, self.kwargs)
 
 class Expectation(object):
   '''
@@ -41,6 +45,8 @@ class Expectation(object):
     self._met = False
     self._stub = stub
     self._arguments_rule = ArgumentsExpecationRule()
+    self._raises = None
+    self._returns = None
 
   def args(self, *args, **kwargs):
     """
@@ -68,15 +74,14 @@ class Expectation(object):
     """
     Returns the value for this expectation or raises the proper exception.
     """
-    if hasattr(self, '_raises'):
+    if self._raises:
       # Handle exceptions
       if inspect.isclass(self._raises):
         raise self._raises()
       else:
         raise self._raises
     else:
-      # Return value or None
-      return getattr(self, '_returns', None)
+      return self._returns
 
   def close(self, *args, **kwargs):
     self._met = True
@@ -100,3 +105,7 @@ class Expectation(object):
       else:
         self._met = False
     return self.return_value()
+  
+  def __str__(self):
+    return_string = "Raises: %s" % self._raises if self._raises else "Returns: %s" % self._returns
+    return "\n\t%s\n\t%s" % (self._arguments_rule, return_string)

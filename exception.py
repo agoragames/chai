@@ -21,3 +21,15 @@ class UnexpectedCall(ChaiAssertion):
   '''
   Raised when a unexpected call occurs to a stub.
   '''
+
+class ExpectationNotSatisfied(ChaiAssertion):
+  '''
+  Raised when all expectations are not met
+  '''
+  
+  def __init__(self, expectation):
+    self._expection = expectation
+  
+  def __str__(self):
+    return str(self._expection)
+  # TODO: Add some magic to show a really nice error

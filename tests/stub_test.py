@@ -108,7 +108,11 @@ class StubTest(unittest.TestCase):
     self.assertEquals( 'attr', s._attr )
     self.assertEquals( [], s._expectations )
 
-  # TODO: test_assert_expectations
+  def test_assert_expectations(self):
+    s = Stub('obj', 'attr')
+    s.expect().args(123).returns(1)
+    
+    self.assertRaises(ExpectationNotSatisfied, s.assert_expectations)
   
   def test_teardown(self):
     s = Stub('obj')

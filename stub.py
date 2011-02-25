@@ -93,8 +93,7 @@ class Stub(object):
     '''
     for exp in self._expectations:
       if not exp.closed():
-        # expectation was not met
-        pass
+        raise ExpectationNotSatisfied(exp)
 
   def teardown(self):
     '''

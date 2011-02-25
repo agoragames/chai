@@ -47,6 +47,10 @@ def _stub_attr(obj, attr_name):
   if isinstance(attr, type):
     return StubClass(attr)
 
+  # What an absurd type this is ....
+  if type(attr).__name__ == 'method-wrapper':
+    return StubMethodWrapper(attr)
+
   raise UnsupportedStub("can't stub %s of %s", attr_name, obj)
 
 
@@ -75,9 +79,15 @@ def _stub_obj(obj):
     else:
       return StubMethod(obj)
 
+  if isinstance(obj, type):
+    return StubClass(obj)
+
   # What an absurd type this is ....
   if type(obj).__name__ == 'method-wrapper':
     return StubMethodWrapper(obj)
+
+  if type(obj).__name__ == 'wrapper_descriptor':
+    return StubWrapperDescriptor(obj)
 
   raise UnsupportedStub("can't stub %s", obj)
 
@@ -193,10 +203,6 @@ class StubMethodWrapper(Stub):
     Initialize with an object that is a method wrapper.
     '''
     super(StubMethodWrapper,self).__init__(obj)
-    #print dir(obj)
-    #print obj.__class__
-    #print obj.__self__
-    #print obj.__name__
     self._instance = obj.__self__
     self._attr = obj.__name__
     setattr( self._instance, self._attr, self )
@@ -207,6 +213,26 @@ class StubMethodWrapper(Stub):
     '''
     setattr( self._instance, self._attr, self._obj )
     
+class StubWrapperDescriptor(Stub):
+  '''
+  Stub a wrapper-descriptor. May never work because this might only be used
+  for builtins that can't be overloaded.
+  '''
+
+  def __init__(self, obj):
+    '''
+    Initialize with an object that is a method wrapper.
+    '''
+    super(StubWrapperDescriptor,self).__init__(obj)
+    self._instance = obj.__objclass__
+    self._attr = obj.__name__
+    setattr( self._instance, self._attr, self )
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._instance, self._attr, self._obj )
 
 class StubClass(Stub):
   '''

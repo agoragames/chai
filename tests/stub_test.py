@@ -98,6 +98,24 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res,StubMethod) )
     self.assertEquals( res, stub(Foo.bar) )
     self.assertEquals( res, getattr(Foo,'bar') )
+
+  def test_stub_method_wrapper_with_attr_name(self):
+    class Foo(object): pass
+
+    foo = Foo()
+    res = stub(foo, '__hash__')
+    self.assertTrue( isinstance(res,StubMethodWrapper) )
+    self.assertEquals( res, stub(foo, '__hash__') )
+    self.assertEquals( res, getattr(foo, '__hash__') )
+
+  def test_stub_method_wrapper_with_obj_ref(self):
+    class Foo(object): pass
+
+    foo = Foo()
+    res = stub(foo.__hash__)
+    self.assertTrue( isinstance(res,StubMethodWrapper) )
+    self.assertEquals( res, stub(foo.__hash__) )
+    self.assertEquals( res, getattr(foo, '__hash__') )
   
   ###
   ### Test Stub class (if only I could mock my mocking mocks)

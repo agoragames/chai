@@ -26,6 +26,8 @@ class ArgumentsExpectationRule(ExpectationRule):
 
     if self.args == args and self.kwargs == kwargs:
       self._passed = True
+    else:
+      self._passed = False
     return self._passed
 
   def __str__(self):
@@ -80,10 +82,16 @@ class Expectation(object):
     self.at_least(1)
   
   def at_most(self, max_count):
-    pass
+    self._max_count = max_count
+    return self
   
   def at_most_once(self):
     self.at_most(1)
+    return self
+  
+  def once(self):
+    self._min_count = 1
+    self._max_count = 1
   
   def return_value(self):
     """
@@ -101,8 +109,11 @@ class Expectation(object):
   def close(self, *args, **kwargs):
     self._met = True
     
-  def closed(self):
-    return self._met
+  def closed(self, with_counts=False):
+    rval = self._met
+    if with_counts:
+      rval = rval or self._run_count >= self._min_count and not (self._max_count and not self._max_count == self._run_count)
+    return rval
   
   def match(self, *args, **kwargs):
     """
@@ -115,15 +126,16 @@ class Expectation(object):
     Validate all the rules with in this expectation to see if this expectation has been met.
     """
     if not self._met:
-    
+      self._run_count += 1
       if self._arguments_rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
-        self._met = True
+        if not self._max_count == None and self._run_count == self._max_count:
+          self._met = True
       else:
         self._met = False
 
-    self._run_count += 1
     return self.return_value()
   
   def __str__(self):
+    runs_string = "Ran: %s, expect_min: %s, expect_max: %s" % (self._run_count, self._min_count, self._max_count)
     return_string = "Raises: %s" % self._raises if self._raises else "Returns: %s" % self._returns
-    return "\n\t%s\n\t%s" % (self._arguments_rule, return_string)
+    return "\n\t%s\n\t%s\n\t%s" % (self._arguments_rule, return_string, runs_string)

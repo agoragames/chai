@@ -150,7 +150,6 @@ class StubUnboundMethodTest(unittest.TestCase):
       calls = 0
       def __call__(self, *args, **kwargs):
         self.calls += 1
-        super(StubIntercept,self).__call__(*args, **kwargs)
 
     orig = Foo.bar
     s = StubIntercept( Foo.bar )

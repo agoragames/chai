@@ -32,4 +32,3 @@ class ExpectationNotSatisfied(ChaiAssertion):
   
   def __str__(self):
     return str(self._expection)
-  # TODO: Add some magic to show a really nice error

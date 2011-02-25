@@ -148,13 +148,13 @@ class StubMethod(Stub):
     super(StubMethod,self).__init__(obj)
     self._instance = obj.im_self
     self._attr = obj.im_func.func_name
-    setattr( self._obj, self._attr, self )
+    setattr( self._instance, self._attr, self )
 
   def teardown(self):
     '''
     Replace the original method.
     '''
-    setattr( self._instance, self._attr, self._orig )
+    setattr( self._instance, self._attr, self._obj )
 
 class StubUnboundMethod(Stub):
   '''
@@ -168,13 +168,13 @@ class StubUnboundMethod(Stub):
     super(StubUnboundMethod,self).__init__(obj)
     self._instance = obj.im_class
     self._attr = obj.im_func.func_name
-    setattr( self._obj, self._attr, self )
+    setattr( self._instance, self._attr, self )
 
   def teardown(self):
     '''
     Replace the original method.
     '''
-    setattr( self._instance, self._attr, self._orig )
+    setattr( self._instance, self._attr, self._obj )
 
 class StubClass(Stub):
   '''

@@ -111,13 +111,19 @@ class Expectation(object):
     This can be either the exception class or instance of a exception
     """
     self._raises = exception
+
+  def times(self, count):
+    self._min_count = self._max_count = count
+    return self
   
   def at_least(self, min_count):
     self._min_count = min_count
     self._max_count = None
+    return self
   
   def at_least_once(self):
     self.at_least(1)
+    return self
   
   def at_most(self, max_count):
     self._max_count = max_count

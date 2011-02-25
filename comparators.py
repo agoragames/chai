@@ -34,11 +34,18 @@ class Any(Comparator):
   Test to see if any comparator matches
   '''
   def __init__(self, *comparators):
-    self._comparators = comparators
+    self._comparators = []
+    for comp in comparators:
+      if isinstance(comp,Comparator):
+        self._comparators.append( comp )
+      elif isinstance(comp,type):
+        self._comparators.append( InstanceOf(comp) )
+      else:
+        self._comparators.append( Equals(comp) )
 
   def test(self, value):
     for comp in self._comparators:
-      if comp(value): return True
+      if comp.test(value): return True
     return False
 
 class All(Comparator):
@@ -46,11 +53,18 @@ class All(Comparator):
   Test to see if all comparators match
   '''
   def __init__(self, *comparators):
-    self._comparators = comparators
+    self._comparators = []
+    for comp in comparators:
+      if isinstance(comp,Comparator):
+        self._comparators.append( comp )
+      elif isinstance(comp,type):
+        self._comparators.append( InstanceOf(comp) )
+      else:
+        self._comparators.append( Equals(comp) )
 
   def test(self, value):
     for comp in self._comparators:
-      if not comp(value): return False
+      if not comp.test(value): return False
     return True
 
 class Not(Comparator):

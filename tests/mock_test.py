@@ -3,14 +3,14 @@ Tests for the mock object
 '''
 
 import unittest
+import types
 from mock import Mock
-from stub import *
 
 class MockTest(unittest.TestCase):
 
   def test_get_attribute_stubs_a_new_method(self):
     m = Mock()
-    self.assertTrue( isinstance(m.foo, StubMethod) )
+    self.assertTrue( isinstance(m.foo, types.MethodType) )
   
   def test_get_attribute_caches_stub(self):
     m = Mock()

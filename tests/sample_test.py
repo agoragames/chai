@@ -70,6 +70,38 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     self.stub(obj.bound_method)
     self.assertRaises(UnexpectedCall, obj.bound_method)
+  
+  def test_expect_bound_method_with_equals_comparator(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args( self.equals(42) )
+    obj.bound_method( 42 )
+    self.assertRaises(UnexpectedCall, obj.bound_method, 32 )
+
+  def test_expect_bound_method_with_instanceof_comparator(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args( self.instance_of(int) )
+    obj.bound_method( 42 )
+    self.assertRaises(UnexpectedCall, obj.bound_method, '42' )
+  
+  def test_expect_bound_method_with_anyof_comparator(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).times(5).args( 
+      self.any_of(int,3.14,'hello',self.instance_of(list)) )
+    obj.bound_method( 42 )
+    obj.bound_method( 3.14 )
+    obj.bound_method( 'hello' )
+    obj.bound_method( [1,2,3] )
+    self.assertRaises(UnexpectedCall, obj.bound_method, '42' )
+
+  def test_expect_bound_method_with_allof_comparator(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args( self.all_of(bytearray,'hello') )
+    obj.bound_method( bytearray('hello') )
+  
+  def test_expect_bound_method_with_notof_comparator(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args( self.not_of(self.any_of(float,int)) )
+    obj.bound_method( 'hello' )
 
   def test_expect_unbound_method_acts_as_any_instance(self):
     self.expect( SampleBase.bound_method ).args('hello').returns('world')

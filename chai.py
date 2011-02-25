@@ -12,14 +12,19 @@ from exception import *
 from mock import Mock
 from stub import stub
 from collections import deque
+from comparators import *
 
 class Chai(unittest.TestCase):
   '''
   Base class for all tests
   '''
 
-  # mox uses a metaclass for wrapping setUp and tearDown, would be nice to
-  # try and simplify if possible. For now expect
+  # Load in the comparators
+  equals = Equals
+  instance_of = InstanceOf
+  any_of = Any
+  all_of = All
+  not_of = Not
 
   def setUp(self):
     super(Chai,self).setUp()

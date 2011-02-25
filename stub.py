@@ -6,8 +6,10 @@ import inspect
 import types
 
 from expectation import Expectation
-from exceptions import *
+from exception import *
 
+# For clarity here and in tests, could make these class or static methods on
+# Stub. Chai base class would hide that.
 def stub(obj, attr=None):
   '''
   Stub an object. If attr is not None, will attempt to stub that attribute
@@ -130,7 +132,8 @@ class StubProperty(Stub):
   '''
   
   def __init__(self, obj, attr):
-    super(Stub,self).__init__(obj, attr)
+    super(StubProperty,self).__init__(obj, attr)
+    setattr( self._obj, self._attr, self )
 
 
 class StubMethod(Stub):
@@ -143,9 +146,9 @@ class StubMethod(Stub):
     Initialize with an object of type MethodType
     '''
     super(StubMethod,self).__init__(obj)
-    self._orig = obj
     self._instance = obj.im_self
     self._attr = obj.im_func.func_name
+    setattr( self._obj, self._attr, self )
 
   def teardown(self):
     '''
@@ -163,9 +166,9 @@ class StubUnboundMethod(Stub):
     Initialize with an object that is an unbound method
     '''
     super(StubUnboundMethod,self).__init__(obj)
-    self._orig = obj
     self._instance = obj.im_class
     self._attr = obj.im_func.func_name
+    setattr( self._obj, self._attr, self )
 
   def teardown(self):
     '''

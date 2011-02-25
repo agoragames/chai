@@ -69,14 +69,22 @@ class Expectation(object):
   
     return self
   
+  def raises(self, exception):
+    self._raises = exception
+  
   @property  
   def rules(self):
     return self._rule_set
 
-  @property
   def return_value(self):
-    return self._returns
-
+    if hasattr(self, '_raises'):
+      if isinstance(type, type(self._raises)): # Check if it is a class.
+        raise self._raises()
+      else:
+        raise self._raises
+    else:
+      return getattr(self, '_returns', None)
+      
   @property
   def is_met(self):
     '''
@@ -90,4 +98,6 @@ class Expectation(object):
       for rule in self._rule_set:
         if rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
           self._met = True
+        else:
+          self._met = False
     return self

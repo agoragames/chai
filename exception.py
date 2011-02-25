@@ -12,9 +12,12 @@ class UnsupportedStub(ChaiException):
   Can't stub the requested object or attribute.
   '''
 
-
-
 class ChaiAssertion(AssertionError):
   '''
   Base class for all assertion errors.
+  '''
+
+class UnexpectedCall(ChaiAssertion):
+  '''
+  Raised when a unexpected call occurs to a stub.
   '''

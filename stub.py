@@ -112,7 +112,6 @@ class Stub(object):
     return exp
 
   def __call__(self, *args, **kwargs):
-    handled = False
     for exp in self._expectations:
       res = exp.call(*args, **kwargs)
       if res.is_met:
@@ -121,7 +120,7 @@ class Stub(object):
         for rule in res.rules:
           # Use result to raise some kinda of error
           if rule.passed:
-            pass
+            print rule
           else:
             # FIXME: This needs better error reporting
             print rule

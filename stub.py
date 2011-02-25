@@ -11,7 +11,7 @@ def stub(obj, attr=None):
   on the object. Only required for modules and other rare cases where we
   can't determine the binding from the object.
   '''
-  return Stub()
+  return Stub(obj, attr)
 
 
 class Stub(object):
@@ -19,10 +19,12 @@ class Stub(object):
   Base class for all stubs.
   '''
 
-  def __init__(self):
+  def __init__(self, obj, attr):
     '''
     Setup the structs for expectations
     '''
+    self._obj = obj
+    self._attr = attr
     self._expectations = deque()
     self._is_met = True
 
@@ -38,13 +40,13 @@ class Stub(object):
     Clean up all expectations and restore the original attribute of the mocked
     object.
     '''
-    self._expectations  = deque()
+    self._expectations = deque()
 
   def expect(self):
     '''
     Add an expectation to this stub. Return the expectation
     '''
-    exp = Expectation()
+    exp = Expectation(self._obj, self._attr)
     self._expectations.append( exp )
     return exp
 

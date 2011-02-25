@@ -121,9 +121,8 @@ class Stub(object):
       if not exp.match(*args, **kwargs):
         exp.close(*args, **kwargs)
       else:
-        res = exp.test(*args, **kwargs)
-        if res.closed():
-          return res.return_value()
+        return exp.test(*args, **kwargs)
+    
     raise UnexpectedCall("No expectation in place for this call")
 
 class StubProperty(Stub):

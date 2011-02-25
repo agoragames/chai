@@ -111,6 +111,7 @@ class Expectation(object):
     This can be either the exception class or instance of a exception
     """
     self._raises = exception
+    return self
 
   def times(self, count):
     self._min_count = self._max_count = count
@@ -136,6 +137,7 @@ class Expectation(object):
   def once(self):
     self._min_count = 1
     self._max_count = 1
+    return self
   
   def return_value(self):
     """
@@ -170,8 +172,8 @@ class Expectation(object):
     Validate all the rules with in this expectation to see if this expectation has been met.
     """
     if not self._met:
-      self._run_count += 1
       if self._arguments_rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
+        self._run_count += 1
         if not self._max_count == None and self._run_count == self._max_count:
           self._met = True
       else:

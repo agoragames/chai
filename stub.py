@@ -113,27 +113,17 @@ class Stub(object):
 
   def __call__(self, *args, **kwargs):
     for exp in self._expectations:
-      if exp.is_met:
-        continue # This expectation has been meet see if applys to the next one
-        
-      res = exp.test(*args, **kwargs)
-      if res.is_met:
-        # Will need to wrap this with some debug flags
-        print
-        for rule in res.rules:
-          print rule
-        print
-        
-        return res.return_value()
-
+      # If expectation closed skip
+      if exp.closed():
+        continue
+      
+      # If args don't match the expectation, close it and move on, else
+      # pass to it for testing.
+      if not exp.match(*args, **kwargs):
+        exp.close(*args, **kwargs)
       else:
-        for rule in res.rules:
-          # Use result to raise some kinda of error
-          if rule.passed:
-            print rule
-          else:
-            # FIXME: This needs better error reporting
-            print rule
+        return exp.test(*args, **kwargs)
+
     raise UnexpectedCall("No expectation in place for this call")
 
 class StubProperty(Stub):

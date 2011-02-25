@@ -5,7 +5,6 @@ import types
 from stub import *
 
 class StubTest(unittest.TestCase):
-
   ###
   ### Test the public stub() method
   ###
@@ -99,6 +98,10 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res,StubMethod) )
     self.assertEquals( res, stub(Foo.bar) )
     self.assertEquals( res, getattr(Foo,'bar') )
+  
+  ###
+  ### Test Stub class
+  ###
 
 class StubMethodTest(unittest.TestCase):
   

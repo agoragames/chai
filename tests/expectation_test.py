@@ -4,37 +4,37 @@ import types
 
 from expectation import *
 
-class ArgumentsExpecationRuleTest(unittest.TestCase):
+class ArgumentsExpectationRuleTest(unittest.TestCase):
   
   def test_validate_with_no_args(self):
-    r = ArgumentsExpecationRule()
+    r = ArgumentsExpectationRule()
     self.assertTrue(r.validate())
 
   def test_validate_with_args(self):
-    r = ArgumentsExpecationRule(1,2,2)
+    r = ArgumentsExpectationRule(1,2,2)
     self.assertTrue(r.validate(1,2,2))
 
-    r = ArgumentsExpecationRule(1,1,1)
+    r = ArgumentsExpectationRule(1,1,1)
     self.assertFalse(r.validate(2,2,2))
 
   def test_validate_with_kwargs(self):
-    r = ArgumentsExpecationRule(name="vitaly")
+    r = ArgumentsExpectationRule(name="vitaly")
     self.assertTrue(r.validate(name="vitaly"))
 
-    r = ArgumentsExpecationRule(name="vitaly")
+    r = ArgumentsExpectationRule(name="vitaly")
     self.assertFalse(r.validate(name="aaron"))
 
   def test_validate_with_args_and_kwargs(self):
-    r = ArgumentsExpecationRule(1, name="vitaly")
+    r = ArgumentsExpectationRule(1, name="vitaly")
     self.assertTrue(r.validate(1, name="vitaly"))
 
-    r = ArgumentsExpecationRule(1, name="vitaly")
+    r = ArgumentsExpectationRule(1, name="vitaly")
     self.assertFalse(r.validate(1, name="aaron"))
   
 
-class ExpecationTest(unittest.TestCase):
+class ExpectationRule(unittest.TestCase):
   
-  def test_default_expecation(self):
+  def test_default_expectation(self):
     exp = Expectation(object)
     self.assertFalse(exp.closed())
     self.assertTrue(exp.match())

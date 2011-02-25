@@ -3,16 +3,16 @@ import inspect
 Expectations that can set on a stub.
 '''
 
-class ExpecationRule(object):
+class ExpectationRule(object):
   def __init__(self, *args, **kwargs):
     self._passed = False
 
   def validate(self, *args, **kwargs):
     raise NotImplementedError("Must be implmeneted by subclasses")
   
-class ArgumentsExpecationRule(ExpecationRule):
+class ArgumentsExpectationRule(ExpectationRule):
   def __init__(self, *args, **kwargs):
-    super(ArgumentsExpecationRule, self).__init__(*args, **kwargs)
+    super(ArgumentsExpectationRule, self).__init__(*args, **kwargs)
     self.args = args
     self.kwargs = kwargs
   
@@ -21,16 +21,20 @@ class ArgumentsExpecationRule(ExpecationRule):
     self.kwargs = kwargs
   
   def validate(self, *args, **kwargs):
-    self.validate_args = args
-    self.validate_kwargs = kwargs
+    self.in_args = args
+    self.in_kwargs = kwargs
 
     if self.args == args and self.kwargs == kwargs:
       self._passed = True
     return self._passed
 
   def __str__(self):
-    return "ArgumentsExpecationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
-      (self.passed, self.args, self.validate_args, self.kwargs, self.validate_kwargs)
+    if hasattr(self, 'in_args') and hasattr(self, 'in_kwargs'):
+      return "ArgumentsExpectationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
+        (self._passed, self.args, self.in_args, self.kwargs, self.in_kwargs)
+        
+    return "ArgumentsExpectationRule: passed: %s, args: %s, kwargs: %s, " % \
+      (self._passed, self.args, self.kwargs)
 
 class Expectation(object):
   '''
@@ -40,11 +44,15 @@ class Expectation(object):
   def __init__(self, stub):
     self._met = False
     self._stub = stub
-    self._arguments_rule = ArgumentsExpecationRule()
-
+    self._arguments_rule = ArgumentsExpectationRule()
+    self._raises = None
+    self._returns = None
+    self._max_count = self._min_count = 1
+    self._run_count = 0 
+    
   def args(self, *args, **kwargs):
     """
-    Creates a ArgumentsExpecationRule and adds it to the expectation
+    Creates a ArgumentsExpectationRule and adds it to the expectation
     """
     self._arguments_rule.set_args(*args, **kwargs)
     return self
@@ -64,19 +72,31 @@ class Expectation(object):
     """
     self._raises = exception
   
+  def at_least(self, min_count):
+    self._min_count = min_count
+    self._max_count = None
+  
+  def at_least_once(self):
+    self.at_least(1)
+  
+  def at_most(self, max_count):
+    pass
+  
+  def at_most_once(self):
+    self.at_most(1)
+  
   def return_value(self):
     """
     Returns the value for this expectation or raises the proper exception.
     """
-    if hasattr(self, '_raises'):
+    if self._raises:
       # Handle exceptions
       if inspect.isclass(self._raises):
         raise self._raises()
       else:
         raise self._raises
     else:
-      # Return value or None
-      return getattr(self, '_returns', None)
+      return self._returns
 
   def close(self, *args, **kwargs):
     self._met = True
@@ -95,8 +115,15 @@ class Expectation(object):
     Validate all the rules with in this expectation to see if this expectation has been met.
     """
     if not self._met:
+    
       if self._arguments_rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
         self._met = True
       else:
         self._met = False
+
+    self._run_count += 1
     return self.return_value()
+  
+  def __str__(self):
+    return_string = "Raises: %s" % self._raises if self._raises else "Returns: %s" % self._returns
+    return "\n\t%s\n\t%s" % (self._arguments_rule, return_string)

@@ -8,7 +8,7 @@ try:
 except ImportError:
   import unittest
 
-from exceptions import *
+from exception import *
 from mock import Mock
 from stub import stub
 from collections import deque
@@ -39,10 +39,20 @@ class Chai(unittest.TestCase):
 
     # Docs insist that this will be called no matter what happens in runTest(),
     # so this should be a safe spot to unstub everything
+    exception = None
     while len(self.stubs):
-      stub = self.stubs.popleft()
-      stub.assert_expectations()
-      stub.teardown()
+        stub = self.stubs.popleft()
+        try:
+          stub.assert_expectations()
+        except ExpectationNotSatisfied, e:
+          if not exception: # Store only the first exception
+            exception = e
+
+        stub.teardown() # Teardown the reset of the stub
+      
+    if exception:
+      raise exception
+      
 
     # Do the mocks in reverse order in the rare case someone called mock(obj,attr)
     # twice.

@@ -41,12 +41,12 @@ class Chai(unittest.TestCase):
         try:
           stub.assert_expectations()
         except ExpectationNotSatisfied, e:
-          if not exception:
+          if not exception: # Store only the first exception
             exception = e
 
         stub.teardown() # Teardown the reset of the stub
       
-    if exception: # Raise exception if not all expectations have been closed.
+    if exception:
       raise exception
       
 

@@ -92,7 +92,7 @@ class Stub(object):
     Assert that all expectations on the stub have been met.
     '''
     for exp in self._expectations:
-      exp.is_met()
+      exp.is_met
 
   def teardown(self):
     '''
@@ -111,7 +111,7 @@ class Stub(object):
 
   def __call__(self, *args, **kwargs):
     handled = False
-    for exp in self._exepctations:
+    for exp in self._expectations:
       res = exp.call(*args, **kwargs)
       if res.is_met:
         return res.return_value
@@ -119,11 +119,10 @@ class Stub(object):
         for rule in res.rules:
           # Use result to raise some kinda of error
           if rule.passed:
-            # These passed
             pass
           else:
-            # This failed
-            pass
+            # FIXME: This needs better error reporting
+            print rule
 
 class StubProperty(Stub):
   '''

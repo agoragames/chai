@@ -27,6 +27,10 @@ class Chai(unittest.TestCase):
     # Setup stub tracking
     self.stubs = deque()
 
+    # Setup mock tracking
+    self.mocks = deque()
+    
+
   # Because cAmElCaSe sucks
   setup = setUp
 
@@ -50,6 +54,15 @@ class Chai(unittest.TestCase):
       raise exception
       
 
+    # Do the mocks in reverse order in the rare case someone called mock(obj,attr)
+    # twice.
+    while len(self.mocks):
+      mock = self.mocks.pop()
+      if len(mock)==2:
+        delattr( mock[0], mock[1] )
+      else:
+        setattr( mock[0], mock[1], mock[2] )
+
   # Because cAmElCaSe sucks
   teardown = tearDown
 
@@ -71,8 +84,17 @@ class Chai(unittest.TestCase):
     '''
     return self.stub(obj,attr).expect()
 
-  def mock(self):
+  def mock(self, obj=None, attr=None):
     '''
     Return a mock object.
     '''
-    return Mock()
+    rval = Mock()
+    if obj!=None and attr!=None:
+      if hasattr(obj,attr):
+        orig = getattr(obj, attr)
+        self.mocks.append( (obj,attr,orig) )
+        setattr(obj, attr, rval)
+      else:
+        self.mocks.append( (obj,attr) )
+        setattr(obj, attr, rval)
+    return rval

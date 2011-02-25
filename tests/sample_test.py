@@ -5,6 +5,7 @@ Tests for the sample module
 from chai import Chai
 from stub import stub
 from exception import *
+import samples
 from samples import SampleBase, SampleChild
 
 import unittest2 as unittest
@@ -106,6 +107,21 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     self.expect(obj.callback_target)
     obj.callback_source()
+
+  def test_add_to_list_with_mock_object(self):
+    obj = SampleBase()
+    obj._deque = self.mock()
+    self.expect( obj._deque.append ).args('value')
+    obj.add_to_list('value')
+
+  def test_add_to_list_with_module_mock_object(self):
+    self.mock( samples, 'deque' )
+    deq = self.mock()
+    self.expect( samples.deque.__call__ ).returns( deq )
+    self.expect( deq.append ).args('value')
+
+    obj = SampleBase()
+    obj.add_to_list('value')
 
 class SampleChildTest(Chai):
 

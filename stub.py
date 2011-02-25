@@ -44,6 +44,9 @@ def _stub_attr(obj, attr_name):
     else:
       return StubMethod(attr)
 
+  if isinstance(attr, type):
+    return StubClass(attr)
+
   raise UnsupportedStub("can't stub %s of %s", attr_name, obj)
 
 
@@ -71,6 +74,10 @@ def _stub_obj(obj):
       return StubUnboundMethod(obj)
     else:
       return StubMethod(obj)
+
+  # What an absurd type this is ....
+  if type(obj).__name__ == 'method-wrapper':
+    return StubMethodWrapper(obj)
 
   raise UnsupportedStub("can't stub %s", obj)
 
@@ -175,6 +182,31 @@ class StubUnboundMethod(Stub):
     Replace the original method.
     '''
     setattr( self._instance, self._attr, self._obj )
+
+class StubMethodWrapper(Stub):
+  '''
+  Stub a method-wrapper.
+  '''
+
+  def __init__(self, obj):
+    '''
+    Initialize with an object that is a method wrapper.
+    '''
+    super(StubMethodWrapper,self).__init__(obj)
+    #print dir(obj)
+    #print obj.__class__
+    #print obj.__self__
+    #print obj.__name__
+    self._instance = obj.__self__
+    self._attr = obj.__name__
+    setattr( self._instance, self._attr, self )
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._instance, self._attr, self._obj )
+    
 
 class StubClass(Stub):
   '''

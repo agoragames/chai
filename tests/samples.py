@@ -42,6 +42,9 @@ class SampleBase(object):
   def a_classmethod(cls):
     return cls.a_class_value
 
+  def add_to_list(self, value):
+    self._deque.append( value )
+
   # Can test a bound method
   def bound_method(self, arg1, arg2='two'):
     self._arg1 = arg1

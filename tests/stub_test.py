@@ -100,8 +100,76 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, getattr(Foo,'bar') )
   
   ###
-  ### Test Stub class
+  ### Test Stub class (if only I could mock my mocking mocks)
   ###
+  def test_init(self):
+    s = Stub('obj','attr')
+    self.assertEquals( 'obj', s._obj )
+    self.assertEquals( 'attr', s._attr )
+    self.assertEquals( [], s._expectations )
+
+  # TODO: test_assert_expectations
+  
+  def test_teardown(self):
+    s = Stub('obj')
+    s._expections = ['1','2']
+    s.teardown()
+    self.assertEquals( [], s._expectations )
+
+  def test_expect(self):
+    s = Stub('obj')
+
+    self.assertEquals( [], s._expectations )
+    e = s.expect()
+    self.assertEquals( [e], s._expectations )
+    self.assertEquals( s, e._stub )
+
+  def test_call_raises_unexpected_call_when_no_expectations(self):
+    s = Stub('obj')
+    self.assertRaises( UnexpectedCall, s, 'foo' )
+
+  def test_call_when_args_match(self):
+    class Expect(object):
+      def closed(self): return False
+      def match(self, *args, **kwargs): return True
+      def test(self, *args, **kwargs): return 'success'
+    
+    s = Stub('obj')
+    s._expectations = [ Expect() ]
+    self.assertEquals( 'success', s('foo') )
+  
+  def test_call_raises_unexpected_call_when_all_expectations_closed(self):
+    class Expect(object):
+      def closed(self): return True
+    
+    s = Stub('obj')
+    s._expectations = [ Expect(), Expect() ]
+    self.assertRaises( UnexpectedCall, s, 'foo' )
+
+  def test_call_raises_unexpected_call_when_closed_and_no_matching(self):
+    class Expect(object):
+      def __init__(self, closed): 
+        self._closed=closed
+        self._match_count = 0
+        self._close_count=0
+      def closed(self):
+        return self._closed
+      def match(self, *args, **kwargs):
+        self._match_count +=1
+        return False
+      def close(self, *args, **kwargs):
+        self._close_count += 1
+        self._close_args = (args,kwargs)
+    
+    s = Stub('obj')
+    s._expectations = [ Expect(True), Expect(False) ]
+    self.assertRaises( UnexpectedCall, s, 'foo' )
+    self.assertEquals( 0, s._expectations[0]._match_count )
+    self.assertEquals( 1, s._expectations[1]._match_count )
+    self.assertEquals( 0, s._expectations[0]._close_count )
+    self.assertEquals( 1, s._expectations[1]._close_count )
+    self.assertEquals( (('foo',),{}), s._expectations[1]._close_args )
+    
 
 class StubMethodTest(unittest.TestCase):
   

@@ -14,4 +14,11 @@ class Expectation(object):
     '''
     Return whether this expectation has been met.
     '''
+    # raise error if is set
     return self._met
+
+  def call():
+    if not self._met:
+      # check conditions
+      # if not met, set error
+      pass

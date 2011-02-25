@@ -24,7 +24,7 @@ class Stub(object):
     Setup the structs for expectations
     '''
     self._expectations = deque()
-    
+    self._is_met = True
 
   def assert_expectations(self):
     '''
@@ -47,3 +47,9 @@ class Stub(object):
     exp = Expectation()
     self._expectations.append( exp )
     return exp
+
+  def __call__(self, *args, **kwargs):
+    handled = False
+    for exp in self._exepctations:
+      handled = exp.call(*args, **kwargs)
+      if handled: break

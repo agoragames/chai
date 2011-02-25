@@ -1,7 +1,9 @@
-import inspect
 '''
 Expectations that can set on a stub.
 '''
+
+import inspect
+from comparators import *
 
 class ExpectationRule(object):
   def __init__(self, *args, **kwargs):
@@ -13,21 +15,57 @@ class ExpectationRule(object):
 class ArgumentsExpectationRule(ExpectationRule):
   def __init__(self, *args, **kwargs):
     super(ArgumentsExpectationRule, self).__init__(*args, **kwargs)
-    self.args = args
-    self.kwargs = kwargs
+    self.set_args( *args, **kwargs )
   
   def set_args(self, *args, **kwargs):
-    self.args = args
-    self.kwargs = kwargs
+    #self.args = args
+    #self.kwargs = kwargs
+    self.args = []
+    self.kwargs = {}
+    
+    # Convert all of the key word arguments to comparators
+    for arg in args:
+      if not isinstance(arg,Comparator):
+        self.args.append( Equals(arg) )
+      else:
+        self.args.append( arg )
+
+    for k,v in kwargs.iteritems():
+      if not isinstance(v,Comparator):
+        self.kwargs[k] = Equals(v)
+      else:
+        self.kwargs[k] = v
   
   def validate(self, *args, **kwargs):
-    self.in_args = args
-    self.in_kwargs = kwargs
+    self.in_args = args[:]
+    self.in_kwargs = kwargs.copy()
 
-    if self.args == args and self.kwargs == kwargs:
-      self._passed = True
-    else:
+    # First just check that the number of arguments is the same or different
+    if len(args)!=len(self.args) or len(kwargs)!=len(self.kwargs):
       self._passed = False
+      return False
+
+    for x in xrange(len(self.args)):
+      if not self.args[x].test( args[x] ):
+        self._passed = False
+        return False
+
+    for arg_name,arg_test in self.kwargs.iteritems():
+      try:
+        value=kwargs.pop(arg_name)
+      except KeyError:
+        self._passed = False
+        return False
+      if not arg_test.test( value ):
+        self._passed = False
+        return False
+
+    # If there are arguments left over, is error
+    if len(kwargs):
+      self._passed = False
+      return False
+
+    self._passed = True
     return self._passed
 
   def __str__(self):

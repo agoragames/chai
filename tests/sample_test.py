@@ -21,6 +21,12 @@ class SampleBaseTest(Chai):
     self.expect(obj.bound_method).args(1, 4).returns(1100)
     self.assertEquals(1100, obj.bound_method(1, 4))
 
+  def test_expects_bound_method_at_least(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args(1, 2).returns(12).at_least(1)
+    self.assertEquals(12, obj.bound_method(1, 2))
+    self.assertEquals(12, obj.bound_method(1, 2))
+
   def test_expects_bound_method_raises(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(1, 2).raises(CustomException)

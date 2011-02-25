@@ -116,7 +116,7 @@ class Stub(object):
       if exp.is_met:
         continue # This expectation has been meet see if applys to the next one
         
-      res = exp.call(*args, **kwargs)
+      res = exp.test(*args, **kwargs)
       if res.is_met:
         # Will need to wrap this with some debug flags
         print

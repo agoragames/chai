@@ -59,24 +59,44 @@ class Expectation(object):
     self._met = False
     self._stub = stub
     self._rule_set = []
-  
-  def args(self, *args, **kwargs):
-    self._rule_set.append(ArgumentsExpecationRule(*args, **kwargs))
-    return self
-  
-  def returns(self, value):
-    self._returns = value
-  
-    return self
-  
-  def raises(self, exception):
-    self._raises = exception
-  
+
   @property  
   def rules(self):
     return self._rule_set
 
+  @property
+  def is_met(self):
+    '''
+    Return whether this expectation has been met.
+    '''
+    return self._met
+
+  def args(self, *args, **kwargs):
+    """
+    Creates a ArgumentsExpecationRule and adds it to the exception
+    """
+    self._rule_set.append(ArgumentsExpecationRule(*args, **kwargs))
+    return self
+
+  def returns(self, value):
+    """
+    What this expectation should return
+    """
+    self._returns = value
+    return self
+
+  def raises(self, exception):
+    """
+    Adds a raises to the expectation, this will be raised when the expectation is met.
+    
+    This can be either the exception class or instance of a exception
+    """
+    self._raises = exception
+
   def return_value(self):
+    """
+    Returns the value for this expectation or raises the proper exception.
+    """
     if hasattr(self, '_raises'):
       if isinstance(type, type(self._raises)): # Check if it is a class.
         raise self._raises()
@@ -85,15 +105,10 @@ class Expectation(object):
     else:
       return getattr(self, '_returns', None)
       
-  @property
-  def is_met(self):
-    '''
-    Return whether this expectation has been met.
-    '''
-    # raise error if is set
-    return self._met
-
-  def call(self, *args, **kwargs):
+  def test(self, *args, **kwargs):
+    """
+    Validate all the rules with in this expectation to see if this expectation has been met.
+    """
     if not self._met:
       for rule in self._rule_set:
         if rule.validate(*args, **kwargs): # What data do we need to be sure it has been met

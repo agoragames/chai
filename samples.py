@@ -33,6 +33,10 @@ class SampleBase(object):
   def del_property(self):
     self._prop_value = None
 
+  @staticmethod
+  def a_staticmethod(arg):
+    return str(arg)
+
   # Can test a class method
   @classmethod
   def a_classmethod(cls):

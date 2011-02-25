@@ -112,6 +112,7 @@ class Stub(object):
     return exp
 
   def __call__(self, *args, **kwargs):
+    
     for exp in self._expectations:
       # If expectation closed skip
       if exp.closed():
@@ -122,8 +123,9 @@ class Stub(object):
       if not exp.match(*args, **kwargs):
         exp.close(*args, **kwargs)
       else:
-        return exp.test(*args, **kwargs)
-
+        res = exp.test(*args, **kwargs)
+        if res.closed():
+          return res.return_value()
     raise UnexpectedCall("No expectation in place for this call")
 
 class StubProperty(Stub):

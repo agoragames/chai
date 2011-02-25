@@ -1,3 +1,4 @@
+import inspect
 '''
 Expectations that can set on a stub.
 '''
@@ -9,12 +10,13 @@ class ExpecationRule(object):
   def validate(self, *args, **kwargs):
     raise NotImplementedError("Must be implmeneted by subclasses")
   
-  @property
-  def passed(self):
-    return self._passed
-
 class ArgumentsExpecationRule(ExpecationRule):
   def __init__(self, *args, **kwargs):
+    super(ArgumentsExpecationRule, self).__init__(*args, **kwargs)
+    self.args = args
+    self.kwargs = kwargs
+  
+  def set_args(self, *args, **kwargs):
     self.args = args
     self.kwargs = kwargs
   
@@ -30,26 +32,6 @@ class ArgumentsExpecationRule(ExpecationRule):
     return "ArgumentsExpecationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
       (self.passed, self.args, self.validate_args, self.kwargs, self.validate_kwargs)
 
-class AtLeastExpecationRule(ExpecationRule):
-  def __init__(self, *args, **kwargs):
-    pass
-  
-  def validate(self, *args, **kwargs):
-    pass
-
-  def __str__(self):
-    pass
-
-class AtMostExpecationRule(ExpecationRule):
-  def __init__(self, *args, **kwargs):
-    pass
-  
-  def validate(self, *args, **kwargs):
-    pass
-
-  def __str__(self):
-    pass
-
 class Expectation(object):
   '''
   Encapsulate an expectation.
@@ -58,11 +40,7 @@ class Expectation(object):
   def __init__(self, stub):
     self._met = False
     self._stub = stub
-    self._rule_set = []
-
-  @property  
-  def rules(self):
-    return self._rule_set
+    self._arguments_rule = ArgumentsExpecationRule()
 
   @property
   def is_met(self):
@@ -73,9 +51,9 @@ class Expectation(object):
 
   def args(self, *args, **kwargs):
     """
-    Creates a ArgumentsExpecationRule and adds it to the exception
+    Creates a ArgumentsExpecationRule and adds it to the expectation
     """
-    self._rule_set.append(ArgumentsExpecationRule(*args, **kwargs))
+    self._arguments_rule.set_args(*args, **kwargs)
     return self
 
   def returns(self, value):
@@ -92,27 +70,38 @@ class Expectation(object):
     This can be either the exception class or instance of a exception
     """
     self._raises = exception
-
+  
   def return_value(self):
     """
     Returns the value for this expectation or raises the proper exception.
     """
     if hasattr(self, '_raises'):
-      if isinstance(type, type(self._raises)): # Check if it is a class.
+      if inspect.isclass(self._raises):
         raise self._raises()
       else:
         raise self._raises
     else:
       return getattr(self, '_returns', None)
-      
+
+  def close(self, *args, **kwargs):
+    self._is_met = True
+    
+  def closed(self):
+    return self._met
+  
+  def match(self, *args, **kwargs):
+    """
+    Check the if these args match this expectation.
+    """
+    return self._arguments_rule.validate(*args, **kwargs)
+
   def test(self, *args, **kwargs):
     """
     Validate all the rules with in this expectation to see if this expectation has been met.
     """
     if not self._met:
-      for rule in self._rule_set:
-        if rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
-          self._met = True
-        else:
-          self._met = False
+      if self._arguments_rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
+        self._met = True
+      else:
+        self._met = False
     return self

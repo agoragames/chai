@@ -1,7 +1,6 @@
 '''
 Implementation of stubbing
 '''
-from collections import deque
 import inspect
 import types
 
@@ -86,8 +85,7 @@ class Stub(object):
     '''
     self._obj = obj
     self._attr = attr
-    self._expectations = deque()
-    self._is_met = True
+    self._expectations = []
 
   def assert_expectations(self):
     '''
@@ -103,7 +101,7 @@ class Stub(object):
     Clean up all expectations and restore the original attribute of the mocked
     object.
     '''
-    self._expectations = deque()
+    self._expectations = []
 
   def expect(self):
     '''
@@ -125,9 +123,8 @@ class Stub(object):
       if not exp.match(*args, **kwargs):
         exp.close(*args, **kwargs)
       else:
-        res = exp.test(*args, **kwargs)
-        if res.closed():
-          return res.return_value()
+        return exp.test(*args, **kwargs)
+    
     raise UnexpectedCall("No expectation in place for this call")
 
 class StubProperty(Stub):

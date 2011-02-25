@@ -33,8 +33,15 @@ def _stub_attr(obj, attr_name):
   if isinstance(attr, property):
     return StubProperty(obj, attr_name)
 
+  if isinstance(attr, type):
+    return StubClass(attr)
+
   if isinstance(attr, types.MethodType):
-    return StubMethod(obj, attr_name)
+    # Handle differently if unbound because it's an implicit "any instance"
+    if attr.im_self==None:
+      return StubUnboundMethod(attr)
+    else:
+      return StubMethod(attr)
 
   raise UnsupportedStub("can't stub %s of %s", attr_name, obj)
 
@@ -47,12 +54,24 @@ def _stub_obj(obj):
   if isinstance(obj, Stub):
     return obj
  
-  # can't stub properties directly because  
+  # can't stub properties directly because the property object doesn't have
+  # a reference to the class or name of the attribute on which it was defined
   if isinstance(obj, property):
-    return StubProperty(obj)
+    raise UnsupportedStub("must call stub(obj,attr) for properties")
 
-  
+  if isinstance(obj, type):
+    return StubClass(obj)
 
+  # I thought that types.UnboundMethodType differentiated these cases but
+  # apparently not.
+  if isinstance(obj, types.MethodType):
+    # Handle differently if unbound because it's an implicit "any instance"
+    if obj.im_self==None:
+      return StubUnboundMethod(obj)
+    else:
+      return StubMethod(obj)
+
+  raise UnsupportedStub("can't stub %s", obj)
 
 class Stub(object):
   '''
@@ -80,13 +99,13 @@ class Stub(object):
     Clean up all expectations and restore the original attribute of the mocked
     object.
     '''
-    self._expectations  = deque()
+    self._expectations = deque()
 
   def expect(self):
     '''
     Add an expectation to this stub. Return the expectation
     '''
-    exp = Expectation()
+    exp = Expectation(self._obj, self._attr)
     self._expectations.append( exp )
     return exp
 
@@ -103,3 +122,50 @@ class StubProperty(Stub):
   
   def __init__(self, obj, attr):
     super(Stub,self).__init__(obj, attr)
+
+
+class StubMethod(Stub):
+  '''
+  Stub a method.
+  '''
+
+  def __init__(self, obj):
+    '''
+    Initialize with an object of type MethodType
+    '''
+    super(StubMethod,self).__init__(obj)
+    self._orig = obj
+    self._instance = obj.im_self
+    self._attr = obj.im_func.func_name
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._instance, self._attr, self._orig )
+
+class StubUnboundMethod(Stub):
+  '''
+  Stub an unbound method.
+  '''
+
+  def __init__(self, obj):
+    '''
+    Initialize with an object that is an unbound method
+    '''
+    super(StubUnboundMethod,self).__init__(obj)
+    self._orig = obj
+    self._instance = obj.im_class
+    self._attr = obj.im_func.func_name
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._instance, self._attr, self._orig )
+
+class StubClass(Stub):
+  '''
+  Stub an actual class. Lots to do here like overriding attribute gets and
+  so on.
+  '''

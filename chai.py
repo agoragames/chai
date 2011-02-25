@@ -9,6 +9,7 @@ except ImportError:
   import unittest
 
 from exceptions import *
+from mock import Mock
 from stub import stub
 from collections import deque
 
@@ -42,7 +43,7 @@ class Chai(unittest.TestCase):
   # Because cAmElCaSe sucks
   teardown = tearDown
 
-  def stub(obj, attr=None):
+  def stub(self, obj, attr=None):
     '''
     Stub an object. If attr is not None, will attempt to stub that attribute
     on the object. Only required for modules and other rare cases where we
@@ -53,9 +54,15 @@ class Chai(unittest.TestCase):
       self.stubs.append( s )
     return s
 
-  def expect(obj, attr=None):
+  def expect(self, obj, attr=None):
     '''
     Open and return an expectation on an object. Will automatically create a
     stub for the object. See stub documentation for argument information.
     '''
-    self.stub(obj,attr).expect()
+    return self.stub(obj,attr).expect()
+
+  def mock(self):
+    '''
+    Return a mock object.
+    '''
+    return Mock()

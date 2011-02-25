@@ -47,6 +47,7 @@ class SampleBaseTest(Chai):
     self.assertEquals(12, obj.bound_method(1, 2))
     self.assertEquals(12, obj.bound_method(1, 2))
     obj.bound_method(1, 2)
+    self.assertRaises(UnexpectedCall, obj.bound_method, 1, 2)
 
   def test_expects_bound_method_raises(self):
     obj = SampleBase()

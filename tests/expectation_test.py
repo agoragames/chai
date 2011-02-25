@@ -57,11 +57,49 @@ class ExpectationRule(unittest.TestCase):
     
     self.assertTrue(exp.match(1, name="vitaly"))
   
+  def test_at_least_once(self):
+    exp = Expectation(object)
+    exp.args(1).at_least_once()
+    exp.test(1)
+    self.assertTrue(exp.closed(with_counts=True))
+
+  def test_at_least(self):
+    exp = Expectation(object)
+    exp.args(1).at_least(10)
+    for x in xrange(10):
+      exp.test(1)
+    self.assertTrue(exp.closed(with_counts=True))
+
+  def test_at_most_once(self):
+    exp = Expectation(object)
+    exp.args(1).at_most_once()
+    exp.test(1)
+    self.assertTrue(exp.closed(with_counts=True))
+
+  def test_at_most(self):
+    exp = Expectation(object)
+    exp.args(1).at_most(10)
+    for x in xrange(10):
+      exp.test(1)
+    self.assertTrue(exp.closed(with_counts=True))
+  
+  def test_once(self):
+    exp = Expectation(object)
+    exp.args(1).once()
+    exp.test(1)
+    self.assertTrue(exp.closed())
+
   def test_closed(self):
     exp = Expectation(object)
     exp.args(1)
     exp.test(1)
     self.assertTrue(exp.closed())
+
+  def test_closed_with_count(self):
+    exp = Expectation(object)
+    exp.args(1).at_least(1)
+    exp.test(1)
+    self.assertTrue(exp.closed(with_counts=True))
 
   def test_close(self):
     exp = Expectation(object)

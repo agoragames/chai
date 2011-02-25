@@ -42,7 +42,6 @@ class Chai(unittest.TestCase):
   # Because cAmElCaSe sucks
   teardown = tearDown
 
-
   def stub(obj, attr=None):
     '''
     Stub an object. If attr is not None, will attempt to stub that attribute
@@ -50,7 +49,8 @@ class Chai(unittest.TestCase):
     can't determine the binding from the object.
     '''
     s = stub(obj, attr)
-    self.stubs.append( s )
+    if s not in self.stubs:
+      self.stubs.append( s )
     return s
 
   def expect(obj, attr=None):

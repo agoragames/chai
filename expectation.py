@@ -30,6 +30,26 @@ class ArgumentsExpecationRule(ExpecationRule):
     return "ArgumentsExpecationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
       (self.passed, self.args, self.validate_args, self.kwargs, self.validate_kwargs)
 
+class AtLeastExpecationRule(ExpecationRule):
+  def __init__(self, *args, **kwargs):
+    pass
+  
+  def validate(self, *args, **kwargs):
+    pass
+
+  def __str__(self):
+    pass
+
+class AtMostExpecationRule(ExpecationRule):
+  def __init__(self, *args, **kwargs):
+    pass
+  
+  def validate(self, *args, **kwargs):
+    pass
+
+  def __str__(self):
+    pass
+
 class Expectation(object):
   '''
   Encapsulate an expectation.
@@ -64,7 +84,6 @@ class Expectation(object):
     '''
     # raise error if is set
     return self._met
-  
 
   def call(self, *args, **kwargs):
     if not self._met:
@@ -72,5 +91,3 @@ class Expectation(object):
         if rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
           self._met = True
     return self
-    
-

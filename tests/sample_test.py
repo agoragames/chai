@@ -156,12 +156,12 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     obj.add_to_list('value')
   
-  def test_regex_comaptor(self):
+  def test_regex_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.matches("name$")).returns(100)
     self.assert_equals(obj.bound_method('first_name'), 100)
 
-  def test_regex_comaptor(self):
+  def test_regex_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.matches("name$")).returns(100)
     self.assert_equals(obj.bound_method('first_name'), 100)
@@ -171,29 +171,29 @@ class SampleBaseTest(Chai):
     self.expect(obj.bound_method).args(self.ignore_arg()).returns(100)
     self.assert_equals(obj.bound_method('first_name'), 100)
 
-  def test_function_comaptor(self):
+  def test_function_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.use_func(lambda arg: arg > 10)).returns(100)
     self.assert_equals(obj.bound_method(100), 100)
 
-  def test_in_comaptor(self):
+  def test_in_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.in_arg('name')).returns(100).at_most(3)
     self.assert_equals(obj.bound_method(['name', 'age']), 100)
     self.assert_equals(obj.bound_method({'name' : 'vitaly'}), 100)
     self.assert_equals(obj.bound_method('lasfs-name-asfsad'), 100)
 
-  def test_contains_comaptor(self):
+  def test_contains_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.contains('name')).returns(100)
     self.assert_equals(obj.bound_method('lasfs-name-asfsad'), 100)
 
-  def test_almost_equals_comaptor(self):
+  def test_almost_equals_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.almost_equals(10.1234, 2)).returns(100)
     self.assert_equals(obj.bound_method(10.12), 100)
 
-  def test_is_comaptor(self):
+  def test_is_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.is_arg(obj)).returns(100)
     self.assert_equals(obj.bound_method(obj), 100)

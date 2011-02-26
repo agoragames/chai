@@ -11,18 +11,14 @@ except ImportError:
     from setuptools.command.test import test
     from setuptools.command.install import install
 
-requirements = map(str.strip, open('requirements.txt').readlines())
-
 setup(
     name='chai',
     version='0.0.1',
     author="Vitaly Babiy, Aaron Westendorf",
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
-    packages = find_packages() ,
-    py_modules = ['chai'],
-    install_requires = requirements,
+    packages = find_packages(),
     license="MIT License",
-    long_description=open('README.txt').read(),
+    long_description=open('README.rst').read(),
     keywords=['python', 'test', 'mock'],
     classifiers=[
         'Development Status :: 4 - Beta',

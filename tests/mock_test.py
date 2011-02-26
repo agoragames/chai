@@ -4,7 +4,7 @@ Tests for the mock object
 
 import unittest
 import types
-from mock import Mock
+from chai.mock import Mock
 
 class MockTest(unittest.TestCase):
 

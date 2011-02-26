@@ -2,7 +2,7 @@
 import unittest
 import types
 
-from stub import *
+from chai.stub import *
 
 class StubTest(unittest.TestCase):
   ###

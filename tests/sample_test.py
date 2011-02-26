@@ -3,8 +3,8 @@ Tests for the sample module
 '''
 
 from chai import Chai
-from stub import stub
-from exception import *
+from chai.stub import stub
+from chai.exception import *
 import samples
 from samples import SampleBase, SampleChild
 

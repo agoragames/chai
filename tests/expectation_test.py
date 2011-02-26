@@ -2,8 +2,8 @@
 import unittest
 import types
 
-from expectation import *
-from comparators import *
+from chai.expectation import *
+from chai.comparators import *
 
 class ArgumentsExpectationRuleTest(unittest.TestCase):
   

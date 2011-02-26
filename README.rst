@@ -23,8 +23,8 @@ Example
 =======
 
 The following is an example of a simple test case which is mocking out a get method
-on the `CustomObject`. Chai api allows use chain calls together to make the code short
-and clean, and very readable. ::
+on the `CustomObject`. Chai api allows use chain calls together to make the code 
+short, clean, and very readable. ::
 
 
     from chai import Chai

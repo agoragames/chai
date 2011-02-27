@@ -49,6 +49,26 @@ class SampleBaseTest(Chai):
     obj.bound_method(1, 2)
     self.assert_raises(UnexpectedCall, obj.bound_method, 1, 2)
 
+  def tests_expects_bound_method_any_order_with_fixed_maxes(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args(1).returns(2).any_order()
+    self.expect(obj.bound_method).args(3).returns(4).any_order()
+    self.assert_equals(4, obj.bound_method(3) )
+    self.assert_equals(2, obj.bound_method(1) )
+    self.assert_raises(UnexpectedCall, obj.bound_method, 1)
+
+  def tests_expects_bound_method_any_order_with_mins(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args(1).returns(2).any_order().at_least_once()
+    self.expect(obj.bound_method).args(3).returns(4).any_order().at_least_once()
+    self.assert_equals(4, obj.bound_method(3) )
+    self.assert_equals(2, obj.bound_method(1) )
+    self.assert_equals(4, obj.bound_method(3) )
+    self.assert_equals(2, obj.bound_method(1) )
+    self.assert_equals(2, obj.bound_method(1) )
+    self.assert_equals(4, obj.bound_method(3) )
+    self.assert_equals(2, obj.bound_method(1) )
+
   def test_expects_bound_method_raises(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(1, 2).raises(CustomException)
@@ -95,8 +115,9 @@ class SampleBaseTest(Chai):
 
   def test_expect_bound_method_with_allof_comparator(self):
     obj = SampleBase()
-    self.expect(obj.bound_method).args( self.all_of(bytearray,'hello') )
+    self.expect(obj.bound_method).args( self.all_of(bytearray,'hello') ).times(2)
     obj.bound_method( bytearray('hello') )
+    self.assert_raises(UnexpectedCall, obj.bound_method, 'hello' )
   
   def test_expect_bound_method_with_notof_comparator(self):
     obj = SampleBase()

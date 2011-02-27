@@ -109,6 +109,28 @@ class ExpectationRule(unittest.TestCase):
     exp.test(1)
     self.assertTrue(exp.closed())
 
+  def test_any_order(self):
+    exp = Expectation(None)
+    self.assertEquals( exp, exp.any_order() )
+    self.assertFalse( exp.closed() )
+    exp.close()
+    self.assertFalse( exp.closed() )
+    self.assertFalse( exp.closed(with_counts=True) )
+    exp.test()
+    self.assertTrue( exp.closed() )
+    self.assertTrue( exp.closed(with_counts=True) )
+
+  def test_any_order_with_no_max(self):
+    exp = Expectation(None)
+    self.assertEquals( exp, exp.any_order().at_least_once() )
+    self.assertFalse( exp.closed() )
+    exp.close()
+    self.assertFalse( exp.closed() )
+    self.assertFalse( exp.closed(with_counts=True) )
+    exp.test()
+    self.assertFalse( exp.closed() )
+    self.assertTrue( exp.closed(with_counts=True) )
+
   def test_closed(self):
     exp = Expectation(object)
     exp.args(1)

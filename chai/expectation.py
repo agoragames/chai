@@ -89,6 +89,7 @@ class Expectation(object):
     self._returns = None
     self._max_count = self._min_count = 1
     self._run_count = 0 
+    self._any_order = False
     
   def args(self, *args, **kwargs):
     """
@@ -138,6 +139,10 @@ class Expectation(object):
     self._min_count = 1
     self._max_count = 1
     return self
+
+  def any_order(self):
+    self._any_order = True
+    return self
   
   def return_value(self):
     """
@@ -153,7 +158,15 @@ class Expectation(object):
       return self._returns
 
   def close(self, *args, **kwargs):
-    self._met = True
+    '''
+    Mark this expectation as closed. It will no longer be used for matches.
+    '''
+    # If any_order, then this effectively is never closed. The Stub.__call__ 
+    # will just bypass it when it doesn't match. If there is a strict count
+    # it will also be bypassed, but if there's just a min set up, then it'll
+    # effectively stay open and catch any matching call no matter the order
+    if not self._any_order:
+      self._met = True
     
   def closed(self, with_counts=False):
     rval = self._met

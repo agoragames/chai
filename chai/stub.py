@@ -35,7 +35,7 @@ def _stub_attr(obj, attr_name):
     return StubProperty(obj, attr_name)
 
   if isinstance(attr, type):
-    return StubClass(attr)
+    return StubClass(obj, attr_name)
 
   if isinstance(attr, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
@@ -48,7 +48,7 @@ def _stub_attr(obj, attr_name):
   if type(attr).__name__ == 'method-wrapper':
     return StubMethodWrapper(attr)
 
-  raise UnsupportedStub("can't stub %s of %s", attr_name, obj)
+  raise UnsupportedStub("can't stub %s(%s) of %s", attr_name, type(attr), obj)
 
 
 def _stub_obj(obj):
@@ -122,7 +122,6 @@ class Stub(object):
     return exp
 
   def __call__(self, *args, **kwargs):
-    
     for exp in self._expectations:
       # If expectation closed skip
       if exp.closed():
@@ -227,3 +226,31 @@ class StubWrapperDescriptor(Stub):
     Replace the original method.
     '''
     setattr( self._instance, self._attr, self._obj )
+
+class StubClass(Stub):
+  '''
+  Stub a wrapper-descriptor. May never work because this might only be used
+  for builtins that can't be overloaded.
+  '''
+
+  def __init__(self, module_or_class, name=None):
+    '''
+    Initialize with an object that is a method wrapper.
+    '''
+    super(StubClass,self).__init__(module_or_class, name)
+    if inspect.isclass(module_or_class):
+      # Working with class
+      self._class = module_or_class
+      self._attr = self._class.__name__
+      self._obj = inspect.getmodule(module_or_class)
+    else:
+      # Working with module
+      self._class = getattr(module_or_class, name)
+
+    setattr( self._obj, self._attr, self )
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._obj, self._attr, self._class )

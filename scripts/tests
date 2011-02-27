@@ -7,7 +7,11 @@ import sys
 project_root = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
 loader = unittest.TestLoader()
+# Test
 suite = loader.discover('tests', pattern='*_test.py', top_level_dir=project_root)
+unittest.TextTestRunner(verbosity=1).run(suite)
 
+# Examples
+suite = loader.discover('tests/examples', pattern='*.py', top_level_dir=project_root)
 unittest.TextTestRunner(verbosity=1).run(suite)
 

@@ -1,5 +1,5 @@
 =================================
- Chai - Python Mocking made easy
+ Chai - Python Mocking Made Easy
 =================================
 
 :Version: 0.0.1
@@ -15,15 +15,48 @@
 Overview
 ========
 
+Chai provides a very easy to use api for mocking/stubbing your python objects. 
+
 .. _chai-example:
 
 Example
 =======
 
+The following is an example of a simple test case which is mocking out a get method
+on the `CustomObject`. Chai api allows use chain calls together to make the code 
+short, clean, and very readable. ::
+
+
+    from chai import Chai
+
+    class CustomObject (object): 
+        def get(self, arg):
+            pass
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            self.expect(obj.get).args('name').returns('My Name')
+            self.assert_equals(obj.get('name'), 'My Name')
+
+        def test_mock_get_with_at_most(self):
+            obj = CustomObject()
+            self.expect(obj.get).args('name').returns('My Name').at_most(2)
+            self.assert_equals(obj.get('name'), 'My Name')
+            self.assert_equals(obj.get('name'), 'My Name')
+            self.assert_equals(obj.get('name'), 'My Name') # this one will fail
+
+    if __name__ == '__main__':
+        import unittest2
+        unittest2.main()
+
+
 .. _chai-features:
 
 Features
 ========
+
+
 
 .. _chai-installation:
 
@@ -42,7 +75,7 @@ To install using `pip`,::
 Downloading and installing from source
 --------------------------------------
 
-Download the latest version of Celery from http://pypi.python.org/pypi/chai
+Download the latest version of Chai from http://pypi.python.org/pypi/chai
 
 You can install it by doing the following,::
 

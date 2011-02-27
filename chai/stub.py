@@ -229,8 +229,7 @@ class StubWrapperDescriptor(Stub):
 
 class StubClass(Stub):
   '''
-  Stub a wrapper-descriptor. May never work because this might only be used
-  for builtins that can't be overloaded.
+  Stub a class.
   '''
 
   def __init__(self, module_or_class, name=None):

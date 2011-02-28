@@ -34,13 +34,15 @@ class Chai(unittest.TestCase):
   equals = Equals
   almost_equals = AlmostEqual
   instance_of = InstanceOf
+  is_a = InstanceOf
   is_arg = Is
   any_of = Any
   all_of = All
   not_of = Not
   matches = Regex
-  use_func = Function 
+  func = Function 
   ignore_arg = Ignore
+  ignore = Ignore
   in_arg = In
   contains = StringContains
   

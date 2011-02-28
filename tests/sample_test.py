@@ -194,7 +194,7 @@ class SampleBaseTest(Chai):
 
   def test_function_comparator(self):
     obj = SampleBase()
-    self.expect(obj.bound_method).args(self.use_func(lambda arg: arg > 10)).returns(100)
+    self.expect(obj.bound_method).args(self.func(lambda arg: arg > 10)).returns(100)
     self.assert_equals(obj.bound_method(100), 100)
 
   def test_in_comparator(self):

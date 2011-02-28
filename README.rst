@@ -15,7 +15,7 @@
 Overview
 ========
 
-Chai provides a very easy to use api for mocking/stubbing your python objects, patterned after the `Mocha <http://mocha.rubyforge.org/>` library for Ruby.
+Chai provides a very easy to use api for mocking/stubbing your python objects, patterned after the `Mocha <http://mocha.rubyforge.org/>`_ library for Ruby.
 
 .. _chai-example:
 
@@ -23,7 +23,7 @@ Example
 =======
 
 The following is an example of a simple test case which is mocking out a get method
-on the `CustomObject`. The Chai api allows use of call chains to make the code 
+on the ``CustomObject``. The Chai api allows use of call chains to make the code 
 short, clean, and very readable. It also does away with the standard setup-and-replay
 work flow, giving you more flexibility in how you write your cases. ::
 
@@ -59,15 +59,211 @@ work flow, giving you more flexibility in how you write your cases. ::
 API
 ===
 
+All of the features are available by extending the ``Chai`` class, itself a subclass of ``unittest.TestCase``. If ``unittest2`` is available Chai will use that, else it will fall back to ``unittest``. Chai also aliases all of the ``assert*`` methods to lower-case with undersores. For example, ``assertNotEquals`` can also be referenced as ``assert_not_equals``.
 
 
+Stubbing
+--------
 
-.. _chai-features:
+The simplest mock is to stub a method. This replaces the original method with a subclass of ``chai.Stub``, the main instrumentation class. All additional ``stub`` and ``expect`` calls will re-use this stub, and the stub is responsible for re-installing the original reference when ``Chai.tearDown`` is run.
 
-Features
-========
+Stubbing is used of situations when you want to assert that a method is never called. ::
+
+    from chai import Chai, UnexpectedCall
+
+    class CustomObject (object): 
+        def get(self, arg):
+            pass
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            self.stub(obj.get)
+            self.assert_raises( UnexpectedCall, obj.get )
+
+In this example, we can reference ``obj.get`` directly because ``get`` is a bound method and provides all of the context we need to refer back to ``obj`` and stub the method accordingly. There are cases where this is insufficient, such as module imports and special Python types such as ``object().__init__``. If the object can't be stubbed with a reference, ``UnsupportedStub`` will be raised and you can use the verbose reference instead. ::
+    
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            self.stub(obj, 'get')
+            self.assert_raises( UnexpectedCall, obj.get )
+
+Stubbing an unbound method will apply that stub to all future instances of that class. ::
+    
+    class TestCase(Chai):
+        def test_mock_get(self):
+            self.stub(CustomObject.get)
+            obj = CustomObject()
+            self.assert_raises( UnexpectedCall, obj.get )
+
+Finally, some methods cannot be stubbed because it is impossible to call ``setattr`` on the object. A good example of this is the ``datetime.datetime`` class.
 
 
+Expectation
+-----------
+
+Expectations are individual test cases that can be applied to a stub. They are expected to be run in order (unless otherwise noted). They are greedy, in that so long as an expectation has not been met and the arguments match, the arguments will be processed by that expectation. This mostly applies to the "at_least" and "any_order" expectations, which (may) stay open throughout the test and will handle any matching call.
+
+Expectations will automatically create a stub if it's not already applied, so no separate call to ``stub`` is necessary. The arguments and edge cases regarding what can and cannot have expectations applied are identical to stubs. The ``expect`` call will return a new ``chai.Expectation`` object which can then be used to modify the expectation. Without any modifiers, an expectation will expect a single call without arguments and return None. ::
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            self.expect(obj.get)
+            self.assert_equals( None, obj.get() )
+            self.assert_raises( UnexpectedCall, obj.get )
+
+Modifiers can be applied to the expectation. Each modifier will return a reference to the expectation for easy chaining. In this example, we're going to match a parameter and change the behavior depending on the argument. This also shows the ability to incrementally add expectations throughout the test. ::
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            self.expect(obj.get).args('foo').returns('hello').times(2)
+            self.assert_equals( 'hello', obj.get('foo') )
+            self.assert_equals( 'hello', obj.get('foo') )
+            self.expect(obj.get).args('bar').raises( ValueError )
+            self.assert_raises( ValueError, obj.get, 'bar' )
+
+Lastly, the arguments modifier supports several matching functions. For simplicity in covering the common cases, the arg expectation assumes an equals test for instances and an instanceof test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            self.expect(obj.get).args(self.is_a(float)).returns(42)
+            self.assert_raises( UnexpectedCall, obj.get, 3 )
+            self.assert_equals( 42, obj.get(3.14) )
+            
+            self.expect(obj.get).args(str).returns('yes')
+            self.assert_equals( 'yes', obj.get('no') )
+
+            self.expect(obj.get).args(self.is_arg(list)).return('yes')
+            self.assert_raises( UnexpectedCall, obj.get, [] )
+            self.assert_equals( 'yes', obj.get(list) )
+
+Modifiers
++++++++++
+
+Expectations expose the following public methods for changing their behavior.
+
+
+args(\*args, \*\*kwargs)
+  Add a test to the expectation for matching arguments.
+
+returns(object)
+  Add a return value to the expectation when it is matched and executed.
+
+raises(exception)
+  When the expectation is run it will raise this exception. Accepts type or instance.
+
+times(int)
+  An integer that defines a hard limit on the minimum and maximum number of times the expectation should be executed.
+
+at_least(int)
+  Sets a minimum number of times the expectation should run and removes any maximum.
+
+at_least_once
+  Equivalent to ``at_least(1)``.
+
+at_most(int)
+  Sets a maximum number of times the expectation should run. Does not affect the minimum.
+
+at_most_once
+  Equivalent to ``at_most(1)``.
+
+once
+  Equivalent to ``times(1)``, also the default for any expectation.
+
+any_order
+  The expectation can be called at any time, independent of when it was defined. Can be combined with ``at_least_once`` to force it to respond to all matching calls throughout the test.
+  
+
+Argument Matchers
++++++++++++++++++
+
+Expectation modifiers are defined as classes in ``chai.comparators``, but loaded into the ``Chai`` class for convenience. From a ``Chai`` subclass, they are all accessible through ``self``.
+
+equals(object)
+  The default comparator, uses standard Python equals operator
+
+almost_equals(float, places)
+  Identical to assertAlmostEquals, will match an argument to the comparator value to a most ``places`` digits beyond the decimal point.
+
+instance_of(type)
+  Match an argument of a given type. Supports same arguments as builtin function ``isinstance``.
+
+is_a(type)
+  Alias of ``instance_of``.
+
+is_arg(object)
+  Matches an argument using the Python ``is`` comparator.
+
+any_of(comparator_list)
+  Matches an argument if any of the comparators in the argument list are met. Uses automatic comparator generation for instances and types in the list.
+
+all_of(comparator_list)
+  Matches an argument if all of the comparators in the argument list are met. Uses automatic comparator generation for instances and types in the list.
+
+not_of(comparator)
+  Matches an argument if the supplied comparator does not match.
+
+matches(pattern)
+  Matches an argument using a regular expression. Standard ``re`` rules apply.
+
+func(callable)
+  Matches an argument if the callable returns True. The callable must take one argument, the parameter being checked.
+
+ignore
+  Matches any argument.
+
+in_arg(in_list)
+  Matches if the argument is in the ``in_list``.
+
+contains(object)
+  Matches if the argument contains the object using the Python ``in`` function.
+
+
+Mock
+----
+
+Sometimes you need a mock object which can be used to stub and expect anything. Chai exposes this through the ``mock`` method which can be called in one of two ways.
+
+Without any arguments, ``Chai.mock()`` will return a ``chai.Mock`` object that can be used for any purpose. If called with arguments, it behaves like ``stub`` and ``expect``, creating a Mock object and setting it as the attribute on another object.
+
+Any request for an attribute from a Mock will return a callable function, but ``setattr`` behaves as expected so it can store state as well. ::
+
+    class CustomObject(object):
+        def __init__(self, handle):
+            self._handle = handle
+        def do(self, arg):
+            return self._handle.do(arg)
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject( self.mock() )
+            self.expect( obj._handle ).do('it').returns('ok')
+            self.assert_equals('ok', obj.do('it'))
+
+When mocking a class that you intend to create instances of, note that you have to expect the ``__call__`` method and not ``__init__``. ::
+
+    # module custom.py
+    from collections import deque
+
+    class CustomObject(object):
+        def __init__(self):
+            self._stack = deque()
+
+    # module custom_test.py
+    import custom
+    from custom import CustomObject
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            self.mock( custom, 'deque' )
+            self.expect( custom.deque.__call__ ).returns( 'stack' )
+
+            obj = CustomObject()
+            self.assert_equals('stack', obj._stack)
 
 .. _chai-installation:
 
@@ -77,7 +273,7 @@ Installation
 You can install Chai either via the Python Package Index (PyPI)
 or from source.
 
-To install using `pip`,::
+To install using ``pip``,::
 
     $ pip install chai
 

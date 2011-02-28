@@ -44,7 +44,7 @@ class Chai(unittest.TestCase):
   ignore_arg = Ignore
   ignore = Ignore
   in_arg = In
-  contains = StringContains
+  contains = Contains
   
 
   def setUp(self):

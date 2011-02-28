@@ -22,7 +22,7 @@ setup(
     keywords=['python', 'test', 'mock'],
     classifiers=[
         'Development Status :: 4 - Beta',
-        'License :: OSI Approved :: MIT License',
+        'License :: OSI Approved :: BSD License',
         "Intended Audience :: Developers",
         "Operating System :: POSIX",
         "Topic :: Communications",

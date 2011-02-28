@@ -15,7 +15,7 @@
 Overview
 ========
 
-Chai provides a very easy to use api for mocking/stubbing your python objects. 
+Chai provides a very easy to use api for mocking/stubbing your python objects, patterned after the `Mocha <http://mocha.rubyforge.org/>` library for Ruby.
 
 .. _chai-example:
 
@@ -23,8 +23,9 @@ Example
 =======
 
 The following is an example of a simple test case which is mocking out a get method
-on the `CustomObject`. Chai api allows use chain calls together to make the code 
-short, clean, and very readable. ::
+on the `CustomObject`. The Chai api allows use of call chains to make the code 
+short, clean, and very readable. It also does away with the standard setup-and-replay
+work flow, giving you more flexibility in how you write your cases. ::
 
 
     from chai import Chai
@@ -38,6 +39,8 @@ short, clean, and very readable. ::
             obj = CustomObject()
             self.expect(obj.get).args('name').returns('My Name')
             self.assert_equals(obj.get('name'), 'My Name')
+            self.expect(obj.get).args('name').returns('Your Name')
+            self.assert_equals(obj.get('name'), 'Your Name')
 
         def test_mock_get_with_at_most(self):
             obj = CustomObject()
@@ -49,6 +52,14 @@ short, clean, and very readable. ::
     if __name__ == '__main__':
         import unittest2
         unittest2.main()
+
+
+.. _chai-api:
+
+API
+===
+
+
 
 
 .. _chai-features:

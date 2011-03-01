@@ -3,6 +3,8 @@ import unittest
 from collections import deque
 
 from chai import Chai
+from chai.mock import Mock
+from chai.stub import Stub
 from chai.exception import *
 
 class CupOf(Chai):
@@ -62,3 +64,72 @@ class ChaiTest(unittest.TestCase):
     self.assertEquals( 2, stub.calls )
     self.assertEquals( 'fee', obj.mock1 )
     self.assertFalse( hasattr(obj, 'mock2') )
+
+  def test_stub(self):
+    class Milk(object):
+      def pour(self): pass
+
+    case = CupOf()
+    milk = Milk()
+    case.setup()
+    self.assertEquals( deque(), case._stubs )
+    case.stub( milk.pour )
+    self.assertTrue( isinstance(milk.pour, Stub) )
+    self.assertEquals( deque([milk.pour]), case._stubs )
+
+    # Test it's only added once
+    case.stub( milk, 'pour' )
+    self.assertEquals( deque([milk.pour]), case._stubs )
+
+  def test_expect(self):
+    class Milk(object):
+      def pour(self): pass
+
+    case = CupOf()
+    milk = Milk()
+    case.setup()
+    self.assertEquals( deque(), case._stubs )
+    case.expect( milk.pour )
+    self.assertEquals( deque([milk.pour]), case._stubs )
+
+    # Test it's only added once
+    case.expect( milk, 'pour' )
+    self.assertEquals( deque([milk.pour]), case._stubs )
+
+    self.assertEquals( 2, len(milk.pour._expectations) )
+
+  def test_mock_no_binding(self):
+    case = CupOf()
+    case.setup()
+
+    self.assertEquals( deque(), case._mocks )
+    mock1 = case.mock()
+    self.assertTrue( isinstance(mock1, Mock) )
+    self.assertEquals( deque(), case._mocks )
+    mock2 = case.mock()
+    self.assertTrue( isinstance(mock2, Mock) )
+    self.assertEquals( deque(), case._mocks )
+    self.assertNotEqual( mock1, mock2 )
+
+  def test_mock_with_attr_binding(self):
+    class Milk(object):
+      def __init__(self): self._case = []
+      def pour(self): return self._case.pop(0)
+
+    case = CupOf()
+    case.setup()
+    milk = Milk()
+    orig_pour = milk.pour
+
+    self.assertEquals( deque(), case._mocks )
+    mock1 = case.mock( milk, 'pour' )
+    self.assertTrue( isinstance(mock1, Mock) )
+    self.assertEquals( deque([(milk,'pour',orig_pour)]), case._mocks )
+    mock2 = case.mock( milk, 'pour' )
+    self.assertTrue( isinstance(mock2, Mock) )
+    self.assertEquals( deque([(milk,'pour',orig_pour),(milk,'pour',mock1)]), case._mocks )
+    self.assertNotEqual( mock1, mock2 )
+
+    mock3 = case.mock( milk, 'foo' )
+    self.assertTrue( isinstance(mock3, Mock) )
+    self.assertEquals( deque([(milk,'pour',orig_pour),(milk,'pour',mock1),(milk,'foo')]), case._mocks )

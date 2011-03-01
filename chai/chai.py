@@ -116,6 +116,9 @@ class Chai(unittest.TestCase):
     '''
     rval = Mock()
     if obj!=None and attr!=None:
+      rval._object = obj
+      rval._attr = attr
+      
       if hasattr(obj,attr):
         orig = getattr(obj, attr)
         self._mocks.append( (obj,attr,orig) )

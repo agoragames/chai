@@ -4,6 +4,7 @@ An open mocking object.
 from types import MethodType
 from stub import stub, Stub
 
+
 class Mock(object):
   '''
   A class where all calls are stubbed.

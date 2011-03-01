@@ -34,9 +34,6 @@ def _stub_attr(obj, attr_name):
   if isinstance(attr, property):
     return StubProperty(obj, attr_name)
 
-  if isinstance(attr, type):
-    return StubClass(obj, attr_name)
-
   if isinstance(attr, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
     if attr.im_self==None:
@@ -68,9 +65,6 @@ def _stub_obj(obj):
   if isinstance(obj, property):
     raise UnsupportedStub("must call stub(obj,attr) for properties")
 
-  if isinstance(obj, type):
-    return StubClass(obj)
-
   # I thought that types.UnboundMethodType differentiated these cases but
   # apparently not.
   if isinstance(obj, types.MethodType):
@@ -87,7 +81,7 @@ def _stub_obj(obj):
   if type(obj).__name__ == 'wrapper_descriptor':
     raise UnsupportedStub("must call stub(obj,'%s') for slot wrapper on %s", 
       obj.__name__, obj.__objclass__.__name__ )
-
+  
   raise UnsupportedStub("can't stub %s", obj)
 
 class Stub(object):
@@ -233,29 +227,3 @@ class StubWrapperDescriptor(Stub):
     '''
     setattr( self._obj, self._attr, self._orig )
 
-class StubClass(Stub):
-  '''
-  Stub a class.
-  '''
-
-  def __init__(self, module_or_class, name=None):
-    '''
-    Initialize with an object that is a method wrapper.
-    '''
-    super(StubClass,self).__init__(module_or_class, name)
-    if inspect.isclass(module_or_class):
-      # Working with class
-      self._class = module_or_class
-      self._attr = self._class.__name__
-      self._obj = inspect.getmodule(module_or_class)
-    else:
-      # Working with module
-      self._class = getattr(module_or_class, name)
-
-    setattr( self._obj, self._attr, self )
-
-  def teardown(self):
-    '''
-    Replace the original method.
-    '''
-    setattr( self._obj, self._attr, self._class )

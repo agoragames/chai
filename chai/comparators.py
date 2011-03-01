@@ -93,7 +93,7 @@ class Any(Comparator):
     for comp in self._comparators:
       if comp.test(value): return True
     return False
-
+  
 class In(Comparator):
   '''
   Test if a key is in a list or dict

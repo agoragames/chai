@@ -4,6 +4,7 @@ Expectations that can set on a stub.
 
 import inspect
 from comparators import *
+from exception import *
 
 class ExpectationRule(object):
   def __init__(self, *args, **kwargs):
@@ -18,23 +19,15 @@ class ArgumentsExpectationRule(ExpectationRule):
     self.set_args( *args, **kwargs )
   
   def set_args(self, *args, **kwargs):
-    #self.args = args
-    #self.kwargs = kwargs
     self.args = []
     self.kwargs = {}
     
-    # Convert all of the key word arguments to comparators
+    # Convert all of the arguments to comparators
     for arg in args:
-      if not isinstance(arg,Comparator):
-        self.args.append( Equals(arg) )
-      else:
-        self.args.append( arg )
+      self.args.append(Any(arg))
 
     for k,v in kwargs.iteritems():
-      if not isinstance(v,Comparator):
-        self.kwargs[k] = Equals(v)
-      else:
-        self.kwargs[k] = v
+        self.kwargs[k] = Any(v)
   
   def validate(self, *args, **kwargs):
     self.in_args = args[:]
@@ -166,13 +159,20 @@ class Expectation(object):
     # it will also be bypassed, but if there's just a min set up, then it'll
     # effectively stay open and catch any matching call no matter the order
     if not self._any_order:
-      self._met = True
+      if self.counts_met():
+        self._met = True
+      else:
+        raise ExpectationNotSatisfied(self)
+      
     
   def closed(self, with_counts=False):
     rval = self._met
     if with_counts:
-      rval = rval or self._run_count >= self._min_count and not (self._max_count and not self._max_count == self._run_count)
+      rval = rval or self.counts_met()
     return rval
+  
+  def counts_met(self):
+    return self._run_count >= self._min_count and not (self._max_count and not self._max_count == self._run_count)
   
   def match(self, *args, **kwargs):
     """

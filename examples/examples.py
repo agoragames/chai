@@ -10,18 +10,26 @@ def connect():
   sock.bind(('127.0.0.1', 10000))
   return sock.recv(1024)
 
+def get_host():
+  return socket.gethostname()
+
 class SocketTestCase(Chai):
     
   def test_socket(self):
     mock_socket = self.mock()
-    self.expect(socket, 'socket').returns(mock_socket)
-    # Note: Unfortunately we can't use self.expect(socket.socket) till python 3
-    # This is due to the way that the socket module is implemented in python 2
+    self.mock(socket, 'socket')
+    self.expect(socket.socket.__call__).returns(mock_socket)
     
     self.expect(mock_socket.bind).args(('127.0.0.1' , 10000))
     self.expect(mock_socket.recv).args(1024).returns("HELLO WORLD")
     
     self.assert_equals(connect(), "HELLO WORLD")
+
+  def test_get_host(self):
+    self.mock(socket, 'gethostname')
+    self.expect(socket.gethostname.__call__).returns("my_host")
+    self.assert_equals(get_host(), "my_host")
+
 
 ######################################
 ## Mocking datetime.now

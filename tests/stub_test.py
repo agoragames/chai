@@ -238,36 +238,3 @@ class StubUnboundMethodTest(unittest.TestCase):
     f2.bar()
 
     self.assertEquals( 2, s.calls )
-
-
-class StubClassTest(unittest.TestCase):
-  # NOTE: Make sure you always teardown your stub when adding tests to this case.
-  
-  def test_init_with_module_and_name(self):
-    org = samples.SampleBase
-    s = StubClass(samples, 'SampleBase')
-    self.assertEquals(s._class, org)
-    self.assertEquals(s._obj, samples)
-    self.assertEquals(s._attr, "SampleBase")
-    s.teardown()
-
-  def test_init_with_class(self):
-    org = samples.SampleBase
-    s = StubClass(samples.SampleBase)
-    self.assertEquals(s, samples.SampleBase)
-    self.assertEquals(s._class, org)
-    self.assertEquals(s._obj, samples)
-    self.assertEquals(s._attr, "SampleBase")
-    s.teardown()
-
-  def test_teardown_with_module(self):
-    org = samples.SampleBase
-    s = StubClass(samples, 'SampleBase')
-    s.teardown()
-    self.assertEquals(samples.SampleBase, org)
-
-  def test_teardown_with_class(self):
-    org = samples.SampleBase
-    s = StubClass(samples.SampleBase)
-    s.teardown()
-    self.assertEquals(samples.SampleBase, org)

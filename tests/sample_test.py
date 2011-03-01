@@ -27,21 +27,11 @@ class SampleBaseTest(Chai):
     self.expect(obj.bound_method).args(1, 2).returns(12).at_least(3)
     self.assert_equals(12, obj.bound_method(1, 2))
     self.assert_equals(12, obj.bound_method(1, 2))
-    self.assert_equals(12, obj.bound_method(1, 2))
-    self.assert_equals(12, obj.bound_method(1, 2))
+
+    self.expect(obj.bound_method).args(1, 3).returns(100)
+    self.assert_equals(100, obj.bound_method(1, 3))
     
-    self.expect(obj.bound_method).args(1, 3).returns(100)
-    self.assert_equals(100, obj.bound_method(1, 3))
-
-  def test_expects_bound_method_at_least_with_other_expectation_raise_ExpectationNotSatisfied(self):
-    obj = SampleBase()
-    self.expect(obj.bound_method).args(1, 2).returns(12).at_least(3)
     self.assert_equals(12, obj.bound_method(1, 2))
-    self.assert_equals(12, obj.bound_method(1, 2))
-    self.assert_equals(12, obj.bound_method(1, 2))
-
-    self.expect(obj.bound_method).args(1, 3).returns(100)
-    self.assert_equals(100, obj.bound_method(1, 3))
 
   def test_expects_bound_method_at_least_as_last_expectation(self):
     obj = SampleBase()

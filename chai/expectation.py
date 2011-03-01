@@ -4,6 +4,7 @@ Expectations that can set on a stub.
 
 import inspect
 from comparators import *
+from exception import *
 
 class ExpectationRule(object):
   def __init__(self, *args, **kwargs):
@@ -18,23 +19,15 @@ class ArgumentsExpectationRule(ExpectationRule):
     self.set_args( *args, **kwargs )
   
   def set_args(self, *args, **kwargs):
-    #self.args = args
-    #self.kwargs = kwargs
     self.args = []
     self.kwargs = {}
     
-    # Convert all of the key word arguments to comparators
+    # Convert all of the arguments to comparators
     for arg in args:
-      if not isinstance(arg,Comparator):
-        self.args.append( Equals(arg) )
-      else:
-        self.args.append( arg )
+      self.args.append(Any(arg))
 
     for k,v in kwargs.iteritems():
-      if not isinstance(v,Comparator):
-        self.kwargs[k] = Equals(v)
-      else:
-        self.kwargs[k] = v
+        self.kwargs[k] = Any(v)
   
   def validate(self, *args, **kwargs):
     self.in_args = args[:]

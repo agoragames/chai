@@ -4,7 +4,7 @@ import re
 All of the comparators that can be used for arguments.
 '''
 
-def build_comparators(values_or_types):
+def build_comparators(*values_or_types):
   comparators = []
   for item in values_or_types:
     if isinstance(item,Comparator):
@@ -92,7 +92,7 @@ class Any(Comparator):
   Test to see if any comparator matches
   '''
   def __init__(self, *comparators):
-    self._comparators = build_comparators(comparators)
+    self._comparators = build_comparators(*comparators)
 
   def test(self, value):
     for comp in self._comparators:
@@ -114,7 +114,7 @@ class All(Comparator):
   Test to see if all comparators match
   '''
   def __init__(self, *comparators):
-    self._comparators = build_comparators(comparators)
+    self._comparators = build_comparators(*comparators)
 
   def test(self, value):
     for comp in self._comparators:
@@ -126,7 +126,7 @@ class Not(Comparator):
   Return the opposite of a comparator
   '''
   def __init__(self, *comparators):
-    self._comparators = build_comparators(comparators)
+    self._comparators = build_comparators(*comparators)
 
   def test(self, value):
     return all([not c.test(value) for c in self._comparators])

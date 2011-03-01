@@ -4,6 +4,30 @@ import unittest
 from chai.comparators import *
 
 class ComparatorsTest(unittest.TestCase):
+  
+  def test_build_comparators_builds_equals(self):
+    comp = build_comparators("str")[0]
+    self.assertTrue(isinstance(comp, Equals))
+    comp = build_comparators(12)[0]
+    self.assertTrue(isinstance(comp, Equals))
+    comp = build_comparators(12.1)[0]
+    self.assertTrue(isinstance(comp, Equals))
+    comp = build_comparators([])[0]
+    self.assertTrue(isinstance(comp, Equals))
+    comp = build_comparators({})[0]
+    self.assertTrue(isinstance(comp, Equals))
+    comp = build_comparators(tuple())[0]
+    self.assertTrue(isinstance(comp, Equals))
+  
+  def test_build_comparators_instace_of(self):
+    class CustomObject(object): pass
+    comp = build_comparators(CustomObject)[0]
+    self.assertTrue(isinstance(comp, InstanceOf))
+
+  def test_build_comparators_passes_comparators(self):
+    any_comp = Any()
+    comp = build_comparators(any_comp)[0]
+    self.assertEquals(comp, any_comp)
 
   def test_equals(self):
     comp = Equals(3)
@@ -56,6 +80,12 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test(1) )
     self.assertTrue( comp.test(2.3) )
     self.assertFalse( comp.test(4) )
+  
+  def test_in(self):
+    comp = In("name")
+    self.assertTrue(comp.test(["name", "age"]))
+    self.assertTrue(comp.test("nameage"))
+    self.assertTrue(comp.test({"name" : "my name"}))
 
   def test_all(self):
     comp = All(InstanceOf(bytearray), Equals('foo'))

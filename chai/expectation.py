@@ -23,8 +23,8 @@ class ArgumentsExpectationRule(ExpectationRule):
     self.kwargs = {}
     
     # Convert all of the arguments to comparators
-    self.args = build_comparators(args)
-    self.kwargs = dict([(k, build_comparators([v])[0]) for k, v in kwargs.iteritems()])
+    self.args = build_comparators(*args)
+    self.kwargs = dict([(k, build_comparators(v)[0]) for k, v in kwargs.iteritems()])
 
   def validate(self, *args, **kwargs):
     self.in_args = args[:]

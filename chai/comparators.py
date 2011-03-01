@@ -4,6 +4,18 @@ import re
 All of the comparators that can be used for arguments.
 '''
 
+def build_comparators(values_or_types):
+  comparators = []
+  for item in values_or_types:
+    if isinstance(item,Comparator):
+      comparators.append( item )
+    elif isinstance(item,type):
+      # If you are passing around a type you will have to build a Equals comparator
+      comparators.append( InstanceOf(item) )
+    else:
+      comparators.append( Equals(item) )
+  return comparators
+
 class Comparator(object):
   '''
   Base class of all comparators, used for type testing
@@ -80,14 +92,7 @@ class Any(Comparator):
   Test to see if any comparator matches
   '''
   def __init__(self, *comparators):
-    self._comparators = []
-    for comp in comparators:
-      if isinstance(comp,Comparator):
-        self._comparators.append( comp )
-      elif isinstance(comp,type):
-        self._comparators.append( InstanceOf(comp) )
-      else:
-        self._comparators.append( Equals(comp) )
+    self._comparators = build_comparators(comparators)
 
   def test(self, value):
     for comp in self._comparators:
@@ -109,14 +114,7 @@ class All(Comparator):
   Test to see if all comparators match
   '''
   def __init__(self, *comparators):
-    self._comparators = []
-    for comp in comparators:
-      if isinstance(comp,Comparator):
-        self._comparators.append( comp )
-      elif isinstance(comp,type):
-        self._comparators.append( InstanceOf(comp) )
-      else:
-        self._comparators.append( Equals(comp) )
+    self._comparators = build_comparators(comparators)
 
   def test(self, value):
     for comp in self._comparators:
@@ -127,11 +125,11 @@ class Not(Comparator):
   '''
   Return the opposite of a comparator
   '''
-  def __init__(self, comparator):
-    self._comparator = comparator
+  def __init__(self, *comparators):
+    self._comparators = build_comparators(comparators)
 
   def test(self, value):
-    return not self._comparator.test(value)
+    return all([not c.test(value) for c in self._comparators])
 
 class Function(Comparator):
   '''

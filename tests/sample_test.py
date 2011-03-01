@@ -124,6 +124,11 @@ class SampleBaseTest(Chai):
     self.expect(obj.bound_method).args( self.not_of(self.any_of(float,int)) )
     obj.bound_method( 'hello' )
 
+  def test_expect_bound_method_with_notof_comparator_using_types(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args( self.not_of(float,int) )
+    obj.bound_method( 'hello' )
+    
   def test_expect_unbound_method_acts_as_any_instance(self):
     self.expect( SampleBase.bound_method ).args('hello').returns('world')
     self.expect( SampleBase.bound_method ).args('hello').returns('mars')

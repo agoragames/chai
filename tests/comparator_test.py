@@ -52,21 +52,22 @@ class ComparatorsTest(unittest.TestCase):
     self.assertFalse( comp.test('fuu') )
 
   def test_any(self):
-    comp = Any([1,2.3,str])
+    comp = Any(1,2.3,str)
     self.assertTrue( comp.test(1) )
     self.assertTrue( comp.test(2.3) )
     self.assertFalse( comp.test(4) )
 
   def test_all(self):
-    comp = All([InstanceOf(bytearray), Equals('foo')])
+    comp = All(InstanceOf(bytearray), Equals('foo'))
     self.assertTrue( comp.test(bytearray('foo')) )
     self.assertFalse( comp.test('foo') )
     self.assertEquals( 'foo', bytearray('foo') )
 
   def test_not(self):
-    comp = Not([1,3])
+    comp = Not( Any(1,3) )
     self.assertTrue( comp.test(2) )
     self.assertFalse( comp.test(1) )
+    self.assertFalse( comp.test(3) )
 
   def test_function(self):
     r = [True,False]

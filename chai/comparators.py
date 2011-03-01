@@ -65,17 +65,6 @@ class AlmostEqual(Comparator):
   def test(self, value):
     return round(value - self._float_value, self._places) == 0
 
-class Contains(Comparator):
-  '''
-  Checks to see if an argument contains a value
-  '''
-  
-  def __init__(self, obj):  
-    self._obj = obj
-  
-  def test(self, value):
-    return self._obj in value
-
 class Regex(Comparator):
   '''
   Checks to see if a string matches a regex

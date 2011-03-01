@@ -209,11 +209,6 @@ class SampleBaseTest(Chai):
     self.assert_equals(obj.bound_method({'name' : 'vitaly'}), 100)
     self.assert_equals(obj.bound_method('lasfs-name-asfsad'), 100)
 
-  def test_contains_comparator(self):
-    obj = SampleBase()
-    self.expect(obj.bound_method).args(self.contains('name')).returns(100)
-    self.assert_equals(obj.bound_method('lasfs-name-asfsad'), 100)
-
   def test_almost_equals_comparator(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(self.almost_equals(10.1234, 2)).returns(100)

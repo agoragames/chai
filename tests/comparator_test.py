@@ -62,12 +62,6 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test(3.1416) )
     self.assertFalse( comp.test(3.14) )
 
-  def test_contains(self):
-    comp = Contains('foo')
-    self.assertTrue( comp.test('foobar') )
-    self.assertTrue( comp.test(['foo','bar']) )
-    self.assertTrue( comp.test({'foo':'bar'}) )
-    self.assertFalse( comp.test('feet') )
 
   def test_regex(self):
     comp = Regex('[wf][io]{2}')
@@ -82,10 +76,11 @@ class ComparatorsTest(unittest.TestCase):
     self.assertFalse( comp.test(4) )
   
   def test_in(self):
-    comp = In("name")
-    self.assertTrue(comp.test(["name", "age"]))
-    self.assertTrue(comp.test("nameage"))
-    self.assertTrue(comp.test({"name" : "my name"}))
+    comp = In('foo')
+    self.assertTrue( comp.test('foobar') )
+    self.assertTrue( comp.test(['foo','bar']) )
+    self.assertTrue( comp.test({'foo':'bar'}) )
+    self.assertFalse( comp.test('feet') )
 
   def test_all(self):
     comp = All(InstanceOf(bytearray), Equals('foo'))

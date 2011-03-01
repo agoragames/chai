@@ -145,6 +145,7 @@ class ExpectationRule(unittest.TestCase):
 
   def test_close(self):
     exp = Expectation(object)
+    exp.test()
     exp.close()
     self.assertTrue(exp.closed())
   

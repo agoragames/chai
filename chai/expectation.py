@@ -159,13 +159,20 @@ class Expectation(object):
     # it will also be bypassed, but if there's just a min set up, then it'll
     # effectively stay open and catch any matching call no matter the order
     if not self._any_order:
-      self._met = True
+      if self.counts_met():
+        self._met = True
+      else:
+        raise ExpectationNotSatisfied(self)
+      
     
   def closed(self, with_counts=False):
     rval = self._met
     if with_counts:
-      rval = rval or self._run_count >= self._min_count and not (self._max_count and not self._max_count == self._run_count)
+      rval = rval or self.counts_met()
     return rval
+  
+  def counts_met(self):
+    return self._run_count >= self._min_count and not (self._max_count and not self._max_count == self._run_count)
   
   def match(self, *args, **kwargs):
     """

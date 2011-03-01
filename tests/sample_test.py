@@ -33,6 +33,16 @@ class SampleBaseTest(Chai):
     self.expect(obj.bound_method).args(1, 3).returns(100)
     self.assert_equals(100, obj.bound_method(1, 3))
 
+  def test_expects_bound_method_at_least_with_other_expectation_raise_ExpectationNotSatisfied(self):
+    obj = SampleBase()
+    self.expect(obj.bound_method).args(1, 2).returns(12).at_least(3)
+    self.assert_equals(12, obj.bound_method(1, 2))
+    self.assert_equals(12, obj.bound_method(1, 2))
+    self.assert_equals(12, obj.bound_method(1, 2))
+
+    self.expect(obj.bound_method).args(1, 3).returns(100)
+    self.assert_equals(100, obj.bound_method(1, 3))
+
   def test_expects_bound_method_at_least_as_last_expectation(self):
     obj = SampleBase()
     self.expect(obj.bound_method).args(1, 2).returns(12).at_least(3)
@@ -105,7 +115,7 @@ class SampleBaseTest(Chai):
   
   def test_expect_bound_method_with_anyof_comparator(self):
     obj = SampleBase()
-    self.expect(obj.bound_method).times(5).args( 
+    self.expect(obj.bound_method).times(4).args( 
       self.any_of(int,3.14,'hello',self.instance_of(list)) )
     obj.bound_method( 42 )
     obj.bound_method( 3.14 )
@@ -115,7 +125,7 @@ class SampleBaseTest(Chai):
 
   def test_expect_bound_method_with_allof_comparator(self):
     obj = SampleBase()
-    self.expect(obj.bound_method).args( self.all_of(bytearray,'hello') ).times(2)
+    self.expect(obj.bound_method).args( self.all_of(bytearray,'hello') )
     obj.bound_method( bytearray('hello') )
     self.assert_raises(UnexpectedCall, obj.bound_method, 'hello' )
   

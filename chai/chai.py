@@ -51,10 +51,10 @@ class Chai(unittest.TestCase):
     super(Chai,self).setUp()
 
     # Setup stub tracking
-    self.stubs = deque()
+    self._stubs = deque()
 
     # Setup mock tracking
-    self.mocks = deque()
+    self._mocks = deque()
     
 
   # Because cAmElCaSe sucks
@@ -66,28 +66,28 @@ class Chai(unittest.TestCase):
     # Docs insist that this will be called no matter what happens in runTest(),
     # so this should be a safe spot to unstub everything
     exception = None
-    while len(self.stubs):
-        stub = self.stubs.popleft()
-        try:
-          stub.assert_expectations()
-        except ExpectationNotSatisfied, e:
-          if not exception: # Store only the first exception
-            exception = e
+    while len(self._stubs):
+      stub = self._stubs.popleft()
+      try:
+        stub.assert_expectations()
+      except ExpectationNotSatisfied, e:
+        if not exception: # Store only the first exception
+          exception = e
 
-        stub.teardown() # Teardown the reset of the stub
-      
-    if exception:
-      raise exception
-      
-
+      stub.teardown() # Teardown the reset of the stub
+    
     # Do the mocks in reverse order in the rare case someone called mock(obj,attr)
     # twice.
-    while len(self.mocks):
-      mock = self.mocks.pop()
+    while len(self._mocks):
+      mock = self._mocks.pop()
       if len(mock)==2:
         delattr( mock[0], mock[1] )
       else:
         setattr( mock[0], mock[1], mock[2] )
+    
+    # Lastly, if there were any errors, raise them
+    if exception:
+      raise exception
 
   # Because cAmElCaSe sucks
   teardown = tearDown
@@ -99,8 +99,8 @@ class Chai(unittest.TestCase):
     can't determine the binding from the object.
     '''
     s = stub(obj, attr)
-    if s not in self.stubs:
-      self.stubs.append( s )
+    if s not in self._stubs:
+      self._stubs.append( s )
     return s
 
   def expect(self, obj, attr=None):
@@ -118,9 +118,9 @@ class Chai(unittest.TestCase):
     if obj!=None and attr!=None:
       if hasattr(obj,attr):
         orig = getattr(obj, attr)
-        self.mocks.append( (obj,attr,orig) )
+        self._mocks.append( (obj,attr,orig) )
         setattr(obj, attr, rval)
       else:
-        self.mocks.append( (obj,attr) )
+        self._mocks.append( (obj,attr) )
         setattr(obj, attr, rval)
     return rval

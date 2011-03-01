@@ -204,7 +204,7 @@ class SampleBaseTest(Chai):
 
   def test_in_comparator(self):
     obj = SampleBase()
-    self.expect(obj.bound_method).args(self.in_arg('name')).returns(100).at_most(3)
+    self.expect(obj.bound_method).args(self.contains('name')).returns(100).at_most(3)
     self.assert_equals(obj.bound_method(['name', 'age']), 100)
     self.assert_equals(obj.bound_method({'name' : 'vitaly'}), 100)
     self.assert_equals(obj.bound_method('lasfs-name-asfsad'), 100)

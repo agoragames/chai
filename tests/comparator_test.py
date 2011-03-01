@@ -76,7 +76,13 @@ class ComparatorsTest(unittest.TestCase):
     self.assertFalse( comp.test(4) )
   
   def test_in(self):
-    comp = In('foo')
+    comp = In(['foo', 'bar'])
+    self.assertTrue( comp.test('foo') )
+    self.assertTrue( comp.test('bar') )
+    self.assertFalse( comp.test('none') )
+
+  def test_contains(self):
+    comp = Contains('foo')
     self.assertTrue( comp.test('foobar') )
     self.assertTrue( comp.test(['foo','bar']) )
     self.assertTrue( comp.test({'foo':'bar'}) )

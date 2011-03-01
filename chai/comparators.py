@@ -92,11 +92,21 @@ class In(Comparator):
   '''
   Test if a key is in a list or dict
   '''
-  def __init__(self, key):
-    self._key = key
+  def __init__(self, hay_stack):
+    self._hay_stack = hay_stack
 
-  def test(self, value):
-    return self._key in value
+  def test(self, needle):
+    return needle in self._hay_stack
+
+class Contains(Comparator):
+  '''
+  Test if a key is in a list or dict
+  '''
+  def __init__(self, needle):
+    self._needle = needle
+
+  def test(self, hay_stack):
+    return self._needle in hay_stack
 
 class All(Comparator):
   '''

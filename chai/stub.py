@@ -25,11 +25,19 @@ def _stub_attr(obj, attr_name):
   Stub an attribute of an object. Will return an existing stub if there already
   is one.
   '''
+  # Annoying circular reference requires importing here. Would like to see
+  # this cleaned up. @AW
+  from mock import Mock
+
   attr = getattr(obj, attr_name)
   
   # Return an existing stub
   if isinstance(attr, Stub):
     return attr
+
+  # If a Mock object, stub its __call__
+  if isinstance(attr, Mock):
+    return stub(attr.__call__)
 
   if isinstance(attr, property):
     return StubProperty(obj, attr_name)
@@ -56,9 +64,17 @@ def _stub_obj(obj):
   '''
   Stub an object directly.
   '''
+  # Annoying circular reference requires importing here. Would like to see
+  # this cleaned up. @AW
+  from mock import Mock
+
   # Return an existing stub
   if isinstance(obj, Stub):
     return obj
+
+  # If a Mock object, stub its __call__
+  if isinstance(obj, Mock):
+    return stub(obj.__call__)
  
   # can't stub properties directly because the property object doesn't have
   # a reference to the class or name of the attribute on which it was defined

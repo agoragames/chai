@@ -3,6 +3,7 @@ An open mocking object.
 '''
 from types import MethodType
 from stub import stub, Stub
+from exception import UnexpectedCall
 
 
 class Mock(object):
@@ -19,12 +20,14 @@ class Mock(object):
   def __call__(self, *args, **kwargs):
     if isinstance(getattr(self,'__call__'), Stub):
       return getattr(self,'__call__')(*args, **kwargs)
+    raise UnexpectedCall()
 
   def __getattr__(self,name):
     rval = self.__dict__.get(name)
 
     if not rval or not isinstance(rval,Stub):
-      def noop(*args, **kwargs): pass
+      def noop(*args, **kwargs):
+        raise UnexpectedCall()
       noop.func_name = name
 
       rval = MethodType(noop, self, Mock)

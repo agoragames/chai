@@ -3,6 +3,7 @@ import unittest
 import types
 
 from chai.stub import *
+from chai.mock import Mock
 import samples
 
 class StubTest(unittest.TestCase):
@@ -25,6 +26,28 @@ class StubTest(unittest.TestCase):
       def prop(self): return 3
 
     self.assertRaises( UnsupportedStub, stub, Foo.prop)
+
+  def test_stub_mock_with_attr_name(self):
+    class Foo(object):
+      def bar(self): pass
+
+    f = Foo()
+    f.bar = Mock()
+    res = stub(f, 'bar')
+    self.assertTrue( isinstance(res, StubMethod) )
+    self.assertEquals( res, f.bar.__call__ )
+    self.assertEquals( res, stub(f, 'bar') )
+
+  def test_stub_mock_with_obj_ref(self):
+    class Foo(object):
+      def bar(self): pass
+
+    f = Foo()
+    f.bar = Mock()
+    res = stub(f.bar)
+    self.assertTrue( isinstance(res, StubMethod) )
+    self.assertEquals( res, f.bar.__call__ )
+    self.assertEquals( res, stub(f.bar) )
 
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):

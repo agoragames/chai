@@ -49,8 +49,12 @@ class StubTest(unittest.TestCase):
       def bar(self): pass
 
     foo = Foo()
+    orig = foo.bar
     res = stub(foo, 'bar')
     self.assertTrue( isinstance(res,StubMethod) )
+    self.assertEquals( res._instance, foo )
+    self.assertEquals( res._obj, orig )
+    self.assertEquals( res._attr, 'bar' )
     self.assertEquals( res, stub(foo,'bar') )
     self.assertEquals( res, getattr(foo,'bar') )
 
@@ -59,8 +63,12 @@ class StubTest(unittest.TestCase):
       def bar(self): pass
 
     foo = Foo()
+    orig = foo.bar
     res = stub(foo.bar)
     self.assertTrue( isinstance(res,StubMethod) )
+    self.assertEquals( res._instance, foo )
+    self.assertEquals( res._obj, orig )
+    self.assertEquals( res._attr, 'bar' )
     self.assertEquals( res, stub(foo.bar) )
     self.assertEquals( res, getattr(foo,'bar') )
 
@@ -185,7 +193,17 @@ class StubMethodTest(unittest.TestCase):
       def bar(self): pass
 
     f = Foo()
+    orig = f.bar
     s = StubMethod( f.bar )
+    self.assertEquals( s._obj, orig )
+    self.assertEquals( s._instance, f )
+    self.assertEquals( s._attr, 'bar' )
+    self.assertEquals( s, getattr(f,'bar') )
+    
+    f = Foo()
+    orig = f.bar
+    s = StubMethod( f, 'bar' )
+    self.assertEquals( s._obj, orig )
     self.assertEquals( s._instance, f )
     self.assertEquals( s._attr, 'bar' )
     self.assertEquals( s, getattr(f,'bar') )

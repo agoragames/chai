@@ -39,7 +39,7 @@ def _stub_attr(obj, attr_name):
     if attr.im_self==None:
       return StubUnboundMethod(attr)
     else:
-      return StubMethod(attr)
+      return StubMethod(obj, attr_name)
 
   # What an absurd type this is ....
   if type(attr).__name__ == 'method-wrapper':
@@ -150,13 +150,17 @@ class StubMethod(Stub):
   Stub a method.
   '''
 
-  def __init__(self, obj):
+  def __init__(self, obj, attr=None):
     '''
     Initialize with an object of type MethodType
     '''
-    super(StubMethod,self).__init__(obj)
-    self._instance = obj.im_self
-    self._attr = obj.im_func.func_name
+    super(StubMethod,self).__init__(obj, attr)
+    if not self._attr: 
+      self._attr = obj.im_func.func_name
+      self._instance = obj.im_self
+    else:
+      self._instance = self._obj
+      self._obj = getattr( self._instance, self._attr )
     setattr( self._instance, self._attr, self )
 
   def teardown(self):

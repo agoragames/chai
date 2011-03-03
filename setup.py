@@ -19,7 +19,7 @@ setup(
     packages = find_packages(),
     url="https://github.com/agoragames/chai",
     description="Easy to use mocking/stub framework.",
-    license="MIT License",
+    license="BSD License",
     long_description=open('README.rst').read(),
     keywords=['python', 'test', 'mock'],
     classifiers=[

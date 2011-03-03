@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.0
+:Version: 0.1.1
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -244,7 +244,7 @@ Any request for an attribute from a Mock will return a callable function, but ``
             self.expect( obj._handle ).do('it').returns('ok')
             self.assert_equals('ok', obj.do('it'))
 
-When mocking a class that you intend to create instances of, note that you have to expect the ``__call__`` method and not ``__init__``. ::
+The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mocking the ``__call__`` method, which can also act in place of ``__init__``.  ::
 
     # module custom.py
     from collections import deque
@@ -260,7 +260,7 @@ When mocking a class that you intend to create instances of, note that you have 
     class TestCase(Chai):
         def test_mock_get(self):
             self.mock( custom, 'deque' )
-            self.expect( custom.deque.__call__ ).returns( 'stack' )
+            self.expect( custom.deque ).returns( 'stack' )
 
             obj = CustomObject()
             self.assert_equals('stack', obj._stack)

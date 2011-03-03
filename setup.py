@@ -17,6 +17,8 @@ setup(
     author="Vitaly Babiy, Aaron Westendorf",
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
     packages = find_packages(),
+    url="https://github.com/agoragames/chai",
+    description="Easy to use mocking/stub framework.",
     license="MIT License",
     long_description=open('README.rst').read(),
     keywords=['python', 'test', 'mock'],

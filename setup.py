@@ -13,7 +13,7 @@ except ImportError:
 
 setup(
     name='chai',
-    version='0.1.1',
+    version='0.1.2',
     author="Vitaly Babiy, Aaron Westendorf",
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
     packages = find_packages(),

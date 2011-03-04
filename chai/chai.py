@@ -9,6 +9,8 @@ except ImportError:
   import unittest
 
 import re
+import sys
+import inspect
 
 from exception import *
 from mock import Mock
@@ -55,6 +57,20 @@ class Chai(unittest.TestCase):
 
     # Setup mock tracking
     self._mocks = deque()
+
+    # Try to load this into the module that the test case is defined in, so
+    # that 'self.' can be removed. This has to be done at the start of the test
+    # because we need the reference to be correct at the time of test run, not
+    # when the class is defined or an instance is created.
+    mod = sys.modules[ self.__class__.__module__ ]
+    for attr in dir(self):
+      if attr.startswith('assert'):
+        setattr(mod, attr, getattr(self, attr) )
+      elif isinstance(getattr(self,attr), type) and issubclass( getattr(self,attr), Comparator ):
+        setattr(mod, attr, getattr(self, attr) )
+    setattr(mod, 'stub', self.stub)
+    setattr(mod, 'expect', self.expect)
+    setattr(mod, 'mock', self.mock)
     
 
   # Because cAmElCaSe sucks

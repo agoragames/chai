@@ -61,6 +61,7 @@ API
 
 All of the features are available by extending the ``Chai`` class, itself a subclass of ``unittest.TestCase``. If ``unittest2`` is available Chai will use that, else it will fall back to ``unittest``. Chai also aliases all of the ``assert*`` methods to lower-case with undersores. For example, ``assertNotEquals`` can also be referenced as ``assert_not_equals``.
 
+Additionally, ``Chai`` loads in all assertions, comparators and mocking methods into the module in which a ``Chai`` subclass is declared. This is done to cut down on the verbosity of typing ``self.`` everywhere that you want to run a test.
 
 Stubbing
 --------
@@ -78,24 +79,24 @@ Stubbing is used of situations when you want to assert that a method is never ca
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject()
-            self.stub(obj.get)
-            self.assert_raises( UnexpectedCall, obj.get )
+            stub(obj.get)
+            assert_raises( UnexpectedCall, obj.get )
 
 In this example, we can reference ``obj.get`` directly because ``get`` is a bound method and provides all of the context we need to refer back to ``obj`` and stub the method accordingly. There are cases where this is insufficient, such as module imports and special Python types such as ``object().__init__``. If the object can't be stubbed with a reference, ``UnsupportedStub`` will be raised and you can use the verbose reference instead. ::
     
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject()
-            self.stub(obj, 'get')
-            self.assert_raises( UnexpectedCall, obj.get )
+            stub(obj, 'get')
+            assert_raises( UnexpectedCall, obj.get )
 
 Stubbing an unbound method will apply that stub to all future instances of that class. ::
     
     class TestCase(Chai):
         def test_mock_get(self):
-            self.stub(CustomObject.get)
+            stub(CustomObject.get)
             obj = CustomObject()
-            self.assert_raises( UnexpectedCall, obj.get )
+            assert_raises( UnexpectedCall, obj.get )
 
 Finally, some methods cannot be stubbed because it is impossible to call ``setattr`` on the object. A good example of this is the ``datetime.datetime`` class.
 
@@ -110,36 +111,36 @@ Expectations will automatically create a stub if it's not already applied, so no
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject()
-            self.expect(obj.get)
-            self.assert_equals( None, obj.get() )
-            self.assert_raises( UnexpectedCall, obj.get )
+            expect(obj.get)
+            assert_equals( None, obj.get() )
+            assert_raises( UnexpectedCall, obj.get )
 
 Modifiers can be applied to the expectation. Each modifier will return a reference to the expectation for easy chaining. In this example, we're going to match a parameter and change the behavior depending on the argument. This also shows the ability to incrementally add expectations throughout the test. ::
 
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject()
-            self.expect(obj.get).args('foo').returns('hello').times(2)
-            self.assert_equals( 'hello', obj.get('foo') )
-            self.assert_equals( 'hello', obj.get('foo') )
-            self.expect(obj.get).args('bar').raises( ValueError )
-            self.assert_raises( ValueError, obj.get, 'bar' )
+            expect(obj.get).args('foo').returns('hello').times(2)
+            assert_equals( 'hello', obj.get('foo') )
+            assert_equals( 'hello', obj.get('foo') )
+            expect(obj.get).args('bar').raises( ValueError )
+            assert_raises( ValueError, obj.get, 'bar' )
 
 Lastly, the arguments modifier supports several matching functions. For simplicity in covering the common cases, the arg expectation assumes an equals test for instances and an instanceof test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
 
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject()
-            self.expect(obj.get).args(self.is_a(float)).returns(42)
-            self.assert_raises( UnexpectedCall, obj.get, 3 )
-            self.assert_equals( 42, obj.get(3.14) )
+            expect(obj.get).args(is_a(float)).returns(42)
+            assert_raises( UnexpectedCall, obj.get, 3 )
+            assert_equals( 42, obj.get(3.14) )
             
-            self.expect(obj.get).args(str).returns('yes')
-            self.assert_equals( 'yes', obj.get('no') )
+            expect(obj.get).args(str).returns('yes')
+            assert_equals( 'yes', obj.get('no') )
 
-            self.expect(obj.get).args(self.is_arg(list)).return('yes')
-            self.assert_raises( UnexpectedCall, obj.get, [] )
-            self.assert_equals( 'yes', obj.get(list) )
+            expect(obj.get).args(is_arg(list)).return('yes')
+            assert_raises( UnexpectedCall, obj.get, [] )
+            assert_equals( 'yes', obj.get(list) )
 
 Modifiers
 +++++++++
@@ -234,15 +235,15 @@ Any request for an attribute from a Mock will return a callable function, but ``
 
     class CustomObject(object):
         def __init__(self, handle):
-            self._handle = handle
+            _handle = handle
         def do(self, arg):
-            return self._handle.do(arg)
+            return _handle.do(arg)
 
     class TestCase(Chai):
         def test_mock_get(self):
-            obj = CustomObject( self.mock() )
-            self.expect( obj._handle ).do('it').returns('ok')
-            self.assert_equals('ok', obj.do('it'))
+            obj = CustomObject( mock() )
+            expect( obj._handle ).do('it').returns('ok')
+            assert_equals('ok', obj.do('it'))
 
 The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mocking the ``__call__`` method, which can also act in place of ``__init__``.  ::
 
@@ -259,11 +260,11 @@ The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mock
 
     class TestCase(Chai):
         def test_mock_get(self):
-            self.mock( custom, 'deque' )
-            self.expect( custom.deque ).returns( 'stack' )
+            mock( custom, 'deque' )
+            expect( custom.deque ).returns( 'stack' )
 
             obj = CustomObject()
-            self.assert_equals('stack', obj._stack)
+            assert_equals('stack', obj._stack)
 
 .. _chai-installation:
 

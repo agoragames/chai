@@ -61,16 +61,32 @@ API
 
 All of the features are available by extending the ``Chai`` class, itself a subclass of ``unittest.TestCase``. If ``unittest2`` is available Chai will use that, else it will fall back to ``unittest``. Chai also aliases all of the ``assert*`` methods to lower-case with undersores. For example, ``assertNotEquals`` can also be referenced as ``assert_not_equals``.
 
-Additionally, ``Chai`` loads in all assertions, comparators and mocking methods into the module in which a ``Chai`` subclass is declared. This is done to cut down on the verbosity of typing ``self.`` everywhere that you want to run a test.
+Additionally, ``Chai`` loads in all assertions, comparators and mocking methods into the module in which a ``Chai`` subclass is declared. This is done to cut down on the verbosity of typing ``self.`` everywhere that you want to run a test.  The references are loaded into the subclass' module during ``setUp``, so you're sure any method you call will be a reference to the class and module in which a particular test method is currently being executed. Methods and comparators you define locally in a test case will be globally available when you're running that particular case as well. ::
+    
+    class ProtocolInterface(object): 
+        def _private_call(self, arg):
+            pass
+        def get_result(self, arg): 
+            self._private_call(arg)
+            return 'ok'
+    
+    class TestCase(Chai):
+        def assert_complicated_state(self, obj):
+            return True  # ..or.. raise AssertionError()
+
+        def test_mock_get(self):
+            obj = ProtocolInterface()
+            data = object()
+            expect(obj._private_call).args(data)
+            assert_equals('ok', obj.get_result(data))
+            assert_complicated_state(data)
 
 Stubbing
 --------
 
 The simplest mock is to stub a method. This replaces the original method with a subclass of ``chai.Stub``, the main instrumentation class. All additional ``stub`` and ``expect`` calls will re-use this stub, and the stub is responsible for re-installing the original reference when ``Chai.tearDown`` is run.
 
-Stubbing is used of situations when you want to assert that a method is never called. ::
-
-    from chai import Chai, UnexpectedCall
+Stubbing is used for situations when you want to assert that a method is never called. ::
 
     class CustomObject (object): 
         def get(self, arg):
@@ -231,7 +247,7 @@ Sometimes you need a mock object which can be used to stub and expect anything. 
 
 Without any arguments, ``Chai.mock()`` will return a ``chai.Mock`` object that can be used for any purpose. If called with arguments, it behaves like ``stub`` and ``expect``, creating a Mock object and setting it as the attribute on another object.
 
-Any request for an attribute from a Mock will return a callable function, but ``setattr`` behaves as expected so it can store state as well. ::
+Any request for an attribute from a Mock will return a callable function, but ``setattr`` behaves as expected so it can store state as well. The dynamic function will act like a stub, raising ``UnexpectedCall`` if no expectation is defined. ::
 
     class CustomObject(object):
         def __init__(self, handle):
@@ -242,8 +258,9 @@ Any request for an attribute from a Mock will return a callable function, but ``
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject( mock() )
-            expect( obj._handle ).do('it').returns('ok')
+            expect( obj._handle.do ).args('it').returns('ok')
             assert_equals('ok', obj.do('it'))
+            assert_raises( UnexpectedCall, obj._handle.do_it_again )
 
 The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mocking the ``__call__`` method, which can also act in place of ``__init__``.  ::
 

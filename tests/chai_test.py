@@ -6,8 +6,49 @@ from chai import Chai
 from chai.mock import Mock
 from chai.stub import Stub
 from chai.exception import *
+from chai.comparators import Comparator
 
 class CupOf(Chai):
+  '''
+  An example of a subclass on which we can test certain features.
+  '''
+
+  class msg_equals(Comparator):
+    '''
+    A Comparator used for check message equality
+    '''
+    def __init__(self, (key,value)):
+      self._key = key
+      self._value = value
+
+    def test(self, value):
+      if isinstance(value,dict):
+        return self._value==value.get(self._key)
+      return False
+
+  def assert_msg_sent(self, msg):
+    '''
+    Assert that a message was sent and marked that it was handled.
+    '''
+    return msg.get('sent_at') and msg.get('received')
+
+  def test_local_definitions_work_and_are_global(self):
+    class Foo(object):
+      def _save_data(self, msg):
+        pass #dosomethingtottalyawesomewiththismessage
+        
+      def do_it(self, msg):
+        self._save_data(msg)
+        msg['sent_at'] = 'now'
+        msg['received'] = 'yes'
+
+    f = Foo()
+    expect( f._save_data ).args( msg_equals(('target','bob')) )
+    
+    msg = {'target':'bob'}
+    f.do_it( msg )
+    assert_msg_sent( msg )
+
   def test_something(self): pass
   def runTest(self, *args, **kwargs): pass
 

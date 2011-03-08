@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.2
+:Version: 0.1.3
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -195,10 +195,10 @@ any_order
   The expectation can be called at any time, independent of when it was defined. Can be combined with ``at_least_once`` to force it to respond to all matching calls throughout the test.
   
 
-Argument Matchers
-+++++++++++++++++
+Argument Comparators
+++++++++++++++++++++
 
-Expectation modifiers are defined as classes in ``chai.comparators``, but loaded into the ``Chai`` class for convenience. From a ``Chai`` subclass, they are all accessible through ``self``.
+Argument comparators are defined as classes in ``chai.comparators``, but loaded into the ``Chai`` class for convenience (and by extension, a subclass' module).
 
 equals(object)
   The default comparator, uses standard Python equals operator
@@ -239,6 +239,9 @@ in_arg(in_list)
 contains(object)
   Matches if the argument contains the object using the Python ``in`` function.
 
+
+**A note of caution**
+If you are using the ``func`` comparator to produce side effects, be aware that it may be called more than once even if the expectation you're defining only occurs once. This is due to the way ``Stub.__call__`` processes the expectations and determines when to process arguments through an expectation.
 
 Mock
 ----

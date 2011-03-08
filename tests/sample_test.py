@@ -22,9 +22,20 @@ class SampleBaseTest(Chai):
     expect(obj.bound_method).args(1, 4).returns(1100)
     assert_equals(1100, obj.bound_method(1, 4))
 
-  def test_expects_bound_method_at_least_with_other_expectation(self):
+  def test_expects_bound_method_at_least_with_other_expectation_and_no_anyorder(self):
     obj = SampleBase()
-    expect(obj.bound_method).args(1, 2).returns(12).at_least(3)
+    expect(obj.bound_method).args(1, 2).returns(12).at_least(2)
+    assert_equals(12, obj.bound_method(1, 2))
+    assert_equals(12, obj.bound_method(1, 2))
+
+    expect(obj.bound_method).args(1, 3).returns(100)
+    assert_equals(100, obj.bound_method(1, 3))
+    
+    assert_raises(UnexpectedCall, obj.bound_method, 1, 2)
+
+  def test_expects_bound_method_at_least_with_other_expectation_and_anyorder(self):
+    obj = SampleBase()
+    expect(obj.bound_method).args(1, 2).returns(12).at_least(2).any_order()
     assert_equals(12, obj.bound_method(1, 2))
     assert_equals(12, obj.bound_method(1, 2))
 
@@ -66,6 +77,15 @@ class SampleBaseTest(Chai):
     assert_equals(4, obj.bound_method(3) )
     assert_equals(2, obj.bound_method(1) )
     assert_equals(2, obj.bound_method(1) )
+    assert_equals(4, obj.bound_method(3) )
+    assert_equals(2, obj.bound_method(1) )
+
+  def test_expects_any_order_without_count_modifiers(self):
+    obj = SampleBase()
+    expect(obj.bound_method).args(3).returns(4)
+    expect(obj.bound_method).args(1).returns(2).any_order()
+    expect(obj.bound_method).args(3).returns(4)
+    assert_equals(4, obj.bound_method(3) )
     assert_equals(4, obj.bound_method(3) )
     assert_equals(2, obj.bound_method(1) )
 

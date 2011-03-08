@@ -105,12 +105,10 @@ class Expectation(object):
     return self
 
   def times(self, count):
-    self.any_order()
     self._min_count = self._max_count = count
     return self
   
   def at_least(self, min_count):
-    self.any_order()
     self._min_count = min_count
     self._max_count = None
     return self
@@ -120,7 +118,6 @@ class Expectation(object):
     return self
   
   def at_most(self, max_count):
-    self.any_order()
     self._max_count = max_count
     return self
   

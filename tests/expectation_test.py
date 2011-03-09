@@ -131,6 +131,27 @@ class ExpectationRule(unittest.TestCase):
     self.assertFalse( exp.closed() )
     self.assertTrue( exp.closed(with_counts=True) )
 
+  def test_side_effect(self):
+    called = []
+    def effect(foo=called):
+      foo.append('foo')
+
+    exp = Expectation(None)
+    self.assertEquals( exp, exp.side_effect(effect) )
+    exp.test()
+    self.assertEquals( ['foo'], called )
+
+  def test_side_effect_with_an_exception(self):
+    called = []
+    def effect(foo=called):
+      foo.append('foo')
+    class Zono(Exception): pass
+
+    exp = Expectation(None)
+    self.assertEquals( exp, exp.side_effect(effect).raises(Zono) )
+    self.assertRaises( Zono, exp.test )
+    self.assertEquals( ['foo'], called )
+
   def test_closed(self):
     exp = Expectation(object)
     exp.args(1)

@@ -80,6 +80,7 @@ class Expectation(object):
     self._max_count = self._min_count = 1
     self._run_count = 0 
     self._any_order = False
+    self._side_effect = False
     
   def args(self, *args, **kwargs):
     """
@@ -133,6 +134,10 @@ class Expectation(object):
   def any_order(self):
     self._any_order = True
     return self
+
+  def side_effect(self, func):
+    self._side_effect = func
+    return self
   
   def return_value(self):
     """
@@ -182,6 +187,8 @@ class Expectation(object):
         self._run_count += 1
         if not self._max_count == None and self._run_count == self._max_count:
           self._met = True
+        if self._side_effect:
+          self._side_effect()
       else:
         self._met = False
 

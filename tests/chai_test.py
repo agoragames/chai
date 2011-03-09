@@ -3,6 +3,7 @@ import unittest
 from collections import deque
 
 from chai import Chai
+from chai.chai import ChaiTestType
 from chai.mock import Mock
 from chai.stub import Stub
 from chai.exception import *
@@ -69,42 +70,22 @@ class ChaiTest(unittest.TestCase):
     self.assertEquals( deque(), case._mocks )
 
   def test_teardown_closes_out_stubs_and_mocks(self):
-    class Stub(object):
-      calls = 0
-      def assert_expectations(self): self.calls += 1
-      def teardown(self): self.calls += 1
-
-    obj = type('test',(object,),{})()
-    setattr(obj, 'mock1', 'foo')
-    setattr(obj, 'mock2', 'bar')
+      class Stub(object):
+        calls = 0
+        def teardown(self): self.calls += 1
     
-    case = CupOf()
-    stub = Stub()
-    case._stubs = deque([stub])
-    case._mocks = deque([(obj,'mock1','fee'), (obj,'mock2')])
-    case.teardown()
-    self.assertEquals( 2, stub.calls )
-    self.assertEquals( 'fee', obj.mock1 )
-    self.assertFalse( hasattr(obj, 'mock2') )
-
-  def test_teardown_closes_out_stubs_and_mocks_when_exception(self):
-    class Stub(object):
-      calls = 0
-      def assert_expectations(self): self.calls += 1; raise ExpectationNotSatisfied('blargh')
-      def teardown(self): self.calls += 1
-
-    obj = type('test',(object,),{})()
-    setattr(obj, 'mock1', 'foo')
-    setattr(obj, 'mock2', 'bar')
-    
-    case = CupOf()
-    stub = Stub()
-    case._stubs = deque([stub])
-    case._mocks = deque([(obj,'mock1','fee'), (obj,'mock2')])
-    self.assertRaises( ExpectationNotSatisfied, case.teardown )
-    self.assertEquals( 2, stub.calls )
-    self.assertEquals( 'fee', obj.mock1 )
-    self.assertFalse( hasattr(obj, 'mock2') )
+      obj = type('test',(object,),{})()
+      setattr(obj, 'mock1', 'foo')
+      setattr(obj, 'mock2', 'bar')
+      
+      case = CupOf()
+      stub = Stub()
+      case._stubs = deque([stub])
+      case._mocks = deque([(obj,'mock1','fee'), (obj,'mock2')])
+      case.teardown()
+      self.assertEquals( 1, stub.calls )
+      self.assertEquals( 'fee', obj.mock1 )
+      self.assertFalse( hasattr(obj, 'mock2') )
 
   def test_stub(self):
     class Milk(object):
@@ -174,3 +155,24 @@ class ChaiTest(unittest.TestCase):
     mock3 = case.mock( milk, 'foo' )
     self.assertTrue( isinstance(mock3, Mock) )
     self.assertEquals( deque([(milk,'pour',orig_pour),(milk,'pour',mock1),(milk,'foo')]), case._mocks )
+    
+  def test_chai_class_use_metaclass(self):
+    obj = CupOf()    
+    self.assertTrue(obj, ChaiTestType)
+    
+  def test_runs_assert_expectations(self):
+    class Stub(object):
+      calls = 0
+      def assert_expectations(self): self.calls += 1
+      def teardown(self): self.calls += 1
+
+    # obj = type('test',(object,),{})()
+    # setattr(obj, 'mock1', 'foo')
+    # setattr(obj, 'mock2', 'bar')
+    
+    case = CupOf()
+    stub = Stub()
+    case._stubs = deque([stub])
+    
+    case.test_local_definitions_work_and_are_global()
+    self.assertEquals(stub.calls, 1)

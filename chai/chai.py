@@ -18,10 +18,47 @@ from stub import stub
 from collections import deque
 from comparators import *
 
+class ChaiTestType(type):
+  """
+  Metaclass used to wrap all test methods to make sure the assert_expectations
+  in the correct context.
+  """
+
+  def __init__(cls, name, bases, d):
+    type.__init__(cls, name, bases, d)
+
+    # also get all the attributes from the base classes to account
+    # for a case when test class is not the immediate child of MoxTestBase
+    for base in bases:
+      for attr_name in dir(base):
+        d[attr_name] = getattr(base, attr_name)
+
+    for func_name, func in d.items():
+      if func_name.startswith('test') and callable(func):
+        setattr(cls, func_name, ChaiTestType.test_wrapper(cls, func))
+
+  @staticmethod
+  def test_wrapper(cls, func):
+    """
+    Wraps a test method, when that test method has completed it 
+    calls assert_expectations on the stub. This is to avoid getting to exceptions about the same error.
+    """
+    def wrapper(self, *args, **kwargs):
+      func(self, *args, **kwargs)
+      for stub in self._stubs:
+        stub.assert_expectations()
+      
+    wrapper.__name__ = func.__name__
+    wrapper.__doc__ = func.__doc__
+    wrapper.__module__ = func.__module__
+    return wrapper
+
 class Chai(unittest.TestCase):
   '''
   Base class for all tests
   '''
+  
+  __metaclass__ = ChaiTestType
 
   # When initializing, alias all the cAmElCaSe methods to more helpful ones
   def __init__(self, *args, **kwargs):
@@ -84,12 +121,6 @@ class Chai(unittest.TestCase):
     exception = None
     while len(self._stubs):
       stub = self._stubs.popleft()
-      try:
-        stub.assert_expectations()
-      except ExpectationNotSatisfied, e:
-        if not exception: # Store only the first exception
-          exception = e
-
       stub.teardown() # Teardown the reset of the stub
     
     # Do the mocks in reverse order in the rare case someone called mock(obj,attr)

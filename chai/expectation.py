@@ -61,7 +61,7 @@ class ArgumentsExpectationRule(ExpectationRule):
   def __str__(self):
     if hasattr(self, 'in_args') and hasattr(self, 'in_kwargs'):
       return "ArgumentsExpectationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
-        (self._passed, self.args, self.in_args, self.kwargs, self.in_kwargs)
+        (self._passed, str(self.args), self.in_args, self.kwargs, self.in_kwargs)
         
     return "ArgumentsExpectationRule: passed: %s, args: %s, kwargs: %s, " % \
       (self._passed, self.args, self.kwargs)

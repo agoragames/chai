@@ -19,11 +19,11 @@ class ComparatorsTest(unittest.TestCase):
     comp = build_comparators(tuple())[0]
     self.assertTrue(isinstance(comp, Equals))
   
-  def test_build_comparators_instace_of(self):
+  def test_build_comparators_is_a(self):
     class CustomObject(object): pass
     comp = build_comparators(CustomObject)[0]
-    self.assertTrue(isinstance(comp, InstanceOf))
-
+    self.assertTrue(isinstance(comp, IsA))
+    
   def test_build_comparators_passes_comparators(self):
     any_comp = Any()
     comp = build_comparators(any_comp)[0]
@@ -34,17 +34,31 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test(3) )
     self.assertTrue( comp.test(3.0) )
     self.assertFalse( comp.test('3') )
+  
+  def test_equals_repr(self):
+      comp = Equals(3)
+      self.assertEquals(str(comp), "Equals(3)")
 
-  def test_instance_of(self):
-    comp = InstanceOf(str)
+  def test_is_a(self):
+    comp = IsA(str)
     self.assertTrue( comp.test('foo') )
     self.assertFalse( comp.test(u'foo') )
     self.assertFalse( comp.test(bytearray('foo')) )
     
-    comp = InstanceOf((str,int))
+    comp = IsA((str,int))
     self.assertTrue( comp.test('') )
     self.assertTrue( comp.test(42) )
     self.assertFalse( comp.test(3.14) )
+
+  def test_is_a_repr(self):
+    comp = IsA(str)
+    self.assertEquals(repr(comp), "IsA(str)")
+    
+  def test_is_a_format_name(self):
+    comp = IsA(str)
+    self.assertEquals(comp._format_name(), "str")
+    comp = IsA((str, list))
+    self.assertEquals(comp._format_name(), "['str', 'list']")
 
   def test_is(self):
     class Test(object):
@@ -56,18 +70,34 @@ class ComparatorsTest(unittest.TestCase):
     self.assertEquals( obj1, obj2 )
     self.assertTrue( comp.test(obj1) )
     self.assertFalse( comp.test(obj2) )
+  
+  def test_is_repr(self):
+    class TestObj(object):
+      
+      def __str__(self):
+        return "An Object"
+    
+    obj = TestObj()
+    self.assertEquals(repr(Is(obj)), "Is(An Object)" )
 
   def test_almost_equal(self):
     comp = AlmostEqual(3.14159265, 3)
     self.assertTrue( comp.test(3.1416) )
     self.assertFalse( comp.test(3.14) )
-
-
+  
+  def test_almost_equal_repr(self):
+    comp = AlmostEqual(3.14159265, 3)
+    self.assertEquals(repr(comp), "AlmostEqual(value: 3.14159265, places: 3)")
+  
   def test_regex(self):
     comp = Regex('[wf][io]{2}')
     self.assertTrue( comp.test('fii') )
     self.assertTrue( comp.test('woo') )
     self.assertFalse( comp.test('fuu') )
+
+  def test_regex(self):
+    comp = Regex('[wf][io]{2}')
+    self.assertEquals(repr(comp), "Regex(pattern: [wf][io]{2}, flags: 0)")
 
   def test_any(self):
     comp = Any(1,2.3,str)
@@ -75,11 +105,19 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test(2.3) )
     self.assertFalse( comp.test(4) )
   
+  def test_any_repr(self):
+    comp = Any(1,2,3,str)
+    self.assertEquals(repr(comp), "Any([Equals(1), Equals(2), Equals(3), IsA(str)])")
+  
   def test_in(self):
     comp = In(['foo', 'bar'])
     self.assertTrue( comp.test('foo') )
     self.assertTrue( comp.test('bar') )
     self.assertFalse( comp.test('none') )
+  
+  def test_in_repr(self):
+    comp = In(['foo', 'bar'])
+    self.assertEqual(repr(comp), "In(['foo', 'bar'])")
 
   def test_contains(self):
     comp = Contains('foo')
@@ -87,25 +125,46 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test(['foo','bar']) )
     self.assertTrue( comp.test({'foo':'bar'}) )
     self.assertFalse( comp.test('feet') )
+  
+  def test_contains_repr(self):
+    comp = Contains("foo")
+    self.assertEqual(repr(comp), "Contains('foo')")
 
   def test_all(self):
-    comp = All(InstanceOf(bytearray), Equals('foo'))
+    comp = All(IsA(bytearray), Equals('foo'))
     self.assertTrue( comp.test(bytearray('foo')) )
     self.assertFalse( comp.test('foo') )
     self.assertEquals( 'foo', bytearray('foo') )
+  
+  def test_all_repr(self):
+    comp = All(IsA(bytearray), Equals('foobar'))
+    self.assertEqual(repr(comp), "All([IsA(bytearray), Equals(foobar)])")
 
   def test_not(self):
     comp = Not( Any(1,3) )
     self.assertTrue( comp.test(2) )
     self.assertFalse( comp.test(1) )
     self.assertFalse( comp.test(3) )
+  
+  def test_no_repr(self):
+    comp = Not(Any(1,3))
+    self.assertEqual(repr(comp), "Not([Any([Equals(1), Equals(3)])])")
 
   def test_function(self):
     r = [True,False]
     comp = Function(lambda arg: r[arg])
     self.assertTrue( comp.test(0) )
     self.assertFalse( comp.test(1) )
+  
+  def test_function(self):
+    func = lambda arg: True
+    comp = Function(func)
+    self.assertEqual(repr(comp), "Function(%s)" % str(func))
 
   def test_ignore(self):
     comp = Ignore()
     self.assertTrue( comp.test('srsly?') )
+  
+  def test_ignore_repr(self):
+    comp = Ignore()
+    self.assertEqual(repr(comp), "Ignore()")

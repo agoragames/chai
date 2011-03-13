@@ -117,16 +117,16 @@ class SampleBaseTest(Chai):
     obj.bound_method( 42 )
     assert_raises(UnexpectedCall, obj.bound_method, 32 )
 
-  def test_expect_bound_method_with_instanceof_comparator(self):
+  def test_expect_bound_method_with_is_a_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( instance_of(int) )
+    expect(obj.bound_method).args( is_a(int) )
     obj.bound_method( 42 )
     assert_raises(UnexpectedCall, obj.bound_method, '42' )
   
   def test_expect_bound_method_with_anyof_comparator(self):
     obj = SampleBase()
     expect(obj.bound_method).times(4).args( 
-      any_of(int,3.14,'hello',instance_of(list)) )
+      any_of(int,3.14,'hello',is_a(list)) )
     obj.bound_method( 42 )
     obj.bound_method( 3.14 )
     obj.bound_method( 'hello' )

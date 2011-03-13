@@ -18,6 +18,7 @@ from stub import stub
 from collections import deque
 from comparators import *
 
+
 class ChaiTestType(type):
   """
   Metaclass used to wrap all test methods to make sure the assert_expectations
@@ -72,8 +73,7 @@ class Chai(unittest.TestCase):
   # Load in the comparators
   equals = Equals
   almost_equals = AlmostEqual
-  instance_of = InstanceOf
-  is_a = InstanceOf
+  is_a = IsA
   is_arg = Is
   any_of = Any
   all_of = All

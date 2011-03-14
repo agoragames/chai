@@ -311,9 +311,8 @@ Download the latest version of Chai from http://pypi.python.org/pypi/chai
 You can install it by doing the following,::
 
     $ tar xvfz chai-*.*.*.tar.gz
-    $ cd celery-*.*.*
-    $ python setup.py build
-    # python setup.py install # as root
+    $ cd chia-*.*.*.tar.gz
+    $ python setup.py install # as root
 
 .. _chai-installing-from-git:
 

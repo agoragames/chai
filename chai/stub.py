@@ -149,7 +149,17 @@ class Stub(object):
       else:
         return exp.test(*args, **kwargs)
     
-    raise UnexpectedCall("No expectation in place for this call")
+    raise UnexpectedCall("\n\n" + self._format_exception(*args, **kwargs))
+  
+  def _format_exception(self, *in_args, **in_kwargs):
+    result = [
+      "No expectation in place for %s with %s, %s" % (self._attr, in_args, in_kwargs),
+      "All Expectations:"
+    ]
+    for exception in self._expectations:
+      result.append(str(exception))
+    
+    return "\n".join(result)
 
 class StubProperty(Stub):
   '''

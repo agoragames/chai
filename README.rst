@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.4
+:Version: 0.1.5
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -209,11 +209,8 @@ equals(object)
 almost_equals(float, places)
   Identical to assertAlmostEquals, will match an argument to the comparator value to a most ``places`` digits beyond the decimal point.
 
-instance_of(type)
-  Match an argument of a given type. Supports same arguments as builtin function ``isinstance``.
-
 is_a(type)
-  Alias of ``instance_of``.
+  Match an argument of a given type. Supports same arguments as builtin function ``isinstance``.
 
 is_arg(object)
   Matches an argument using the Python ``is`` comparator.

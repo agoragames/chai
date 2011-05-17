@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.5
+:Version: 0.1.6
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -250,7 +250,7 @@ Sometimes you need a mock object which can be used to stub and expect anything. 
 
 Without any arguments, ``Chai.mock()`` will return a ``chai.Mock`` object that can be used for any purpose. If called with arguments, it behaves like ``stub`` and ``expect``, creating a Mock object and setting it as the attribute on another object.
 
-Any request for an attribute from a Mock will return a callable function, but ``setattr`` behaves as expected so it can store state as well. The dynamic function will act like a stub, raising ``UnexpectedCall`` if no expectation is defined. ::
+Any request for an attribute from a Mock will return a new Mock object, but ``setattr`` behaves as expected so it can store state as well. The dynamic function will act like a stub, raising ``UnexpectedCall`` if no expectation is defined. ::
 
     class CustomObject(object):
         def __init__(self, handle):
@@ -265,7 +265,7 @@ Any request for an attribute from a Mock will return a callable function, but ``
             assert_equals('ok', obj.do('it'))
             assert_raises( UnexpectedCall, obj._handle.do_it_again )
 
-The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mocking the ``__call__`` method, which can also act in place of ``__init__``.  ::
+The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mocking the ``__call__`` method, which can also act in place of ``__init__``. ::
 
     # module custom.py
     from collections import deque
@@ -285,6 +285,16 @@ The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mock
 
             obj = CustomObject()
             assert_equals('stack', obj._stack)
+
+``Mock`` objects, because og the ``getattr`` implementation, can also support nested attributes. ::
+
+    class TestCase(Chai):
+        def test_mock(self):
+          m = mock()
+          m.id = 42
+          expect( m.foo.bar ).returns( 'hello' )
+          assert_equals( 'hello', m.foo.bar() )
+          assert_equals( 42, m.id )
 
 .. _chai-installation:
 

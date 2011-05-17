@@ -25,12 +25,8 @@ class Mock(object):
   def __getattr__(self,name):
     rval = self.__dict__.get(name)
 
-    if not rval or not isinstance(rval,Stub):
-      def noop(*args, **kwargs):
-        raise UnexpectedCall()
-      noop.func_name = name
-
-      rval = MethodType(noop, self, Mock)
+    if not rval or not isinstance(rval,(Stub,Mock)):
+      rval = Mock()
       setattr(self, name, rval)
 
     return rval

@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='chai',
-    version='0.1.5',
+    version='0.1.6',
     author='Vitaly Babiy, Aaron Westendorf',
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
     packages=['chai'],

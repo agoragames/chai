@@ -286,7 +286,7 @@ The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mock
             obj = CustomObject()
             assert_equals('stack', obj._stack)
 
-``Mock`` objects, because og the ``getattr`` implementation, can also support nested attributes. ::
+``Mock`` objects, because of the ``getattr`` implementation, can also support nested attributes. ::
 
     class TestCase(Chai):
         def test_mock(self):
@@ -318,7 +318,7 @@ Download the latest version of Chai from http://pypi.python.org/pypi/chai
 You can install it by doing the following,::
 
     $ tar xvfz chai-*.*.*.tar.gz
-    $ cd chia-*.*.*.tar.gz
+    $ cd chai-*.*.*.tar.gz
     $ python setup.py install # as root
 
 .. _chai-installing-from-git:

@@ -241,6 +241,16 @@ class StubMethodTest(unittest.TestCase):
     s.teardown()
     self.assertEquals( orig, f.bar )
 
+  def test_teardown_of_classmethods(self):
+    class Foo(object):
+      @classmethod
+      def bar(self): pass
+    
+    self.assertTrue(isinstance(Foo.__dict__['bar'], classmethod))
+    s = StubMethod( Foo.bar )
+    s.teardown()
+    self.assertTrue(isinstance(Foo.__dict__['bar'], classmethod), "Is not a classmethod")
+
 class StubUnboundMethodTest(unittest.TestCase):
   
   def test_init(self):

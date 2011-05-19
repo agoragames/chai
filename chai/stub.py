@@ -30,7 +30,7 @@ def _stub_attr(obj, attr_name):
   from mock import Mock
 
   attr = getattr(obj, attr_name)
-  
+
   # Return an existing stub
   if isinstance(attr, Stub):
     return attr
@@ -191,9 +191,36 @@ class StubMethod(Stub):
 
   def teardown(self):
     '''
-    Replace the original method.
+    Put the original method back in place. This will also handle the special case
+    when it putting back a class method.
+
+    The following code snippet best describe why it fails using settar, the 
+    class method would be replaced with a bound method not a class method.
+
+    >>> class Example(object):
+    ...     @classmethod
+    ...     def a_classmethod(self):
+    ...         pass
+    ... 
+    >>> Example.__dict__['a_classmethod'] # Note the classmethod is returned.
+    <classmethod object at 0x7f5e6c298be8>
+    >>> orig = getattr(Example, 'a_classmethod')
+    >>> orig
+    <bound method type.a_classmethod of <class '__main__.Example'>>
+    >>> setattr(Example, 'a_classmethod', orig)
+    >>> Example.__dict__['a_classmethod'] # Note that setattr set a bound method not a class method.
+    <bound method type.a_classmethod of <class '__main__.Example'>>
+
+    The only way to figure out if this is a class method is to check and see if 
+    the bound method im_self is a class, if so then we need to wrap the function
+    object (im_func) with class method before setting it back on the class.
+
     '''
-    setattr( self._instance, self._attr, self._obj )
+    if inspect.isclass(self._obj.im_self): # Figure out if this is a class method
+      # Wrap it and set it back on the class
+      setattr(self._instance, self._attr, classmethod(self._obj.im_func))
+    else:
+      setattr( self._instance, self._attr, self._obj )
 
 class StubUnboundMethod(Stub):
   '''

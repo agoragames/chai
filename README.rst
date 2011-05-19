@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.6
+:Version: 0.1.7
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2

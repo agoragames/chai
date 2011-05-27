@@ -32,7 +32,7 @@ class Equals(Comparator):
     return self._value == value
 	
   def __repr__(self):
-    return "Equals(%s)" % (str(self._value))
+    return "Equals(%s)" % (repr(self._value))
   __str__ = __repr__
 
 class IsA(Comparator):
@@ -83,7 +83,7 @@ class AlmostEqual(Comparator):
     return round(value - self._float_value, self._places) == 0
 
   def __repr__(self):
-    return "AlmostEqual(value: %s, places: %s)" % (str(self._float_value), str(self._places))
+    return "AlmostEqual(value: %s, places: %d)" % (str(self._float_value), self._places)
   __str__ = __repr__
 
 class Regex(Comparator):
@@ -174,7 +174,7 @@ class Not(Comparator):
     return all([not c.test(value) for c in self._comparators])
 
   def __repr__(self):
-    return "Not(%s)" % (str(self._comparators))
+    return "Not(%s)" % (repr(self._comparators))
   __str__ = __repr__
 
 class Function(Comparator):

@@ -138,7 +138,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_all_repr(self):
     comp = All(IsA(bytearray), Equals('foobar'))
-    self.assertEqual(repr(comp), "All([IsA(bytearray), Equals(foobar)])")
+    self.assertEqual(repr(comp), "All([IsA(bytearray), Equals('foobar')])")
 
   def test_not(self):
     comp = Not( Any(1,3) )

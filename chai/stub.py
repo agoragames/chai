@@ -3,6 +3,7 @@ Implementation of stubbing
 '''
 import inspect
 import types
+import os
 
 from expectation import Expectation
 from exception import *
@@ -112,14 +113,27 @@ class Stub(object):
     self._obj = obj
     self._attr = attr
     self._expectations = []
+  
+  @property
+  def name(self):
+    if hasattr(self._obj, 'im_class'):
+      filename = os.path.relpath(inspect.getfile(self._obj.im_class))
+      name = "%s.%s (%s)" % (self._obj.im_class.__name__, self._attr, filename)
+    
+    if type(self._obj).__name__ == 'method-wrapper':
+      filename = os.path.relpath(inspect.getfile(self._obj.__self__.__class__))
+      name = "%s.%s (%s)" % (self._obj.__self__.__class__.__name__, self._attr, filename)
+    return name
 
-  def assert_expectations(self):
+  def unmet_expectations(self):
     '''
     Assert that all expectations on the stub have been met.
     '''
+    unmet = []
     for exp in self._expectations:
       if not exp.closed(with_counts=True):
-        raise ExpectationNotSatisfied(exp)
+        unmet.append(ExpectationNotSatisfied(exp))
+    return unmet
 
   def teardown(self):
     '''

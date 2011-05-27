@@ -27,8 +27,8 @@ class ExpectationNotSatisfied(ChaiAssertion):
   Raised when all expectations are not met
   '''
   
-  def __init__(self, expectation):
-    self._expection = expectation
+  def __init__(self, *expectations):
+    self._expections = expectations
   
   def __str__(self):
-    return str(self._expection)
+    return str("\n".join([ str(e) for e in self._expections]))

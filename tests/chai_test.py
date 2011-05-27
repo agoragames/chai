@@ -160,10 +160,10 @@ class ChaiTest(unittest.TestCase):
     obj = CupOf()    
     self.assertTrue(obj, ChaiTestType)
     
-  def test_runs_assert_expectations(self):
+  def test_runs_unmet_expectations(self):
     class Stub(object):
       calls = 0
-      def assert_expectations(self): self.calls += 1
+      def unmet_expectations(self): self.calls += 1; return []
       def teardown(self): self.calls += 1
 
     # obj = type('test',(object,),{})()

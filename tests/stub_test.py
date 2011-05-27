@@ -133,6 +133,7 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, stub(foo.__hash__) )
     self.assertEquals( res, getattr(foo, '__hash__') )
   
+class StubClassTest(unittest.TestCase):
   ###
   ### Test Stub class (if only I could mock my mocking mocks)
   ###
@@ -142,11 +143,11 @@ class StubTest(unittest.TestCase):
     self.assertEquals( 'attr', s._attr )
     self.assertEquals( [], s._expectations )
 
-  def test_assert_expectations(self):
+  def test_unment_expectations(self):
     s = Stub('obj', 'attr')
     s.expect().args(123).returns(1)
     
-    self.assertRaises(ExpectationNotSatisfied, s.assert_expectations)
+    self.assertTrue(all([isinstance(e, ExpectationNotSatisfied) for e in s.unmet_expectations()]))
   
   def test_teardown(self):
     s = Stub('obj')
@@ -231,6 +232,18 @@ class StubMethodTest(unittest.TestCase):
     self.assertEquals( s._attr, 'bar' )
     self.assertEquals( s, getattr(f,'bar') )
 
+  def test_name(self):
+    class Expect(object):
+      def closed(self): return False
+    obj = Expect()
+    s = StubMethod(obj.closed)
+    self.assertEquals(s.name, "Expect.closed (tests/stub_test.pyc)")
+    s.teardown()
+
+    s = StubMethod(obj, 'closed')
+    self.assertEquals(s.name, "Expect.closed (tests/stub_test.pyc)")
+    s.teardown()
+
   def test_teardown(self):
     class Foo(object):
       def bar(self): pass
@@ -262,6 +275,13 @@ class StubUnboundMethodTest(unittest.TestCase):
     self.assertEquals( s._attr, 'bar' )
     self.assertEquals( s, getattr(Foo,'bar') )
 
+  def test_name(self):
+    class Expect(object):
+      def closed(self): return False
+    s = StubUnboundMethod(Expect.closed)
+    self.assertEquals(s.name, "Expect.closed (tests/stub_test.pyc)")
+    s.teardown()
+
   def test_teardown(self):
     class Foo(object):
       def bar(self): pass
@@ -289,3 +309,29 @@ class StubUnboundMethodTest(unittest.TestCase):
     f2.bar()
 
     self.assertEquals( 2, s.calls )
+
+class StubMethodWrapperTest(unittest.TestCase):
+  
+  def test_init(self):
+    class Foo(object):pass
+    foo = Foo()
+
+    s = StubMethodWrapper( foo.__hash__ )
+    self.assertEquals( s._instance, foo )
+    self.assertEquals( s._attr, '__hash__' )
+    self.assertEquals( s, getattr(foo,'__hash__') )
+
+  def test_name(self):
+    class Foo(object):pass
+    foo = Foo()
+    s = StubMethodWrapper(foo.__hash__)
+    self.assertEquals(s.name, "Foo.__hash__ (tests/stub_test.pyc)")
+    s.teardown()
+
+  def test_teardown(self):
+    class Foo(object):pass
+    obj = Foo()
+    orig = obj.__hash__
+    s = StubMethodWrapper( obj.__hash__ )
+    s.teardown()
+    self.assertEquals( orig, obj.__hash__)

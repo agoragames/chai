@@ -46,8 +46,12 @@ class ChaiTestType(type):
     """
     def wrapper(self, *args, **kwargs):
       func(self, *args, **kwargs)
+      exceptions = []
       for stub in self._stubs:
-        stub.assert_expectations()
+        exceptions.extend(stub.unmet_expectations())
+      
+      if exceptions:
+        raise ExpectationNotSatisfied(*exceptions)
       
     wrapper.__name__ = func.__name__
     wrapper.__doc__ = func.__doc__

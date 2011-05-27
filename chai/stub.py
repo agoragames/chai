@@ -30,14 +30,13 @@ def _stub_attr(obj, attr_name):
   # this cleaned up. @AW
   from mock import Mock
 
-  # Check to see if this a property
+  # Check to see if this a property, this check is only when we are dealing with 
+  # a instance. getattr will work for classes.
   is_property = False
-  try:
+  if not inspect.isclass(obj):
     attr = getattr(obj.__class__, attr_name)
     if isinstance(attr, property):
       is_property = True
-  except AttributeError:
-    pass
 
   if not is_property:
     attr = getattr(obj, attr_name)

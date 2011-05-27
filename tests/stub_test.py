@@ -1,4 +1,4 @@
-
+import re
 import unittest
 import types
 
@@ -237,11 +237,11 @@ class StubMethodTest(unittest.TestCase):
       def closed(self): return False
     obj = Expect()
     s = StubMethod(obj.closed)
-    self.assertEquals(s.name, "Expect.closed (tests/stub_test.pyc)")
+    self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
     s.teardown()
 
     s = StubMethod(obj, 'closed')
-    self.assertEquals(s.name, "Expect.closed (tests/stub_test.pyc)")
+    self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
     s.teardown()
 
   def test_teardown(self):
@@ -279,7 +279,8 @@ class StubUnboundMethodTest(unittest.TestCase):
     class Expect(object):
       def closed(self): return False
     s = StubUnboundMethod(Expect.closed)
-    self.assertEquals(s.name, "Expect.closed (tests/stub_test.pyc)")
+
+    self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
     s.teardown()
 
   def test_teardown(self):
@@ -325,7 +326,7 @@ class StubMethodWrapperTest(unittest.TestCase):
     class Foo(object):pass
     foo = Foo()
     s = StubMethodWrapper(foo.__hash__)
-    self.assertEquals(s.name, "Foo.__hash__ (tests/stub_test.pyc)")
+    self.assertTrue(re.match("Foo.__hash__ \(tests/stub_test.py.?\)", s.name))
     s.teardown()
 
   def test_teardown(self):

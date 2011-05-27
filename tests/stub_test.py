@@ -14,11 +14,9 @@ class StubTest(unittest.TestCase):
     class Foo(object):
       @property
       def prop(self): return 3
-
+    
     res = stub(Foo, 'prop')
     self.assertTrue( isinstance(res,StubProperty) )
-    self.assertEquals( res, stub(Foo,'prop') )
-    self.assertEquals( res, getattr(Foo,'prop') )
 
   def test_stub_property_raises_unsupported_with_obj_ref(self):
     class Foo(object):

@@ -14,6 +14,11 @@ class CustomException(Exception): pass
 
 class SampleBaseTest(Chai):
 
+  def test_expects_property(self):
+    obj = SampleBase()
+    expect(obj, 'prop').returns("property value")
+    assert_equals("property value", obj.prop)
+
   def test_expects_bound_method_returns(self):
     obj = SampleBase()
     expect(obj.bound_method).args(1, 2).returns(12)

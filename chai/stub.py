@@ -30,7 +30,17 @@ def _stub_attr(obj, attr_name):
   # this cleaned up. @AW
   from mock import Mock
 
-  attr = getattr(obj, attr_name)
+  # Check to see if this a property
+  is_property = False
+  try:
+    attr = getattr(obj.__class__, attr_name)
+    if isinstance(attr, property):
+      is_property = True
+  except AttributeError:
+    pass
+
+  if not is_property:
+    attr = getattr(obj, attr_name)
 
   # Return an existing stub
   if isinstance(attr, Stub):
@@ -118,12 +128,15 @@ class Stub(object):
   def name(self):
     if hasattr(self._obj, 'im_class'):
       filename = os.path.relpath(inspect.getfile(self._obj.im_class))
-      name = "%s.%s (%s)" % (self._obj.im_class.__name__, self._attr, filename)
+      return "%s.%s (%s)" % (self._obj.im_class.__name__, self._attr, filename)
     
     if type(self._obj).__name__ == 'method-wrapper':
       filename = os.path.relpath(inspect.getfile(self._obj.__self__.__class__))
-      name = "%s.%s (%s)" % (self._obj.__self__.__class__.__name__, self._attr, filename)
-    return name
+      return "%s.%s (%s)" % (self._obj.__self__.__class__.__name__, self._attr, filename)
+    
+    if isinstance(self._obj, property):
+      filename = os.path.relpath(inspect.getfile(self._instance.__class__))
+      return "%s.%s (%s)" % (self._instance.__class__.__name__, self._attr, filename)
 
   def unmet_expectations(self):
     '''
@@ -182,8 +195,25 @@ class StubProperty(Stub):
   
   def __init__(self, obj, attr):
     super(StubProperty,self).__init__(obj, attr)
-    setattr( self._obj, self._attr, self )
+    # In order to stub out a property we have ask the class for the propery object
+    # that was created we python execute class code.
+    if inspect.isclass(obj):
+      self._instance = obj
+    else:
+      self._instance = obj.__class__
 
+    self._obj = getattr(obj, attr)
+    
+    # We have to build a property that will call our stub, we have to wrap this 
+    # in a lambda so we can catch the first argument since it will be the instance.
+    stub_property = property(lambda instance: self()) 
+    setattr(self._instance, self._attr, stub_property)
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._instance, self._attr, self._obj )
 
 class StubMethod(Stub):
   '''

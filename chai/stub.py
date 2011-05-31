@@ -134,8 +134,8 @@ class Stub(object):
       return "%s.%s (%s)" % (self._obj.__self__.__class__.__name__, self._attr, filename)
     
     if isinstance(self._obj, property):
-      filename = os.path.relpath(inspect.getfile(self._instance.__class__))
-      return "%s.%s (%s)" % (self._instance.__class__.__name__, self._attr, filename)
+      filename = os.path.relpath(inspect.getfile(self._instance))
+      return "%s.%s (%s)" % (self._instance.__name__, self._attr, filename)
 
   def unmet_expectations(self):
     '''

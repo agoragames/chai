@@ -33,7 +33,7 @@ def _stub_attr(obj, attr_name):
   # Check to see if this a property, this check is only for when dealing with an 
   # instance. getattr will work for classes.
   is_property = False
-  if not inspect.isclass(obj):
+  if not inspect.isclass(obj) and not inspect.ismodule(obj):
     attr = getattr(obj.__class__, attr_name)
     if isinstance(attr, property):
       is_property = True

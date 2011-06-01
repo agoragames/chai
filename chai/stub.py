@@ -220,10 +220,6 @@ class StubProperty(Stub, property):
     '''
     setattr( self._instance, self._attr, self._obj )
 
-
-  def getter(self):
-    return self
-
 class StubMethod(Stub):
   '''
   Stub a method.

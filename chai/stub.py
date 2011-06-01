@@ -187,13 +187,15 @@ class Stub(object):
     
     return "\n".join(result)
 
-class StubProperty(Stub):
+class StubProperty(Stub, property):
   '''
   Property stubbing.
   '''
   
   def __init__(self, obj, attr):
     super(StubProperty,self).__init__(obj, attr)
+    property.__init__(self, lambda x: self(), 
+      lambda x, val: self.setter(val), lambda x: self.deleter() )
     # In order to stub out a property we have ask the class for the propery object
     # that was created we python execute class code.
     if inspect.isclass(obj):
@@ -201,18 +203,26 @@ class StubProperty(Stub):
     else:
       self._instance = obj.__class__
 
+    # Use a simple Mock object for the deleter and setter. Use same namespace
+    # as property type so that it simply works.
+    # Annoying circular reference requires importing here. Would like to see
+    # this cleaned up. @AW
+    from mock import Mock
     self._obj = getattr(obj, attr)
+    self.setter = Mock()
+    self.deleter = Mock()
     
-    # We have to build a property that will call our stub, we have to wrap this 
-    # in a lambda so we can catch the first argument since it will be the instance.
-    stub_property = property(lambda instance: self()) 
-    setattr(self._instance, self._attr, stub_property)
+    setattr(self._instance, self._attr, self)
 
   def teardown(self):
     '''
     Replace the original method.
     '''
     setattr( self._instance, self._attr, self._obj )
+
+
+  def getter(self):
+    return self
 
 class StubMethod(Stub):
   '''

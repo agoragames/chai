@@ -10,13 +10,33 @@ class StubTest(unittest.TestCase):
   ###
   ### Test the public stub() method
   ###
-  def test_stub_property_with_attr_name(self):
+  def test_stub_property_on_class_with_attr_name(self):
     class Foo(object):
       @property
       def prop(self): return 3
     
     res = stub(Foo, 'prop')
     self.assertTrue( isinstance(res,StubProperty) )
+    self.assertTrue( stub(Foo,'prop') is res )
+
+  def test_stub_property_on_instance_with_attr_name(self):
+    class Foo(object):
+      @property
+      def prop(self): return 3
+    foo = Foo()
+    
+    res = stub(foo, 'prop')
+    self.assertTrue( isinstance(res,StubProperty) )
+    self.assertTrue( stub(foo,'prop') is res )
+
+  def test_stub_property_on_class_applies_to_instance(self):
+    class Foo(object):
+      @property
+      def prop(self): return 3
+    
+    foo = Foo()
+    res = stub(Foo, 'prop')
+    self.assertTrue( stub(foo,'prop') is res )
 
   def test_stub_property_raises_unsupported_with_obj_ref(self):
     class Foo(object):

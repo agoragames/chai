@@ -29,7 +29,7 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res,StubProperty) )
     self.assertTrue( stub(foo,'prop') is res )
 
-  def test_stub_property_on_class_applies_to_instance(self):
+  def test_stub_property_on_class_with_attr_name_applies_to_instance(self):
     class Foo(object):
       @property
       def prop(self): return 3
@@ -38,12 +38,32 @@ class StubTest(unittest.TestCase):
     res = stub(Foo, 'prop')
     self.assertTrue( stub(foo,'prop') is res )
 
-  def test_stub_property_raises_unsupported_with_obj_ref(self):
+  def test_stub_property_with_obj_ref_for_the_reader(self):
     class Foo(object):
       @property
       def prop(self): return 3
 
-    self.assertRaises( UnsupportedStub, stub, Foo.prop)
+    res = stub(Foo.prop)
+    self.assertTrue( isinstance(res, StubProperty) )
+    self.assertTrue( stub(Foo.prop) is res )
+
+  def test_stub_property_with_obj_ref_for_the_setter(self):
+    class Foo(object):
+      @property
+      def prop(self): return 3
+
+    res = stub(Foo.prop.setter)
+    self.assertTrue( isinstance(res, StubMethod) )
+    self.assertTrue( isinstance(Foo.prop, StubProperty) )
+
+  def test_stub_property_with_obj_ref_for_the_deleter(self):
+    class Foo(object):
+      @property
+      def prop(self): return 3
+
+    res = stub(Foo.prop.deleter)
+    self.assertTrue( isinstance(res, StubMethod) )
+    self.assertTrue( isinstance(Foo.prop, StubProperty) )
 
   def test_stub_mock_with_attr_name(self):
     class Foo(object):

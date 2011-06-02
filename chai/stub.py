@@ -4,6 +4,7 @@ Implementation of stubbing
 import inspect
 import types
 import os
+import gc
 
 from expectation import Expectation
 from exception import *
@@ -85,11 +86,6 @@ def _stub_obj(obj):
   # If a Mock object, stub its __call__
   if isinstance(obj, Mock):
     return stub(obj.__call__)
- 
-  # can't stub properties directly because the property object doesn't have
-  # a reference to the class or name of the attribute on which it was defined
-  if isinstance(obj, property):
-    raise UnsupportedStub("must call stub(obj,attr) for properties")
 
   # I thought that types.UnboundMethodType differentiated these cases but
   # apparently not.
@@ -107,7 +103,39 @@ def _stub_obj(obj):
   if type(obj).__name__ == 'wrapper_descriptor':
     raise UnsupportedStub("must call stub(obj,'%s') for slot wrapper on %s", 
       obj.__name__, obj.__objclass__.__name__ )
+
+  # Lastly, look for properties.
+  # First look for the situation where there's a reference back to the property.
+  prop = obj
+  if isinstance( getattr( obj, '__self__', None), property ):
+    obj = prop.__self__
   
+  # Once we've found a property, we have to figure out how to reference back to
+  # the owning class. This is a giant pain and we have to use gc to find out
+  # where it comes from. This code is dense but resolves to something like this:
+  # >>> gc.get_referrers( foo.x )
+  # [{'__dict__': <attribute '__dict__' of 'foo' objects>, 
+  #   'x': <property object at 0x7f68c99a16d8>, 
+  #   '__module__': '__main__', 
+  #   '__weakref__': <attribute '__weakref__' of 'foo' objects>, 
+  #   '__doc__': None}]
+  if isinstance(obj, property):
+    klass,attr = None,None
+    for ref in gc.get_referrers( obj ):
+      if klass and attr: break
+      if isinstance(ref,dict) and ref.get('prop',None) is obj :
+        klass = getattr( ref.get('__dict__',None), '__objclass__', None )
+        for name,val in getattr(klass,'__dict__',{}).iteritems():
+          if val is obj:
+            attr = name
+            break
+    
+    if klass and attr:
+      rval = stub(klass,attr)
+      if prop != obj:
+        return stub(rval, prop.__name__)
+      return rval
+ 
   raise UnsupportedStub("can't stub %s", obj)
 
 class Stub(object):

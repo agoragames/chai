@@ -5,7 +5,7 @@ except ImportError:
 
 setup(
     name='chai',
-    version='0.1.7',
+    version='0.1.8',
     author='Vitaly Babiy, Aaron Westendorf',
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
     packages=['chai'],

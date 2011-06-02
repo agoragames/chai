@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.7
+:Version: 0.1.8
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -91,6 +91,9 @@ Stubbing is used for situations when you want to assert that a method is never c
     class CustomObject (object): 
         def get(self, arg):
             pass
+        @property
+        def prop(self):
+            pass
 
     class TestCase(Chai):
         def test_mock_get(self):
@@ -114,7 +117,25 @@ Stubbing an unbound method will apply that stub to all future instances of that 
             obj = CustomObject()
             assert_raises( UnexpectedCall, obj.get )
 
-Finally, some methods cannot be stubbed because it is impossible to call ``setattr`` on the object. A good example of this is the ``datetime.datetime`` class.
+Some methods cannot be stubbed because it is impossible to call ``setattr`` on the object. A good example of this is the ``datetime.datetime`` class.
+
+Finally, Chai supports stubbing of properties on classes. In all cases, the stub will be applied to a class and individually to each of the 3 property methods. Because the stub is on the class, all instances need to be addressed when you write expectations. The first interface is via the named attribute method which can be used on both classes and instances. ::
+
+    class TestCase(Chai):
+        def test_prop_attr(self):
+            obj = CustomObject()
+            stub( obj, 'prop' )
+            assert_raises( UnexpectedCall, lambda: obj.prop )
+            stub( stub( obj, 'prop' ).setter )
+
+Using the class, you can directly refer to all 3 methods of the property. To refer to the getter you use the property directly, and for the methods you use its associated attribute name. You can stub in any order and it will still resolve correctly. ::
+
+    class TestCase(Chai):
+      def test_prop_attr(self):
+        stub( CustomObject.prop.setter )
+        stub( CustomObject.prop )
+        stub( CustomObject.prop.deleter )
+        assert_raises( UnexpectedCall, lambda: CustomObject().prop )
 
 
 Expectation

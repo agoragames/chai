@@ -1,6 +1,7 @@
 # Simple functional tests
 
 from chai import Chai
+from chai.exception import UnexpectedCall
 
 class FunctionalTest(Chai):
 
@@ -19,6 +20,8 @@ class FunctionalTest(Chai):
     expect( stub(foo,'prop').deleter )
     del foo.prop
 
+    assert_raises( UnexpectedCall, lambda: foo.prop )
+
   def test_properties_using_obj_ref_on_a_class_and_using_get_first(self):
     class Foo(object):
       @property
@@ -31,6 +34,7 @@ class FunctionalTest(Chai):
     assert_equals( 'foo', Foo().prop )
     Foo().prop = 42
     del Foo().prop
+    assert_raises( UnexpectedCall, lambda: Foo().prop )
 
   def test_properties_using_obj_ref_on_a_class_and_using_set_first(self):
     class Foo(object):

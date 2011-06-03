@@ -235,7 +235,6 @@ class StubProperty(Stub, property):
   
   @property
   def name(self):
-    import ipdb; ipdb.set_trace() # FIXME: Remove debug
     return "%s.%s" % (self._instance.__name__, self._attr)
 
 

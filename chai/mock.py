@@ -10,6 +10,11 @@ class Mock(object):
   '''
   A class where all calls are stubbed.
   '''
+
+  def __init__(self, **kwargs):
+    for name, value in kwargs.iteritems():
+      setattr(self, name, value)
+
   # For whatever reason, new-style objects require this method defined before
   # any instance is created. Defining it through __getattr__ is not enough. This
   # appears to be a bug/feature in new classes where special members, or at least
@@ -27,6 +32,7 @@ class Mock(object):
 
     if not rval or not isinstance(rval,(Stub,Mock)):
       rval = Mock()
+      rval._name = name
       setattr(self, name, rval)
 
     return rval

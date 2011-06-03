@@ -275,6 +275,8 @@ class StubMethodTest(unittest.TestCase):
       def closed(self): return False
     obj = Expect()
     s = StubMethod(obj.closed)
+    import ipdb; ipdb.set_trace() # FIXME: Remove debugger
+    print s.name
     self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
     s.teardown()
 

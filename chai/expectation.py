@@ -57,14 +57,25 @@ class ArgumentsExpectationRule(ExpectationRule):
 
     self._passed = True
     return self._passed
+  
+  @classmethod
+  def pretty_format_args(self, *args, **kwargs):
+    """
+    Take the args, and kwargs that are passed them and format in a prototype style.
+    """
+    args = list([repr(a) for a in args])
+    for key, value in kwargs.iteritems():
+      args.append("%s=%s" % (key, repr(value)))
+    
+    return "(%s)" % ", ".join([a for a in args])
 
   def __str__(self):
     if hasattr(self, 'in_args') and hasattr(self, 'in_kwargs'):
-      return "ArgumentsExpectationRule: passed: %s, args: %s, expected args: %s, kwargs: %s, expected kwargs: %s" % \
-        (self._passed, str(self.args), self.in_args, self.kwargs, self.in_kwargs)
+      return "\tExpected: %s\n\t\t    Used: %s" % \
+        (self.pretty_format_args(*self.args, **self.kwargs), self.pretty_format_args(*self.in_args, **self.in_kwargs))
         
-    return "ArgumentsExpectationRule: passed: %s, args: %s, kwargs: %s, " % \
-      (self._passed, self.args, self.kwargs)
+    return "\tExpected: %s" % \
+        (self.pretty_format_args(*self.args, **self.kwargs))
 
 class Expectation(object):
   '''
@@ -195,6 +206,6 @@ class Expectation(object):
     return self.return_value()
   
   def __str__(self):
-    runs_string = "Ran: %s, expect_min: %s, expect_max: %s" % (self._run_count, self._min_count, self._max_count)
-    return_string = "Raises: %s" % self._raises if self._raises else "Returns: %s" % self._returns
-    return "\n\t%s\n\t\t%s\n\t\t%s\n\t\t%s" % (self._stub.name, self._arguments_rule, return_string, runs_string)
+    runs_string = "     Ran: %s, expect_min: %s, expect_max: %s" % (self._run_count, self._min_count, self._max_count)
+    return_string = "  Raises: %s" % self._raises if self._raises else " Returns: %s" % self._returns
+    return "\n\t%s\n\t%s\n\t\t%s\n\t\t%s" % (self._stub.name, self._arguments_rule, return_string, runs_string)

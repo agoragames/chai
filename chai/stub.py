@@ -6,7 +6,7 @@ import types
 import os
 import gc
 
-from expectation import Expectation
+from expectation import Expectation, ArgumentsExpectationRule
 from exception import *
 
 # For clarity here and in tests, could make these class or static methods on
@@ -153,7 +153,15 @@ class Stub(object):
   
   @property
   def name(self):
+    from mock import Mock # Import here for the same reason as above.
     if hasattr(self._obj, 'im_class'):
+      if issubclass(self._obj.im_class, Mock):
+        return "%s (on mock object)" % self._obj.im_self._name
+      
+      if type(self._obj).__name__ == 'instancemethod':
+        filename = os.path.relpath(inspect.getfile(self._obj))
+        return "%s.%s (%s)" % (self._obj.__name__, self._attr, filename)
+
       filename = os.path.relpath(inspect.getfile(self._obj.im_class))
       return "%s.%s (%s)" % (self._obj.im_class.__name__, self._attr, filename)
     
@@ -203,11 +211,11 @@ class Stub(object):
       else:
         return exp.test(*args, **kwargs)
     
-    raise UnexpectedCall("\n\n" + self._format_exception(*args, **kwargs))
+    raise UnexpectedCall("\n\n" + self._format_exception(ArgumentsExpectationRule.pretty_format_args(*args, **kwargs)))
   
-  def _format_exception(self, *in_args, **in_kwargs):
+  def _format_exception(self, args_str):
     result = [
-      "No expectation in place for %s with %s, %s" % (self._attr, in_args, in_kwargs),
+      "No expectation in place for %s with %s" % (self.name, args_str),
       "All Expectations:"
     ]
     for exception in self._expectations:

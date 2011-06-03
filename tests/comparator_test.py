@@ -37,7 +37,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_equals_repr(self):
       comp = Equals(3)
-      self.assertEquals(str(comp), "Equals(3)")
+      self.assertEquals(str(comp), "3")
 
   def test_is_a(self):
     comp = IsA(str)
@@ -107,7 +107,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_any_repr(self):
     comp = Any(1,2,3,str)
-    self.assertEquals(repr(comp), "Any([Equals(1), Equals(2), Equals(3), IsA(str)])")
+    self.assertEquals(repr(comp), "Any([1, 2, 3, IsA(str)])")
   
   def test_in(self):
     comp = In(['foo', 'bar'])
@@ -138,7 +138,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_all_repr(self):
     comp = All(IsA(bytearray), Equals('foobar'))
-    self.assertEqual(repr(comp), "All([IsA(bytearray), Equals('foobar')])")
+    self.assertEqual(repr(comp), "All([IsA(bytearray), 'foobar'])")
 
   def test_not(self):
     comp = Not( Any(1,3) )
@@ -148,7 +148,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_no_repr(self):
     comp = Not(Any(1,3))
-    self.assertEqual(repr(comp), "Not([Any([Equals(1), Equals(3)])])")
+    self.assertEqual(repr(comp), "Not([Any([1, 3])])")
 
   def test_function(self):
     r = [True,False]

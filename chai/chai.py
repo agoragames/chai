@@ -161,11 +161,11 @@ class Chai(unittest.TestCase):
     '''
     return self.stub(obj,attr).expect()
 
-  def mock(self, obj=None, attr=None):
+  def mock(self, obj=None, attr=None, **kwargs):
     '''
     Return a mock object.
     '''
-    rval = Mock()
+    rval = Mock(**kwargs)
     if obj!=None and attr!=None:
       rval._object = obj
       rval._attr = attr

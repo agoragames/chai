@@ -32,7 +32,7 @@ class Equals(Comparator):
     return self._value == value
 	
   def __repr__(self):
-    return "Equals(%s)" % (repr(self._value))
+    return repr(self._value)
   __str__ = __repr__
 
 class IsA(Comparator):

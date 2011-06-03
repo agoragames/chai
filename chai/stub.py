@@ -8,6 +8,7 @@ import gc
 
 from expectation import Expectation, ArgumentsExpectationRule
 from exception import *
+from termcolor import colored
 
 # For clarity here and in tests, could make these class or static methods on
 # Stub. Chai base class would hide that.
@@ -153,26 +154,8 @@ class Stub(object):
   
   @property
   def name(self):
-    from mock import Mock # Import here for the same reason as above.
-    if hasattr(self._obj, 'im_class'):
-      if issubclass(self._obj.im_class, Mock):
-        return "%s (on mock object)" % self._obj.im_self._name
-      
-      if type(self._obj).__name__ == 'instancemethod':
-        filename = os.path.relpath(inspect.getfile(self._obj))
-        return "%s.%s (%s)" % (self._obj.__name__, self._attr, filename)
-
-      filename = os.path.relpath(inspect.getfile(self._obj.im_class))
-      return "%s.%s (%s)" % (self._obj.im_class.__name__, self._attr, filename)
-    
-    if type(self._obj).__name__ == 'method-wrapper':
-      filename = os.path.relpath(inspect.getfile(self._obj.__self__.__class__))
-      return "%s.%s (%s)" % (self._obj.__self__.__class__.__name__, self._attr, filename)
-    
-    if isinstance(self._obj, property):
-      filename = os.path.relpath(inspect.getfile(self._instance))
-      return "%s.%s (%s)" % (self._instance.__name__, self._attr, filename)
-
+    return None # The base class implement this.
+  
   def unmet_expectations(self):
     '''
     Assert that all expectations on the stub have been met.
@@ -215,7 +198,7 @@ class Stub(object):
   
   def _format_exception(self, args_str):
     result = [
-      "No expectation in place for %s with %s" % (self.name, args_str),
+      colored("No expectation in place for %s with %s" % (self.name, args_str), "red"),
       "All Expectations:"
     ]
     for exception in self._expectations:
@@ -249,6 +232,12 @@ class StubProperty(Stub, property):
     self.deleter = Mock()
     
     setattr(self._instance, self._attr, self)
+  
+  @property
+  def name(self):
+    import ipdb; ipdb.set_trace() # FIXME: Remove debug
+    return "%s.%s" % (self._instance.__name__, self._attr)
+
 
   def teardown(self):
     '''
@@ -273,6 +262,20 @@ class StubMethod(Stub):
       self._instance = self._obj
       self._obj = getattr( self._instance, self._attr )
     setattr( self._instance, self._attr, self )
+  
+  @property
+  def name(self):
+    from mock import Mock # Import here for the same reason as above.
+    if hasattr(self._obj, 'im_class'):
+      if issubclass(self._obj.im_class, Mock):
+        return "%s (on mock object)" % self._obj.im_self._name
+    
+    # Always use the class to get the name
+    klass = self._instance
+    if not inspect.isclass(self._instance):
+      klass = self._instance.__class__
+    
+    return "%s.%s" % (klass.__name__, self._attr)
 
   def teardown(self):
     '''
@@ -320,6 +323,10 @@ class StubUnboundMethod(Stub):
     self._instance = obj.im_class
     self._attr = obj.im_func.func_name
     setattr( self._instance, self._attr, self )
+  
+  @property
+  def name(self):
+    return "%s.%s" % (self._instance.__name__, self._attr)
 
   def teardown(self):
     '''
@@ -340,6 +347,10 @@ class StubMethodWrapper(Stub):
     self._instance = obj.__self__
     self._attr = obj.__name__
     setattr( self._instance, self._attr, self )
+
+  @property
+  def name(self):
+    return "%s.%s" % (self._instance.__class__.__name__, self._attr)
 
   def teardown(self):
     '''
@@ -362,6 +373,10 @@ class StubWrapperDescriptor(Stub):
     super(StubWrapperDescriptor,self).__init__(obj, attr_name)
     self._orig = getattr( self._obj, self._attr )
     setattr( self._obj, self._attr, self )
+
+  @property
+  def name(self):
+    return "%s.%s" % (self._obj.__name__, self._attr)
 
   def teardown(self):
     '''

@@ -248,6 +248,17 @@ class StubClassTest(unittest.TestCase):
     self.assertEquals( (('foo',),{}), s._expectations[1]._close_args )
     
 
+class StubPropertyTest(unittest.TestCase):
+  # FIXME: Need to test teardown and init, these test might be in the base stub tests.
+  
+  def test_name(self):
+    class Foo(object):
+      @property
+      def prop(self): return 3
+    
+    s = StubProperty(Foo, 'prop')
+    self.assertEquals(s.name, 'Foo.prop')
+
 class StubMethodTest(unittest.TestCase):
   
   def test_init(self):
@@ -275,13 +286,11 @@ class StubMethodTest(unittest.TestCase):
       def closed(self): return False
     obj = Expect()
     s = StubMethod(obj.closed)
-    import ipdb; ipdb.set_trace() # FIXME: Remove debugger
-    print s.name
-    self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
+    self.assertEquals("Expect.closed", s.name)
     s.teardown()
 
     s = StubMethod(obj, 'closed')
-    self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
+    self.assertEquals("Expect.closed", s.name)
     s.teardown()
 
   def test_teardown(self):
@@ -318,9 +327,9 @@ class StubUnboundMethodTest(unittest.TestCase):
   def test_name(self):
     class Expect(object):
       def closed(self): return False
-    s = StubUnboundMethod(Expect.closed)
 
-    self.assertTrue(re.match("Expect.closed \(tests/stub_test.py.?\)", s.name))
+    s = StubUnboundMethod(Expect.closed)
+    self.assertEquals("Expect.closed", s.name)
     s.teardown()
 
   def test_teardown(self):
@@ -365,8 +374,9 @@ class StubMethodWrapperTest(unittest.TestCase):
   def test_name(self):
     class Foo(object):pass
     foo = Foo()
+
     s = StubMethodWrapper(foo.__hash__)
-    self.assertTrue(re.match("Foo.__hash__ \(tests/stub_test.py.?\)", s.name))
+    self.assertEquals("Foo.__hash__", s.name)
     s.teardown()
 
   def test_teardown(self):
@@ -376,3 +386,26 @@ class StubMethodWrapperTest(unittest.TestCase):
     s = StubMethodWrapper( obj.__hash__ )
     s.teardown()
     self.assertEquals( orig, obj.__hash__)
+
+class StubMethodWrapperDescriptionTest(unittest.TestCase):
+  
+  def test_init(self):
+    class Foo(object):pass
+    s = StubWrapperDescriptor( Foo, '__hash__' )
+    self.assertEquals( s._obj, Foo )
+    self.assertEquals( s._attr, '__hash__' )
+    self.assertEquals( s, getattr(Foo,'__hash__') )
+
+  def test_name(self):
+    class Foo(object):pass
+
+    s = StubWrapperDescriptor(Foo, '__hash__')
+    self.assertEquals("Foo.__hash__", s.name)
+    s.teardown()
+
+  def test_teardown(self):
+    class Foo(object):pass
+    orig = Foo.__hash__
+    s = StubWrapperDescriptor( Foo, '__hash__' )
+    s.teardown()
+    self.assertEquals( orig, Foo.__hash__)

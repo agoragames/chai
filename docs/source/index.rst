@@ -1,7 +1,3 @@
-
-.. warning::
-   This is the start, these docs are no where near complete.
-
 Chai mocking/stubbing framework for python.
 ================================================================
 

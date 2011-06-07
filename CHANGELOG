@@ -1,0 +1,8 @@
+
+0.1.8
+=====
+
+* Support stubbing of get, set and delete on class properties through both 
+  attribute name and object reference
+* Improved output on unmet expectations
+* Changelog

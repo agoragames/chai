@@ -3,6 +3,9 @@ try:
 except ImportError:
     from distutils.core import setup
 
+requirements = [r for r in map(str.strip, open('requirements.txt').readlines())]
+
+
 setup(
     name='chai',
     version='0.1.8',
@@ -14,6 +17,7 @@ setup(
     description="Easy to use mocking/stub framework.",
     long_description=open('README.rst').read(),
     keywords=['python', 'test', 'mock'],
+    install_requires=requirements,
     classifiers=[
         'Development Status :: 4 - Beta',
         'License :: OSI Approved :: BSD License',

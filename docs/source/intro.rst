@@ -3,5 +3,7 @@
 Intro
 ================================
 
-This is a quick idea of getting you started with chai.
+1. Install
+2. Write TestCase
+3. Profit
 

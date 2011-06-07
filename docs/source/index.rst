@@ -1,7 +1,7 @@
-Chai mocking/stubbing framework for python.
+Chai, a mocking/stubbing framework for python.
 ================================================================
 
-Chai offers a very simple and intiative api for mocking, stubbing and expectation setting.
+Chai offers a very simple and intuitive api for mocking, stubbing and expectation management.
 
 .. toctree::
    :maxdepth: 1

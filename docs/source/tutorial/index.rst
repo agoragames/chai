@@ -2,7 +2,7 @@
 Tutorial
 ================================
 
-A Tutorial on useing chai
+A Tutorial about using chai
 
 Index:
 

@@ -211,6 +211,6 @@ class Expectation(object):
   
   def __str__(self):
     runs_string = "     Ran: %s, Min Runs: %s, Max Runs: %s" % (self._run_count, self._min_count, "∞" if self._max_count == None else self._max_count)
-    return_string = "  Raises: %s" % self._raises if self._raises else " Returns: %s" % self._returns
+    return_string = "  Raises: %s" % self._raises if self._raises else " Returns: %s" % repr(self._returns)
     return "\n\t%s\n\t%s\n\t\t%s\n\t\t%s" % (colored("%s - %s" % (self._stub.name, "Passed" if self._arguments_rule._passed else "Failed")
       , "green" if self._arguments_rule._passed else "red"), self._arguments_rule, return_string, runs_string)

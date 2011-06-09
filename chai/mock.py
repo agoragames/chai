@@ -25,7 +25,9 @@ class Mock(object):
   def __call__(self, *args, **kwargs):
     if isinstance(getattr(self,'__call__'), Stub):
       return getattr(self,'__call__')(*args, **kwargs)
-    raise UnexpectedCall()
+    
+    # FIXME: this need to be formated.
+    raise UnexpectedCall("on %s : %s : %s" % (self._name, args, kwargs))
 
   def __getattr__(self,name):
     rval = self.__dict__.get(name)

@@ -4,6 +4,7 @@ Implementation of stubbing
 import inspect
 import types
 import os
+import sys
 import gc
 
 from expectation import Expectation, ArgumentsExpectationRule
@@ -32,9 +33,10 @@ def _stub_attr(obj, attr_name):
   # this cleaned up. @AW
   from mock import Mock
 
-  # Check to see if this a property, this check is only for when dealing with an 
+  # Check to see if this a property, this check is only for when dealing with an
   # instance. getattr will work for classes.
   is_property = False
+
   if not inspect.isclass(obj) and not inspect.ismodule(obj):
     attr = getattr(obj.__class__, attr_name)
     if isinstance(attr, property):
@@ -51,6 +53,9 @@ def _stub_attr(obj, attr_name):
   if isinstance(attr, Mock):
     return stub(attr.__call__)
 
+  if inspect.ismodule(obj):
+    return StubFunction(attr)
+
   if isinstance(attr, property):
     return StubProperty(obj, attr_name)
 
@@ -64,7 +69,7 @@ def _stub_attr(obj, attr_name):
   # What an absurd type this is ....
   if type(attr).__name__ == 'method-wrapper':
     return StubMethodWrapper(attr)
-  
+
   # This is also slot_descriptor
   if type(attr).__name__ == 'wrapper_descriptor':
     return StubWrapperDescriptor(obj, attr_name)
@@ -102,7 +107,7 @@ def _stub_obj(obj):
     return StubMethodWrapper(obj)
 
   if type(obj).__name__ == 'wrapper_descriptor':
-    raise UnsupportedStub("must call stub(obj,'%s') for slot wrapper on %s", 
+    raise UnsupportedStub("must call stub(obj,'%s') for slot wrapper on %s",
       obj.__name__, obj.__objclass__.__name__ )
 
   # Lastly, look for properties.
@@ -110,15 +115,15 @@ def _stub_obj(obj):
   prop = obj
   if isinstance( getattr( obj, '__self__', None), property ):
     obj = prop.__self__
-  
+
   # Once we've found a property, we have to figure out how to reference back to
   # the owning class. This is a giant pain and we have to use gc to find out
   # where it comes from. This code is dense but resolves to something like this:
   # >>> gc.get_referrers( foo.x )
-  # [{'__dict__': <attribute '__dict__' of 'foo' objects>, 
-  #   'x': <property object at 0x7f68c99a16d8>, 
-  #   '__module__': '__main__', 
-  #   '__weakref__': <attribute '__weakref__' of 'foo' objects>, 
+  # [{'__dict__': <attribute '__dict__' of 'foo' objects>,
+  #   'x': <property object at 0x7f68c99a16d8>,
+  #   '__module__': '__main__',
+  #   '__weakref__': <attribute '__weakref__' of 'foo' objects>,
   #   '__doc__': None}]
   if isinstance(obj, property):
     klass,attr = None,None
@@ -130,13 +135,13 @@ def _stub_obj(obj):
           if val is obj:
             attr = name
             break
-    
+
     if klass and attr:
       rval = stub(klass,attr)
       if prop != obj:
         return stub(rval, prop.__name__)
       return rval
- 
+
   raise UnsupportedStub("can't stub %s", obj)
 
 class Stub(object):
@@ -151,11 +156,11 @@ class Stub(object):
     self._obj = obj
     self._attr = attr
     self._expectations = []
-  
+
   @property
   def name(self):
     return None # The base class implement this.
-  
+
   def unmet_expectations(self):
     '''
     Assert that all expectations on the stub have been met.
@@ -186,16 +191,16 @@ class Stub(object):
       # If expectation closed skip
       if exp.closed():
         continue
-      
+
       # If args don't match the expectation, close it and move on, else
       # pass to it for testing.
       if not exp.match(*args, **kwargs):
         exp.close(*args, **kwargs)
       else:
         return exp.test(*args, **kwargs)
-    
+
     raise UnexpectedCall("\n\n" + self._format_exception(ArgumentsExpectationRule.pretty_format_args(*args, **kwargs)))
-  
+
   def _format_exception(self, args_str):
     result = [
       colored("No expectation in place for %s with %s" % (self.name, args_str), "red"),
@@ -203,17 +208,17 @@ class Stub(object):
     ]
     for exception in self._expectations:
       result.append(str(exception))
-    
+
     return "\n".join(result)
 
 class StubProperty(Stub, property):
   '''
   Property stubbing.
   '''
-  
+
   def __init__(self, obj, attr):
     super(StubProperty,self).__init__(obj, attr)
-    property.__init__(self, lambda x: self(), 
+    property.__init__(self, lambda x: self(),
       lambda x, val: self.setter(val), lambda x: self.deleter() )
     # In order to stub out a property we have ask the class for the propery object
     # that was created we python execute class code.
@@ -230,9 +235,9 @@ class StubProperty(Stub, property):
     self._obj = getattr(obj, attr)
     self.setter = Mock()
     self.deleter = Mock()
-    
+
     setattr(self._instance, self._attr, self)
-  
+
   @property
   def name(self):
     return "%s.%s" % (self._instance.__name__, self._attr)
@@ -254,26 +259,26 @@ class StubMethod(Stub):
     Initialize with an object of type MethodType
     '''
     super(StubMethod,self).__init__(obj, attr)
-    if not self._attr: 
+    if not self._attr:
       self._attr = obj.im_func.func_name
       self._instance = obj.im_self
     else:
       self._instance = self._obj
       self._obj = getattr( self._instance, self._attr )
     setattr( self._instance, self._attr, self )
-  
+
   @property
   def name(self):
     from mock import Mock # Import here for the same reason as above.
     if hasattr(self._obj, 'im_class'):
       if issubclass(self._obj.im_class, Mock):
         return "%s (on mock object)" % self._obj.im_self._name
-    
+
     # Always use the class to get the name
     klass = self._instance
     if not inspect.isclass(self._instance):
       klass = self._instance.__class__
-    
+
     return "%s.%s" % (klass.__name__, self._attr)
 
   def teardown(self):
@@ -281,14 +286,14 @@ class StubMethod(Stub):
     Put the original method back in place. This will also handle the special case
     when it putting back a class method.
 
-    The following code snippet best describe why it fails using settar, the 
+    The following code snippet best describe why it fails using settar, the
     class method would be replaced with a bound method not a class method.
 
     >>> class Example(object):
     ...     @classmethod
     ...     def a_classmethod(self):
     ...         pass
-    ... 
+    ...
     >>> Example.__dict__['a_classmethod'] # Note the classmethod is returned.
     <classmethod object at 0x7f5e6c298be8>
     >>> orig = getattr(Example, 'a_classmethod')
@@ -298,7 +303,7 @@ class StubMethod(Stub):
     >>> Example.__dict__['a_classmethod'] # Note that setattr set a bound method not a class method.
     <bound method type.a_classmethod of <class '__main__.Example'>>
 
-    The only way to figure out if this is a class method is to check and see if 
+    The only way to figure out if this is a class method is to check and see if
     the bound method im_self is a class, if so then we need to wrap the function
     object (im_func) with class method before setting it back on the class.
 
@@ -308,6 +313,30 @@ class StubMethod(Stub):
       setattr(self._instance, self._attr, classmethod(self._obj.im_func))
     else:
       setattr( self._instance, self._attr, self._obj )
+
+class StubFunction(Stub):
+  '''
+  Stub a function.
+  '''
+
+  def __init__(self, obj):
+    '''
+    Initialize with an object that is an unbound method
+    '''
+    super(StubFunction, self).__init__(obj)
+    self._instance = sys.modules[obj.__module__]
+    self._attr = obj.func_name
+    setattr( self._instance, self._attr, self )
+
+  @property
+  def name(self):
+    return "%s.%s" % (self._instance.__name__, self._attr)
+
+  def teardown(self):
+    '''
+    Replace the original method.
+    '''
+    setattr( self._instance, self._attr, self._obj )
 
 class StubUnboundMethod(Stub):
   '''
@@ -322,7 +351,7 @@ class StubUnboundMethod(Stub):
     self._instance = obj.im_class
     self._attr = obj.im_func.func_name
     setattr( self._instance, self._attr, self )
-  
+
   @property
   def name(self):
     return "%s.%s" % (self._instance.__name__, self._attr)
@@ -356,7 +385,7 @@ class StubMethodWrapper(Stub):
     Replace the original method.
     '''
     setattr( self._instance, self._attr, self._obj )
-    
+
 class StubWrapperDescriptor(Stub):
   '''
   Stub a wrapper-descriptor. Only works when we can fetch it by name. Because

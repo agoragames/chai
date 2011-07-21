@@ -15,7 +15,7 @@ class ExpectationRule(object):
     self._passed = False
 
   def validate(self, *args, **kwargs):
-    raise NotImplementedError("Must be implmeneted by subclasses")
+    raise NotImplementedError("Must be implemented by subclasses")
   
 class ArgumentsExpectationRule(ExpectationRule):
   def __init__(self, *args, **kwargs):

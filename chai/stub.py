@@ -102,6 +102,10 @@ def _stub_obj(obj):
     else:
       return StubMethod(obj)
 
+  # If a function and it has an associated module, we can mock directly.
+  if isinstance(obj, types.FunctionType) and hasattr(obj, '__module__'):
+    return StubFunction(obj)
+
   # These aren't in the types library
   if type(obj).__name__ == 'method-wrapper':
     return StubMethodWrapper(obj)

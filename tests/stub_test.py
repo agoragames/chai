@@ -170,6 +170,19 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res,StubMethodWrapper) )
     self.assertEquals( res, stub(foo.__hash__) )
     self.assertEquals( res, getattr(foo, '__hash__') )
+
+  def test_stub_module_function_with_attr_name(self):
+    res = stub(samples, 'mod_func_1')
+    self.assertTrue( isinstance(res,StubFunction) )
+    self.assertEquals( res, getattr(samples,'mod_func_1') )
+    self.assertEquals( res, stub(samples,'mod_func_1') )
+
+  def test_stub_module_function_with_obj_ref(self):
+    res = stub(samples.mod_func_1) 
+    self.assertTrue( isinstance(res,StubFunction) )
+    self.assertEquals( res, getattr(samples,'mod_func_1') )
+    self.assertEquals( res, samples.mod_func_1 )
+    self.assertEquals( res, stub(samples,'mod_func_1') )
   
 class StubClassTest(unittest.TestCase):
   ###
@@ -312,6 +325,27 @@ class StubMethodTest(unittest.TestCase):
     s = StubMethod( Foo.bar )
     s.teardown()
     self.assertTrue(isinstance(Foo.__dict__['bar'], classmethod), "Is not a classmethod")
+
+class StubFunctionTest(unittest.TestCase):
+
+  def test_init(self):
+    s = StubFunction( samples.mod_func_1 )
+    self.assertEquals( s._instance, samples )
+    self.assertEquals( s._attr, 'mod_func_1' )
+    self.assertEquals( s, samples.mod_func_1 )
+    s.teardown()
+
+  def test_name(self):
+    s = StubFunction( samples.mod_func_1 )
+    self.assertEquals( 'tests.samples.mod_func_1', s.name )
+    s.teardown()
+
+  def test_teardown(self):
+    orig = samples.mod_func_1
+    s = StubFunction( samples.mod_func_1 )
+    s.teardown()
+    self.assertEquals( orig, samples.mod_func_1 )
+  
 
 class StubUnboundMethodTest(unittest.TestCase):
   

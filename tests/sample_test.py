@@ -12,6 +12,16 @@ import unittest2 as unittest
 
 class CustomException(Exception): pass
 
+class SampleModuleTest(Chai):
+
+  def test_mod_func_2_as_obj_name(self):
+    expect(samples, 'mod_func_1').args(42, foo='bar')
+    samples.mod_func_2(42, foo='bar')
+  
+  def test_mod_func_2_as_obj_ref(self):
+    expect(samples.mod_func_1).args(42, foo='bar')
+    samples.mod_func_2(42, foo='bar')
+
 class SampleBaseTest(Chai):
 
   def test_expects_property(self):

@@ -5,6 +5,12 @@ Contains sample classes and situations that we want to test.
 # Can test module import
 from collections import deque
 
+def mod_func_1(*args, **kwargs):
+  pass
+
+def mod_func_2(*args, **kwargs):
+  mod_func_1(*args, **kwargs)
+
 class SampleBase(object):
 
   a_class_value = 'sample in a jar'

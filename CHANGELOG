@@ -1,3 +1,7 @@
+master
+======
+
+* Support stubbing of functions if they have a module context
 
 0.1.9
 =====

@@ -182,7 +182,7 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res,StubFunction) )
     self.assertEquals( res, getattr(samples,'mod_func_1') )
     self.assertEquals( res, samples.mod_func_1 )
-    self.assertEquals( res, stub(samples,'mod_func_1') )
+    self.assertEquals( res, stub(samples.mod_func_1) )
   
 class StubClassTest(unittest.TestCase):
   ###

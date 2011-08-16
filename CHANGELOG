@@ -1,4 +1,4 @@
-master
+0.1.10
 ======
 
 * Support stubbing of functions if they have a module context

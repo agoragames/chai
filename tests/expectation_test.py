@@ -152,6 +152,17 @@ class ExpectationRule(unittest.TestCase):
     self.assertRaises( Zono, exp.test )
     self.assertEquals( ['foo'], called )
 
+  def test_teardown(self):
+    called = []
+    class notastub(object):
+      def teardown(self, foo=called):
+        foo.append( 'foo' )
+
+    exp = Expectation( notastub() )
+    exp.teardown()
+    exp.test()
+    self.assertEquals( ['foo'], called )
+
   def test_closed(self):
     exp = Expectation(object)
     exp.args(1)

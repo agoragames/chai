@@ -1,3 +1,9 @@
+0.1.12
+======
+
+* Added teardown() expectation modifier to allow for removing a stub after
+  it has been met
+
 0.1.11
 ======
 

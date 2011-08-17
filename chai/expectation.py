@@ -96,6 +96,7 @@ class Expectation(object):
     self._run_count = 0 
     self._any_order = False
     self._side_effect = False
+    self._teardown = False
     
   def args(self, *args, **kwargs):
     """
@@ -153,6 +154,10 @@ class Expectation(object):
   def side_effect(self, func):
     self._side_effect = func
     return self
+
+  def teardown(self):
+    self._teardown = True
+    return self
   
   def return_value(self):
     """
@@ -206,6 +211,11 @@ class Expectation(object):
           self._side_effect()
       else:
         self._met = False
+
+      # If this is met and we're supposed to tear down, must do it now so that 
+      # this stub is not called again
+      if self._met and self._teardown:
+        self._stub.teardown()
 
     return self.return_value()
   

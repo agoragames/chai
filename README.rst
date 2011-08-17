@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.11
+:Version: 0.1.12
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -217,6 +217,9 @@ any_order
 
 side_effect(callable)
   Called with a function argument. When the expectation passes a test, the function will be executed. The side effect will be executed even if the expectation is configured to raise an exception.
+
+teardown
+  Will remove the stub after the expectation has been met. This is useful in cases where you need to mock core methods such as ``open``, but immediately return its original behavior after the mocked call has run.
   
 
 Argument Comparators

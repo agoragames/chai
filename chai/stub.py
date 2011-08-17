@@ -344,14 +344,14 @@ class StubFunction(Stub):
       elif getattr(obj, '__self__', None):
         self._instance = obj.__self__
       else:
-        raise ValueError("Failed to find instance of %s"%(obj))
+        raise UnsupportedStub("Failed to find instance of %s"%(obj))
 
       if getattr(obj,'func_name', None):
         self._attr = obj.func_name
       elif getattr(obj,'__name__', None):
         self._attr = obj.__name__
       else:
-        raise ValueError("Failed to find name of %s"%(obj))
+        raise UnsupportedStub("Failed to find name of %s"%(obj))
     else:
       self._instance = self._obj
       self._obj = getattr(self._instance, self._attr)

@@ -53,11 +53,14 @@ def _stub_attr(obj, attr_name):
   if isinstance(attr, Mock):
     return stub(attr.__call__)
 
-  if inspect.ismodule(obj):
-    return StubFunction(attr)
-
   if isinstance(attr, property):
     return StubProperty(obj, attr_name)
+
+  # Sadly, builtin functions and methods have the same type, so we have to use
+  # the same stub class even though it's a bit ugly
+  if inspect.ismodule(obj) and \
+  isinstance(attr, (types.FunctionType,types.BuiltinFunctionType,types.BuiltinMethodType)):
+    return StubFunction(obj, attr_name)
 
   if isinstance(attr, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
@@ -65,6 +68,9 @@ def _stub_attr(obj, attr_name):
       return StubUnboundMethod(attr)
     else:
       return StubMethod(obj, attr_name)
+
+  if isinstance(attr, (types.BuiltinFunctionType,types.BuiltinMethodType)):
+    return StubBuiltinFunction(attr)
 
   # What an absurd type this is ....
   if type(attr).__name__ == 'method-wrapper':
@@ -102,10 +108,6 @@ def _stub_obj(obj):
     else:
       return StubMethod(obj)
 
-  # If a function and it has an associated module, we can mock directly.
-  if isinstance(obj, types.FunctionType) and hasattr(obj, '__module__'):
-    return StubFunction(obj)
-
   # These aren't in the types library
   if type(obj).__name__ == 'method-wrapper':
     return StubMethodWrapper(obj)
@@ -114,7 +116,7 @@ def _stub_obj(obj):
     raise UnsupportedStub("must call stub(obj,'%s') for slot wrapper on %s",
       obj.__name__, obj.__objclass__.__name__ )
 
-  # Lastly, look for properties.
+  # (Mostly) Lastly, look for properties.
   # First look for the situation where there's a reference back to the property.
   prop = obj
   if isinstance( getattr( obj, '__self__', None), property ):
@@ -145,6 +147,14 @@ def _stub_obj(obj):
       if prop != obj:
         return stub(rval, prop.__name__)
       return rval
+
+  # If a function and it has an associated module, we can mock directly.
+  # Note that this *must* be after properties, otherwise it conflicts with
+  # stubbing out the deleter methods and such
+  # Sadly, builtin functions and methods have the same type, so we have to use
+  # the same stub class even though it's a bit ugly
+  if isinstance(obj, (types.FunctionType,types.BuiltinFunctionType,types.BuiltinMethodType)) and hasattr(obj, '__module__'):
+    return StubFunction(obj)
 
   raise UnsupportedStub("can't stub %s", obj)
 
@@ -323,13 +333,28 @@ class StubFunction(Stub):
   Stub a function.
   '''
 
-  def __init__(self, obj):
+  def __init__(self, obj, attr=None):
     '''
     Initialize with an object that is an unbound method
     '''
-    super(StubFunction, self).__init__(obj)
-    self._instance = sys.modules[obj.__module__]
-    self._attr = obj.func_name
+    super(StubFunction, self).__init__(obj, attr)
+    if not self._attr:
+      if getattr(obj, '__module__', None):
+        self._instance = sys.modules[obj.__module__]
+      elif getattr(obj, '__self__', None):
+        self._instance = obj.__self__
+      else:
+        raise ValueError("Failed to find instance of %s"%(obj))
+
+      if getattr(obj,'func_name', None):
+        self._attr = obj.func_name
+      elif getattr(obj,'__name__', None):
+        self._attr = obj.__name__
+      else:
+        raise ValueError("Failed to find name of %s"%(obj))
+    else:
+      self._instance = self._obj
+      self._obj = getattr(self._instance, self._attr)
     setattr( self._instance, self._attr, self )
 
   @property

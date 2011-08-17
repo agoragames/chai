@@ -2,6 +2,9 @@
 Tests for the sample module
 '''
 
+import os
+import random
+
 from chai import Chai
 from chai.stub import stub
 from chai.exception import *
@@ -28,6 +31,13 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     expect(obj, 'prop').returns("property value")
     assert_equals("property value", obj.prop)
+
+  def test_expects_on_builtin_function(self):
+    # NOTE: os module is a good example where it binds from another
+    # (e.g. posix), so it has to use the named reference or else it
+    # stubs the original module
+    expect( os, 'remove' ).args('foo').returns('ok')
+    assert_equals( 'ok', os.remove('foo') )
 
   def test_expects_bound_method_returns(self):
     obj = SampleBase()

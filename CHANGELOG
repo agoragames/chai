@@ -1,3 +1,8 @@
+0.1.11
+======
+
+* Support stubbing of built-in functions and methods
+
 0.1.10
 ======
 

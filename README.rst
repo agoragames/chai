@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.12
+:Version: 0.1.13
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -262,6 +262,9 @@ in_arg(in_list)
 
 contains(object)
   Matches if the argument contains the object using the Python ``in`` function.
+
+var(name)
+  A variable match against the first time that the argument is called. In the case of multiple calls, the second one must match the previous value of ``name``. After your tests have run, you can check the value against expected arguments through ``var(name).value``. This is really useful when you're testing a deep stack and it's simpler to assert that "value A was used in method call X".
 
 
 **A note of caution**

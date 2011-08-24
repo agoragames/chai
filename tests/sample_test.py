@@ -264,6 +264,22 @@ class SampleBaseTest(Chai):
     expect(obj.bound_method).args(is_arg(obj)).returns(100)
     assert_equals(obj.bound_method(obj), 100)
 
+  def test_var_comparator(self):
+    obj = SampleBase()
+    expect(obj.add_to_list).args( var('value1') )
+    expect(obj.add_to_list).args( var('value2') )
+    expect(obj.add_to_list).args( var('value3') ).at_least_once()
+
+    obj.add_to_list('v1')
+    obj.add_to_list('v2')
+    obj.add_to_list('v3')
+    obj.add_to_list('v3')
+    self.assertRaises( UnexpectedCall, obj.add_to_list, 'v3a')
+
+    assert_equals( 'v1', var('value1').value )
+    assert_equals( 'v2', var('value2').value )
+    assert_equals( 'v3', var('value3').value )
+
 class SampleChildTest(Chai):
 
   def test_stub_base_class_expect_child_classmethod(self):

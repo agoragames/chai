@@ -201,3 +201,35 @@ class Ignore(Comparator):
   def __repr__(self):
     return "Ignore()"
   __str__ = __repr__
+
+class Variable(Comparator):
+  '''
+  A mechanism for tracking variables and their values.
+  '''
+  _cache = {}
+
+  @classmethod
+  def clear(self):
+    '''
+    Delete all cached values. Should only be used by the test suite.
+    '''
+    self._cache.clear()
+  
+  def __init__(self, name):
+    self._name = name
+
+  @property
+  def value(self):
+    try: return self._cache[self._name]
+    except KeyError: raise ValueError("no value '%s'"%(self._name))
+
+  def test(self, value):
+    try: 
+      return self._cache[self._name] == value
+    except KeyError:
+      self._cache[self._name] = value
+    return True
+
+  def __repr__(self):
+    return "Variable('%s')"%(self._name)
+  __str__ = __repr__

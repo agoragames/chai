@@ -95,7 +95,7 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test('woo') )
     self.assertFalse( comp.test('fuu') )
 
-  def test_regex(self):
+  def test_regex_repr(self):
     comp = Regex('[wf][io]{2}')
     self.assertEquals(repr(comp), "Regex(pattern: [wf][io]{2}, flags: 0)")
 
@@ -156,7 +156,7 @@ class ComparatorsTest(unittest.TestCase):
     self.assertTrue( comp.test(0) )
     self.assertFalse( comp.test(1) )
   
-  def test_function(self):
+  def test_function_repr(self):
     func = lambda arg: True
     comp = Function(func)
     self.assertEqual(repr(comp), "Function(%s)" % str(func))
@@ -168,3 +168,31 @@ class ComparatorsTest(unittest.TestCase):
   def test_ignore_repr(self):
     comp = Ignore()
     self.assertEqual(repr(comp), "Ignore()")
+
+  def test_variable(self):
+    comp = Variable('foo')
+    self.assertEquals( 0, len(Variable._cache) )
+    self.assertTrue( comp.test('bar') )
+    self.assertEquals( 1, len(Variable._cache) )
+    self.assertTrue( comp.test('bar') )
+    self.assertFalse( comp.test('bar2') )
+    
+    self.assertTrue( Variable('foo').test('bar') )
+    self.assertFalse( Variable('foo').test('bar2') )
+    self.assertEquals( 1, len(Variable._cache) )
+
+    self.assertEquals( 'bar', comp.value )
+    self.assertEquals( 'bar', Variable('foo').value )
+
+    v = Variable('foo2')
+    self.assertEquals( 1, len(Variable._cache) )
+    v.test('dog')
+    self.assertEquals( 'dog', v.value )
+    self.assertEquals( 2, len(Variable._cache) )
+
+    Variable.clear()
+    self.assertEquals( 0, len(Variable._cache) )
+
+  def test_variable_repr(self):
+    v = Variable('foo')
+    self.assertEquals( repr(v), "Variable('foo')" )

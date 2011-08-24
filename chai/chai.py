@@ -88,7 +88,7 @@ class Chai(unittest.TestCase):
   ignore = Ignore
   in_arg = In
   contains = Contains
-  
+  var = Variable
 
   def setUp(self):
     super(Chai,self).setUp()
@@ -135,6 +135,9 @@ class Chai(unittest.TestCase):
         delattr( mock[0], mock[1] )
       else:
         setattr( mock[0], mock[1], mock[2] )
+
+    # Clear out any cached variables
+    Variable.clear()
     
     # Lastly, if there were any errors, raise them
     if exception:

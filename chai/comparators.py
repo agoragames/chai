@@ -224,7 +224,7 @@ class Variable(Comparator):
     except KeyError: raise ValueError("no value '%s'"%(self._name))
 
   def test(self, value):
-    try: 
+    try:
       return self._cache[self._name] == value
     except KeyError:
       self._cache[self._name] = value
@@ -232,4 +232,37 @@ class Variable(Comparator):
 
   def __repr__(self):
     return "Variable('%s')"%(self._name)
+  __str__ = __repr__
+
+class Like(Comparator):
+  '''
+  A comparator that will assert that fields of a container look like
+  another.
+  '''
+
+  def __init__(self, src):
+    # This might have to change to support more iterable types
+    if not isinstance(src, (dict,set,list,tuple)):
+      raise ValueError("Like comparator only implemented for basic container types")
+    self._src = src
+
+  def test(self, value):
+    # This might need to change so that the ctor arg can be a list, but
+    # any iterable type can be tested.
+    if not isinstance(value, type(self._src)):
+      return False
+
+    rval = True
+    if isinstance(self._src, dict):
+      for k,v in self._src.iteritems():
+        rval = rval and value.get(k)==v
+
+    else:
+      for item in self._src:
+        rval = rval and item in value
+
+    return rval
+
+  def __repr__(self):
+    return "Like(%s)"%(str(self._src))
   __str__ = __repr__

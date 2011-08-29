@@ -196,3 +196,25 @@ class ComparatorsTest(unittest.TestCase):
   def test_variable_repr(self):
     v = Variable('foo')
     self.assertEquals( repr(v), "Variable('foo')" )
+
+  def test_like_init(self):
+    c = Like({'foo':'bar'})
+    self.assertEquals( {'foo':'bar'}, c._src )
+
+    c = Like(['foo', 'bar'])
+    self.assertEquals( ['foo','bar'], c._src )
+
+  def test_like_test(self):
+    c = Like({'foo':'bar'})
+    self.assertTrue( c.test({'foo':'bar'}) )
+    self.assertTrue( c.test({'foo':'bar', 'cat':'dog'}) )
+    self.assertFalse( c.test({'foo':'barf'}) )
+    
+    c = Like(['foo','bar'])
+    self.assertTrue( c.test(['foo','bar']) )
+    self.assertTrue( c.test(['foo','bar','cat','dog']) )
+    self.assertFalse( c.test(['foo','barf']) )
+
+  def test_like_repr(self):
+    c = Like({'foo':'bar'})
+    self.assertEquals( repr(c), "Like({'foo': 'bar'})" )

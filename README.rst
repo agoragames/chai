@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.13
+:Version: 0.1.14
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -185,8 +185,11 @@ Modifiers
 Expectations expose the following public methods for changing their behavior.
 
 
-args(\*args, \*\*kwargs)
+args(``*args``, ``**kwargs``)
   Add a test to the expectation for matching arguments.
+
+any_args
+  Any arguments are accepted.
 
 returns(object)
   Add a return value to the expectation when it is matched and executed.
@@ -262,6 +265,9 @@ in_arg(in_list)
 
 contains(object)
   Matches if the argument contains the object using the Python ``in`` function.
+
+like(container)
+  Matches if the argument contains all of the same items as in ``container``. Insists that the argument is the same type as ``container``. Useful when you need to assert a few values in a list or dictionary, but the exact contents are not known or can vary.
 
 var(name)
   A variable match against the first time that the argument is called. In the case of multiple calls, the second one must match the previous value of ``name``. After your tests have run, you can check the value against expected arguments through ``var(name).value``. This is really useful when you're testing a deep stack and it's simpler to assert that "value A was used in method call X".

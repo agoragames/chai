@@ -71,6 +71,16 @@ class ExpectationRule(unittest.TestCase):
     
     self.assertTrue(exp.match(1, name="vitaly"))
 
+  def test_match_with_any_args(self):
+    exp = Expectation(object)
+    self.assertFalse( exp._any_args )
+    self.assertTrue( exp is exp.any_args() )
+    self.assertTrue( exp._any_args )
+
+    self.assertTrue( exp.match() )
+    self.assertTrue( exp.match('foo') )
+    self.assertTrue( exp.match('bar', hello='world') )
+
   def test_times(self):
     exp = Expectation(object)
     self.assertEquals( exp, exp.times(3) )

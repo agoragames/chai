@@ -97,12 +97,21 @@ class Expectation(object):
     self._any_order = False
     self._side_effect = False
     self._teardown = False
+    self._any_args = False
     
   def args(self, *args, **kwargs):
     """
     Creates a ArgumentsExpectationRule and adds it to the expectation
     """
+    self._any_args = False
     self._arguments_rule.set_args(*args, **kwargs)
+    return self
+
+  def any_args(self):
+    '''
+    Accept any arguments passed to this call.
+    '''
+    self._any_args = True
     return self
 
   def returns(self, value):
@@ -196,14 +205,14 @@ class Expectation(object):
     """
     Check the if these args match this expectation.
     """
-    return self._arguments_rule.validate(*args, **kwargs)
+    return self._any_args or self._arguments_rule.validate(*args, **kwargs)
 
   def test(self, *args, **kwargs):
     """
     Validate all the rules with in this expectation to see if this expectation has been met.
     """
     if not self._met:
-      if self._arguments_rule.validate(*args, **kwargs): # What data do we need to be sure it has been met
+      if self.match(*args, **kwargs):
         self._run_count += 1
         if not self._max_count == None and self._run_count == self._max_count:
           self._met = True

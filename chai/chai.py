@@ -89,6 +89,7 @@ class Chai(unittest.TestCase):
   in_arg = In
   contains = Contains
   var = Variable
+  like = Like
 
   def setUp(self):
     super(Chai,self).setUp()

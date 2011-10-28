@@ -1,3 +1,21 @@
+0.1.15
+======
+
+* Added container and context manager interfaces to Mock object
+
+0.1.14
+======
+
+* Added 'any_args' expectation modifier and 'like' comparator. See documentaion
+  for details.
+
+0.1.13
+======
+
+* Added 'var' comparator for ability to assert that the same argument was used
+  for one or more expectations, and then to fetch the variable after the call
+  and run assertions on it. See documentation for details.
+
 0.1.12
 ======
 

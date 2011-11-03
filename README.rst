@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.15
+:Version: 0.1.16
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -328,6 +328,11 @@ The ``stub`` and ``expect`` methods handle ``Mock`` objects as arguments by mock
           expect( m.foo.bar ).returns( 'hello' )
           assert_equals( 'hello', m.foo.bar() )
           assert_equals( 42, m.id )
+
+In addition to implementing ``__call__``, ``Mock`` objects implement ``__nonzero__``, 
+the container and context manager interfaces are defined. Nonzero will always return
+``True``; other methods will raise ``UnexpectedCall``.  The ``__getattr__`` method
+cannot be itself stubbed.
 
 .. _chai-installation:
 

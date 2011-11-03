@@ -37,6 +37,14 @@ class Mock(object):
     return rval
 
   ###
+  ### Define nonzero so that basic "if <mock>:" stanzas will work.
+  ###
+  def __nonzero__(self):
+    if isinstance(getattr(self,'__nonzero__'), Stub):
+      return getattr(self,'__nonzero__')()
+    return True
+
+  ###
   ### Emulate container types, the 99% of cases where we want to mock the
   ### special methods. They all raise UnexpectedCall unless they're mocked out
   ### http://docs.python.org/reference/datamodel.html#emulating-container-types

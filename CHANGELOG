@@ -1,3 +1,9 @@
+0.1.16
+======
+
+* Added Mock.__nonzero__ to re-support "if exists" code, which was broken by
+  the addition of Mock.__len__.
+
 0.1.15
 ======
 

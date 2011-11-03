@@ -61,6 +61,15 @@ class MockTest(unittest.TestCase):
     stub(m).expect().returns('success')
     self.assertEquals( 'success', m() )
 
+  def test_nonzero_returns_true_when_unstubbed(self):
+    m = Mock()
+    self.assertTrue( m.__nonzero__() )
+
+  def test_nonzero_when_stubbed(self):
+    m = Mock()
+    stub(m.__nonzero__).expect().returns(False)
+    self.assertFalse( m.__nonzero__() )
+
   def test_container_interface_when_unstubbed(self):
     m = Mock()
     self.assertRaises( UnexpectedCall, len, m )

@@ -8,7 +8,7 @@ requirements = [r for r in map(str.strip, open('requirements.txt').readlines())]
 
 setup(
     name='chai',
-    version='0.1.16',
+    version='0.1.17',
     author='Vitaly Babiy, Aaron Westendorf',
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
     packages=['chai'],

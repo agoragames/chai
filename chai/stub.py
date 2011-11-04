@@ -38,7 +38,9 @@ def _stub_attr(obj, attr_name):
   is_property = False
 
   if not inspect.isclass(obj) and not inspect.ismodule(obj):
-    attr = getattr(obj.__class__, attr_name)
+    # It's possible that the attribute is defined after initialization, and
+    # so is not on the class itself.
+    attr = getattr(obj.__class__, attr_name, None)
     if isinstance(attr, property):
       is_property = True
 

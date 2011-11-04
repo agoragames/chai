@@ -1,3 +1,9 @@
+0.1.17
+======
+
+* Fix edge case where an attribute might not be defined on a class when
+  calling stub(obj, 'attr').
+
 0.1.16
 ======
 

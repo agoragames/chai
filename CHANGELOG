@@ -1,3 +1,9 @@
+0.1.18
+======
+
+* Simplified stubbing of object creation, so that `expect(type)` can be used as
+  if it was mocking __init__, but return an object as if it was mocking __new__.
+
 0.1.17
 ======
 

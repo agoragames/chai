@@ -72,7 +72,7 @@ def _stub_attr(obj, attr_name):
       return StubMethod(obj, attr_name)
 
   if isinstance(attr, (types.BuiltinFunctionType,types.BuiltinMethodType)):
-    return StubBuiltinFunction(attr)
+    return StubFunction(obj, attr_name)
 
   # What an absurd type this is ....
   if type(attr).__name__ == 'method-wrapper':
@@ -100,6 +100,11 @@ def _stub_obj(obj):
   # If a Mock object, stub its __call__
   if isinstance(obj, Mock):
     return stub(obj.__call__)
+
+  # If passed-in a type, assume that we're going to stub out the creation.
+  # See StubNew for the awesome sauce.
+  if isinstance(obj, types.TypeType):
+    return StubNew(obj)
 
   # I thought that types.UnboundMethodType differentiated these cases but
   # apparently not.
@@ -368,6 +373,45 @@ class StubFunction(Stub):
     Replace the original method.
     '''
     setattr( self._instance, self._attr, self._obj )
+
+class StubNew(StubFunction):
+  '''
+  Stub out the constructor, but hide the fact that we're stubbing "__new__"
+  and act more like we're stubbing "__init__". Needs to use the logic in
+  the StubFunction ctor.
+  '''
+  _cache = {}
+
+  def __new__(self, klass, *args):
+    '''
+    Because we're not saving the stub into any attribute, then we have
+    to do some faking here to return the same handle.
+    '''
+    rval = self._cache.get(klass)
+    if not rval:
+      rval = self._cache[klass] = super(StubNew,self).__new__(self, *args)
+    return rval
+
+  def __init__(self, obj):
+    '''
+    Overload the initialization so that we can hack access to __new__.
+    '''
+    super(StubNew,self).__init__(obj, '__new__')
+    self._type = obj
+
+  def __call__(self, *args, **kwargs):
+    '''
+    When calling the new function, strip out the first arg which is
+    the type. In this way, the mocker writes their expectation as if it
+    was an __init__.
+    '''
+    return super(StubNew,self).__call__( *(args[1:]), **kwargs )
+  
+  def teardown(self):
+    '''
+    Overload so that we can clear out the cache after a test run.
+    '''
+    StubNew._cache.pop(self._type)
 
 class StubUnboundMethod(Stub):
   '''

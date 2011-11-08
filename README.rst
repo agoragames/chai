@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.17
+:Version: 0.1.18
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -101,7 +101,7 @@ Stubbing is used for situations when you want to assert that a method is never c
             stub(obj.get)
             assert_raises( UnexpectedCall, obj.get )
 
-In this example, we can reference ``obj.get`` directly because ``get`` is a bound method and provides all of the context we need to refer back to ``obj`` and stub the method accordingly. There are cases where this is insufficient, such as module imports and special Python types such as ``object().__init__``. If the object can't be stubbed with a reference, ``UnsupportedStub`` will be raised and you can use the verbose reference instead. ::
+In this example, we can reference ``obj.get`` directly because ``get`` is a bound method and provides all of the context we need to refer back to ``obj`` and stub the method accordingly. There are cases where this is insufficient, such as module imports, special Python types, and when module attributes are imported from another (like ``os`` and ``posix``). If the object can't be stubbed with a reference, ``UnsupportedStub`` will be raised and you can use the verbose reference instead. ::
     
     class TestCase(Chai):
         def test_mock_get(self):
@@ -162,6 +162,21 @@ Modifiers can be applied to the expectation. Each modifier will return a referen
             assert_equals( 'hello', obj.get('foo') )
             expect(obj.get).args('bar').raises( ValueError )
             assert_raises( ValueError, obj.get, 'bar' )
+
+It is very common to need to run expectations on the constructor for an object, possibly including returning a mock object. Chai makes this very simple. ::
+
+    def method():
+        obj = CustomObject('state')
+        obj.save()
+        return obj
+
+    class TestCase(Chai):
+        def test_method(self):
+            obj = mock()
+            expect( CustomObject ).args('state').returns( obj )
+            expect( obj.save )
+            assert_equals( obj, method() )
+    
 
 Lastly, the arguments modifier supports several matching functions. For simplicity in covering the common cases, the arg expectation assumes an equals test for instances and an instanceof test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
 

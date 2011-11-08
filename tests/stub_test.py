@@ -87,6 +87,15 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, f.bar.__call__ )
     self.assertEquals( res, stub(f.bar) )
 
+  def test_stub_type_with_obj_ref(self):
+    class Foo(object):
+      def bar(self): pass
+
+    res = stub( Foo )
+    self.assertTrue( isinstance(res, StubNew) )
+    self.assertEquals( res, Foo.__new__ )
+    self.assertEquals( res, stub(Foo) )
+
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):
       def bar(self): pass
@@ -345,7 +354,47 @@ class StubFunctionTest(unittest.TestCase):
     s = StubFunction( samples.mod_func_1 )
     s.teardown()
     self.assertEquals( orig, samples.mod_func_1 )
-  
+
+class StubNewTest(unittest.TestCase):
+
+  def test_new(self):
+    class Foo(object): pass
+
+    self.assertEquals( 0, len(StubNew._cache) )
+    x = StubNew(Foo)
+    self.assertTrue( x is StubNew(Foo) )
+    self.assertEquals( 1, len(StubNew._cache) )
+    StubNew._cache.clear()
+
+  def test_init(self):
+    class Foo(object): pass
+    
+    s = StubNew( Foo )
+    self.assertEquals( s._instance, Foo )
+    self.assertEquals( s._attr, '__new__' )
+    self.assertEquals( s, Foo.__new__ )
+    s.teardown()
+
+  def test_call(self):
+    class Foo(object): pass
+    class Expect(object):
+      def closed(self): return False
+      def match(self, *args, **kwargs): return args==('state',) and kwargs=={'a':'b'}
+      def test(self, *args, **kwargs): return 'success'
+    
+    s = StubNew( Foo )
+    s._expectations = [ Expect() ]
+    self.assertEquals( 'success', Foo('state', a='b') )
+    s.teardown()
+
+  def test_teardown(self):
+    class Foo(object): pass
+
+    self.assertEquals( 0, len(StubNew._cache) )
+    x = StubNew(Foo)
+    self.assertEquals( 1, len(StubNew._cache) )
+    x.teardown()
+    self.assertEquals( 0, len(StubNew._cache) )
 
 class StubUnboundMethodTest(unittest.TestCase):
   

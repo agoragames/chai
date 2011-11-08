@@ -390,11 +390,13 @@ class StubNewTest(unittest.TestCase):
   def test_teardown(self):
     class Foo(object): pass
 
+    orig = Foo.__new__
     self.assertEquals( 0, len(StubNew._cache) )
     x = StubNew(Foo)
     self.assertEquals( 1, len(StubNew._cache) )
     x.teardown()
     self.assertEquals( 0, len(StubNew._cache) )
+    self.assertEquals( orig, Foo.__new__ )
 
 class StubUnboundMethodTest(unittest.TestCase):
   

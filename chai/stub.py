@@ -411,6 +411,7 @@ class StubNew(StubFunction):
     '''
     Overload so that we can clear out the cache after a test run.
     '''
+    super(StubNew,self).teardown()
     StubNew._cache.pop(self._type)
 
 class StubUnboundMethod(Stub):

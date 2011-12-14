@@ -1,3 +1,8 @@
+0.1.20
+======
+
+* Added __eq__ to all comparators so that they can be used inside data structures.
+
 0.1.19
 ======
 

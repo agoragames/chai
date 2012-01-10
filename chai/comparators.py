@@ -20,6 +20,8 @@ class Comparator(object):
   '''
   Base class of all comparators, used for type testing
   '''
+  def __eq__(self, value):
+    return self.test(value)
 
 class Equals(Comparator):
   '''

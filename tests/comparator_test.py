@@ -27,7 +27,7 @@ class ComparatorsTest(unittest.TestCase):
   def test_build_comparators_passes_comparators(self):
     any_comp = Any()
     comp = build_comparators(any_comp)[0]
-    self.assertEquals(comp, any_comp)
+    self.assertTrue(comp is any_comp)
 
   def test_equals(self):
     comp = Equals(3)
@@ -38,6 +38,10 @@ class ComparatorsTest(unittest.TestCase):
   def test_equals_repr(self):
       comp = Equals(3)
       self.assertEquals(str(comp), "3")
+
+  def test_eq(self):
+    comp = Equals(3)
+    self.assertEquals( comp, 3 )
 
   def test_is_a(self):
     comp = IsA(str)

@@ -1,3 +1,15 @@
+0.1.21
+======
+
+* Fixed a bug with (un)stubbing of a module attribute which is really a classmethod
+* Added support for `with` statement on expectations, see README for usage
+* Fixed (un)stubbing of methods originally defined on `object` class
+
+0.1.20
+======
+
+* Added __eq__ to all comparators so that they can be used inside data structures.
+
 0.1.19
 ======
 

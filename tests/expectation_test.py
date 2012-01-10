@@ -197,6 +197,20 @@ class ExpectationRule(unittest.TestCase):
     
     self.assertEquals(exp.test(), 123)
 
+  def test_with_returns_return_value(self):
+    exp = Expectation(object)
+    with exp.returns(123) as num:
+      self.assertEquals(num, 123)
+
+  def test_with_raises_exceptions(self):
+    exp = Expectation(object)
+
+    # pre-2.7 compatible
+    def foo():
+      with exp.returns(123) as num:
+        raise Exception("FAIL!")
+    self.assertRaises(Exception, foo)
+
   def test_return_value_with_expection_class(self): 
     class CustomException(Exception): pass
     

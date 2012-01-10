@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.19
+:Version: 0.1.21
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -290,6 +290,22 @@ var(name)
 
 **A note of caution**
 If you are using the ``func`` comparator to produce side effects, be aware that it may be called more than once even if the expectation you're defining only occurs once. This is due to the way ``Stub.__call__`` processes the expectations and determines when to process arguments through an expectation.
+
+
+Context Manager
++++++++++++++++
+
+An expectation can act as a context manager, which is very useful in complex mocking situations. The context will always be the return value for the expectation. For example: ::
+
+  def get_cursor(cname):
+      return db.Connection( 'host:port' ).collection( cname ).cursor()
+
+  def test_get_cursor():
+      with expect( db.Connection ).any_args().returns( mock() ) as connection:
+          with expect( connection.collection ).args( 'collection' ).returns( mock() ) as collection:
+              expect( collection.cursor ).returns( 'cursor' )
+
+      assert_equals( 'cursor', get_cursor('collection') )
 
 Mock
 ----

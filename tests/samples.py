@@ -11,6 +11,14 @@ def mod_func_1(*args, **kwargs):
 def mod_func_2(*args, **kwargs):
   mod_func_1(*args, **kwargs)
 
+# For testing when the module has an instance's classmethod bound
+class ModInstance(object):
+  @classmethod
+  def foo(self): pass
+
+mod_instance = ModInstance()
+mod_instance_foo = mod_instance.foo
+
 class SampleBase(object):
 
   a_class_value = 'sample in a jar'

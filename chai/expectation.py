@@ -98,6 +98,14 @@ class Expectation(object):
     self._side_effect = False
     self._teardown = False
     self._any_args = False
+
+  # Support expectations as context managers. See
+  #   https://github.com/agoragames/chai/issues/1
+  def __enter__(self):
+    return self._returns
+
+  def __exit__(*args):
+    pass
     
   def args(self, *args, **kwargs):
     """

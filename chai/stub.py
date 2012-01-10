@@ -329,7 +329,10 @@ class StubMethod(Stub):
     object (im_func) with class method before setting it back on the class.
 
     '''
-    if inspect.isclass(self._obj.im_self): # Figure out if this is a class method
+    # Figure out if this is a class method and we're unstubbing it on the class
+    # to which it belongs. This addresses an edge case where a module can 
+    # expose a method of an instance. gevent does this, for example.
+    if inspect.isclass(self._obj.im_self) and self._obj.im_self is self._instance:
       # Wrap it and set it back on the class
       setattr(self._instance, self._attr, classmethod(self._obj.im_func))
     else:
@@ -362,6 +365,16 @@ class StubFunction(Stub):
     else:
       self._instance = self._obj
       self._obj = getattr(self._instance, self._attr)
+
+    # This handles the case where we're stubbing a special method that's
+    # inherited from object, and so instead of calling setattr on teardown,
+    # we want to call delattr. This is particularly important for not seeing
+    # those stupid DeprecationWarnings after StubNew
+    self._was_object_method = False
+    if hasattr(self._instance, '__dict__'):
+      self._was_object_method = \
+        self._attr not in self._instance.__dict__.keys() and\
+        self._attr in object.__dict__.keys()
     setattr( self._instance, self._attr, self )
 
   @property
@@ -372,7 +385,10 @@ class StubFunction(Stub):
     '''
     Replace the original method.
     '''
-    setattr( self._instance, self._attr, self._obj )
+    if not self._was_object_method:
+      setattr( self._instance, self._attr, self._obj )
+    else:
+      delattr( self._instance, self._attr )
 
 class StubNew(StubFunction):
   '''

@@ -335,6 +335,12 @@ class StubMethodTest(unittest.TestCase):
     s.teardown()
     self.assertTrue(isinstance(Foo.__dict__['bar'], classmethod), "Is not a classmethod")
 
+  def test_teardown_of_bound_instance_methods_exported_in_module(self):
+    orig = samples.mod_instance_foo
+    s = StubMethod( samples, 'mod_instance_foo' )
+    s.teardown()
+    self.assertEquals( orig, samples.mod_instance_foo )
+
 class StubFunctionTest(unittest.TestCase):
 
   def test_init(self):
@@ -342,7 +348,13 @@ class StubFunctionTest(unittest.TestCase):
     self.assertEquals( s._instance, samples )
     self.assertEquals( s._attr, 'mod_func_1' )
     self.assertEquals( s, samples.mod_func_1 )
+    self.assertEquals( False, s._was_object_method )
     s.teardown()
+
+  def test_init_with_object_method(self):
+    x = samples.SampleBase()
+    s = StubFunction( x, '__new__' )
+    self.assertEquals( True, s._was_object_method )
 
   def test_name(self):
     s = StubFunction( samples.mod_func_1 )
@@ -354,6 +366,14 @@ class StubFunctionTest(unittest.TestCase):
     s = StubFunction( samples.mod_func_1 )
     s.teardown()
     self.assertEquals( orig, samples.mod_func_1 )
+
+  def test_teardown_on_object_method(self):
+    x = samples.SampleBase()
+    self.assertEquals( object.__new__, getattr(x, '__new__') )
+    s = StubFunction( x, '__new__' )
+    self.assertNotEquals( object.__new__, getattr(x, '__new__') )
+    s.teardown()
+    self.assertEquals( object.__new__, getattr(x, '__new__') )
 
 class StubNewTest(unittest.TestCase):
 

@@ -243,7 +243,13 @@ teardown
 Argument Comparators
 ++++++++++++++++++++
 
-Argument comparators are defined as classes in ``chai.comparators``, but loaded into the ``Chai`` class for convenience (and by extension, a subclass' module).
+Argument comparators are defined as classes in ``chai.comparators``, but loaded into the ``Chai`` class for convenience (and by extension, a subclass' module). ``Chai`` handles the common case of a ``type`` object by using the ``is_a`` comparator, else defaults to the ``equals`` comparator. Users can create subclasses of ``Comparator`` and use those for custom argument processing.
+
+Comparators can also be used inside data structures. For example: ::
+
+  expect( area ).args( {'pi':almost_equals(3.14), 'radius':is_a(int,long,float)} )
+
+
 
 equals(object)
   The default comparator, uses standard Python equals operator

@@ -96,6 +96,8 @@ class Expectation(object):
     self._run_count = 0 
     self._any_order = False
     self._side_effect = False
+    self._side_effect_args = None
+    self._side_effect_kwargs = None
     self._teardown = False
     self._any_args = False
 
@@ -168,8 +170,10 @@ class Expectation(object):
     self._any_order = True
     return self
 
-  def side_effect(self, func):
+  def side_effect(self, func, *args, **kwargs):
     self._side_effect = func
+    self._side_effect_args = args
+    self._side_effect_kwargs = kwargs
     return self
 
   def teardown(self):
@@ -225,7 +229,7 @@ class Expectation(object):
         if not self._max_count == None and self._run_count == self._max_count:
           self._met = True
         if self._side_effect:
-          self._side_effect()
+          self._side_effect(*self._side_effect_args, **self._side_effect_kwargs)
       else:
         self._met = False
 

@@ -1,3 +1,8 @@
+0.1.22
+======
+
+* side_effect takes arguments after the method to eliminate need for a lambda
+
 0.1.21
 ======
 

@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.21
+:Version: 0.1.22
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -233,7 +233,7 @@ once
 any_order
   The expectation can be called at any time, independent of when it was defined. Can be combined with ``at_least_once`` to force it to respond to all matching calls throughout the test.
 
-side_effect(callable)
+side_effect(callable, \*args, \*\*kwargs)
   Called with a function argument. When the expectation passes a test, the function will be executed. The side effect will be executed even if the expectation is configured to raise an exception.
 
 teardown

@@ -162,6 +162,18 @@ class ExpectationRule(unittest.TestCase):
     exp.test()
     self.assertEquals( ['foo'], called )
 
+  def test_side_effect_with_passed_args(self):
+    called = []
+    def effect(a, b=None):
+      if a=='a' and b=='c':
+        called.append('foo')
+
+    exp = Expectation(None)
+    exp.args('a', b='c')
+    self.assertEquals( exp, exp.side_effect(effect) )
+    exp.test('a', b='c')
+    self.assertEquals( ['foo'], called )
+
   def test_side_effect_with_an_exception(self):
     called = []
     def effect(foo=called):

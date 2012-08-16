@@ -1,3 +1,9 @@
+0.1.23
+======
+
+* side_effect is passed the arguments of the expectation if it doesn't define
+its own arguments
+
 0.1.22
 ======
 

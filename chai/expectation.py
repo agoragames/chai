@@ -229,7 +229,10 @@ class Expectation(object):
         if not self._max_count == None and self._run_count == self._max_count:
           self._met = True
         if self._side_effect:
-          self._side_effect(*self._side_effect_args, **self._side_effect_kwargs)
+          if self._side_effect_args or self._side_effect_kwargs:
+            self._side_effect(*self._side_effect_args, **self._side_effect_kwargs)
+          else:
+            self._side_effect(*args, **kwargs)
       else:
         self._met = False
 

@@ -56,6 +56,7 @@ class ChaiTestType(type):
     wrapper.__name__ = func.__name__
     wrapper.__doc__ = func.__doc__
     wrapper.__module__ = func.__module__
+    wrapper.__wrapped__ = func
     return wrapper
 
 class Chai(unittest.TestCase):

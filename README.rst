@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.1.23
+:Version: 0.2.0
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -422,6 +422,15 @@ License
 
 This software is licensed under the `New BSD License`. See the ``LICENSE``
 file in the top distribution directory for the full license text.
+
+.. _contributors:
+
+Contributors
+============
+
+Special thank you to the following people for contributions to Chai
+
+* Jason Baker (https://github.com/jasonbaker)
 
 .. # vim: syntax=rst expandtab tabstop=4 shiftwidth=4 shiftround
 

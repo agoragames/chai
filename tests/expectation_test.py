@@ -220,6 +220,24 @@ class ExpectationRule(unittest.TestCase):
     
     self.assertEquals(exp.test(), 123)
 
+  def test_return_value_with_variable(self):
+    exp = Expectation(object)
+    var = Variable('test')
+    Variable._cache['test'] = 123
+    exp.returns( var )
+    
+    self.assertEquals(exp.test(), 123)
+    Variable.clear()
+
+  def test_return_value_with_variable_in_tuple(self):
+    exp = Expectation(object)
+    var = Variable('test')
+    Variable._cache['test'] = 123
+    exp.returns( (var,'foo') )
+    
+    self.assertEquals(exp.test(), (123,'foo'))
+    Variable.clear()
+
   def test_with_returns_return_value(self):
     exp = Expectation(object)
     with exp.returns(123) as num:
@@ -234,7 +252,7 @@ class ExpectationRule(unittest.TestCase):
         raise Exception("FAIL!")
     self.assertRaises(Exception, foo)
 
-  def test_return_value_with_expection_class(self): 
+  def test_return_value_with_exception_class(self): 
     class CustomException(Exception): pass
     
     exp = Expectation(object)
@@ -242,7 +260,7 @@ class ExpectationRule(unittest.TestCase):
     
     self.assertRaises(CustomException, exp.test)
 
-  def test_return_value_with_expection_instance(self): 
+  def test_return_value_with_exception_instance(self): 
     class CustomException(Exception): pass
     
     exp = Expectation(object)

@@ -191,7 +191,9 @@ class Expectation(object):
       else:
         raise self._raises
     else:
-      return self._returns
+      if isinstance(self._returns, tuple):
+        return tuple([x.value if isinstance(x,Variable) else x for x in self._returns])
+      return self._returns.value if isinstance(self._returns,Variable) else self._returns
 
   def close(self, *args, **kwargs):
     '''

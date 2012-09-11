@@ -17,7 +17,7 @@ class ChaiAssertion(AssertionError):
   Base class for all assertion errors.
   '''
 
-class UnexpectedCall(ChaiAssertion):
+class UnexpectedCall(BaseException):
   '''
   Raised when a unexpected call occurs to a stub.
   '''

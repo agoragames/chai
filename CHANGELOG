@@ -1,3 +1,10 @@
+0.2.2
+=====
+
+* UnexpectedCall is now a BaseException which is re-raised as an AssertionError 
+in Chai metaclass `test_wrapper` method. This decreases the chance that 
+UnexpectedCall will be caught by the application code being tested.
+
 0.2.1
 =====
 

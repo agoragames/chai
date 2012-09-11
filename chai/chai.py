@@ -45,7 +45,11 @@ class ChaiTestType(type):
     calls assert_expectations on the stub. This is to avoid getting to exceptions about the same error.
     """
     def wrapper(self, *args, **kwargs):
-      func(self, *args, **kwargs)
+      try:
+        func(self, *args, **kwargs)
+      except UnexpectedCall as e:
+        raise AssertionError, e.args, sys.exc_info()[-1]
+
       exceptions = []
       for stub in self._stubs:
         exceptions.extend(stub.unmet_expectations())

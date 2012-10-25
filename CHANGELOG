@@ -1,3 +1,8 @@
+0.2.3
+=====
+
+* Mock objects report parameters and method name when raising UnexpectedCall
+
 0.2.2
 =====
 

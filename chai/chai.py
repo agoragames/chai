@@ -48,7 +48,7 @@ class ChaiTestType(type):
       try:
         func(self, *args, **kwargs)
       except UnexpectedCall as e:
-        raise AssertionError, e.args, sys.exc_info()[-1]
+        raise AssertionError, '\n\n'+str(e), sys.exc_info()[-1]
 
       exceptions = []
       for stub in self._stubs:

@@ -1,9 +1,12 @@
 '''
 An open mocking object.
 '''
+from termcolor import colored
+
 from types import MethodType
 from stub import stub, Stub
 from exception import UnexpectedCall
+from expectation import ArgumentsExpectationRule
 
 class Mock(object):
   '''
@@ -13,6 +16,7 @@ class Mock(object):
   def __init__(self, **kwargs):
     for name, value in kwargs.iteritems():
       setattr(self, name, value)
+    self._name = 'mock'
 
   # For whatever reason, new-style objects require this method defined before
   # any instance is created. Defining it through __getattr__ is not enough. This
@@ -24,14 +28,15 @@ class Mock(object):
   def __call__(self, *args, **kwargs):
     if isinstance(getattr(self,'__call__'), Stub):
       return getattr(self,'__call__')(*args, **kwargs)
-    raise UnexpectedCall()
+    
+    raise UnexpectedCall("\n\n" + colored("No expectation in place for %s with %s"%(self._name, ArgumentsExpectationRule.pretty_format_args(*args, **kwargs)), 'red' ))
 
   def __getattr__(self,name):
     rval = self.__dict__.get(name)
 
     if not rval or not isinstance(rval,(Stub,Mock)):
       rval = Mock()
-      rval._name = name
+      rval._name = '%s.%s'%(self._name,name)
       setattr(self, name, rval)
 
     return rval

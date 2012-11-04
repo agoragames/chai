@@ -220,16 +220,14 @@ class Stub(object):
       else:
         return exp.test(*args, **kwargs)
 
-    raise UnexpectedCall("\n\n" + self._format_exception(ArgumentsExpectationRule.pretty_format_args(*args, **kwargs)))
+    raise UnexpectedCall(call=self.name, suffix=self._format_exception(), args=args, kwargs=kwargs) 
 
-  def _format_exception(self, args_str):
+  def _format_exception(self):
     result = [
-      colored("No expectation in place for %s with %s" % (self.name, args_str), "red"),
-      "All Expectations:"
+      colored("All expectations", 'white', attrs=['bold'])
     ]
-    for exception in self._expectations:
-      result.append(str(exception))
-
+    for e in self._expectations:
+      result.append( str(e) )
     return "\n".join(result)
 
 class StubProperty(Stub, property):
@@ -293,7 +291,7 @@ class StubMethod(Stub):
     from mock import Mock # Import here for the same reason as above.
     if hasattr(self._obj, 'im_class'):
       if issubclass(self._obj.im_class, Mock):
-        return "%s (on mock object)" % self._obj.im_self._name
+        return self._obj.im_self._name
 
     # Always use the class to get the name
     klass = self._instance

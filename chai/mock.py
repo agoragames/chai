@@ -29,7 +29,7 @@ class Mock(object):
     if isinstance(getattr(self,'__call__'), Stub):
       return getattr(self,'__call__')(*args, **kwargs)
     
-    raise UnexpectedCall("\n\n" + colored("No expectation in place for %s with %s"%(self._name, ArgumentsExpectationRule.pretty_format_args(*args, **kwargs)), 'red' ))
+    raise UnexpectedCall(call=self._name, args=args, kwargs=kwargs)
 
   def __getattr__(self,name):
     rval = self.__dict__.get(name)
@@ -59,37 +59,37 @@ class Mock(object):
   def __len__(self):
     if isinstance(getattr(self,'__len__'), Stub):
       return getattr(self,'__len__')()
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__len__')
     
   def __getitem__(self, key):
     if isinstance(getattr(self,'__getitem__'), Stub):
       return getattr(self,'__getitem__')(key)
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__getitem__', args=(key,))
 
   def __setitem__(self, key, value):
     if isinstance(getattr(self,'__setitem__'), Stub):
       return getattr(self,'__setitem__')(key, value)
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__setitem__', args=(key,value))
 
   def __delitem__(self, key):
     if isinstance(getattr(self,'__delitem__'), Stub):
       return getattr(self,'__delitem__')(key)
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__delitem__', args=(key,))
 
   def __iter__(self):
     if isinstance(getattr(self,'__iter__'), Stub):
       return getattr(self,'__iter__')()
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__iter__')
 
   def __reversed__(self):
     if isinstance(getattr(self,'__reversed__'), Stub):
       return getattr(self,'__reversed__')()
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__reversed__')
 
   def __contains__(self, item):
     if isinstance(getattr(self,'__contains__'), Stub):
       return getattr(self,'__contains__')(item)
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__contains__', args=(item,))
 
   ###
   ### Emulate context managers
@@ -98,9 +98,9 @@ class Mock(object):
   def __enter__(self):
     if isinstance(getattr(self,'__enter__'), Stub):
       return getattr(self,'__enter__')()
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__enter__')
   
   def __exit__(self, exc_type, exc_value, traceback):
     if isinstance(getattr(self,'__exit__'), Stub):
       return getattr(self,'__exit__')(exc_type, exc_value, traceback)
-    raise UnexpectedCall()
+    raise UnexpectedCall(call=self._name+'.__exit__', args=(exc_type,exc_value,traceback))

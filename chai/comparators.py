@@ -1,10 +1,15 @@
+'''
+Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+
+https://github.com/agoragames/chai/blob/master/LICENSE.txt
+'''
 import re
 
-'''
-All of the comparators that can be used for arguments.
-'''
 
 def build_comparators(*values_or_types):
+  '''
+  All of the comparators that can be used for arguments.
+  '''
   comparators = []
   for item in values_or_types:
     if isinstance(item,Comparator):

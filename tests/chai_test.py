@@ -55,14 +55,6 @@ class CupOf(Chai):
 
 class ChaiTest(unittest.TestCase):
 
-  def test_init(self):
-    case = CupOf.__new__(CupOf)
-    self.assertTrue( hasattr(case, 'assertEquals') )
-    self.assertFalse( hasattr(case, 'assert_equals') )
-    case.__init__()
-    self.assertTrue( hasattr(case, 'assertEquals') )
-    self.assertTrue( hasattr(case, 'assert_equals') )
-
   def test_setup(self):
     case = CupOf()
     case.setup()

@@ -17,8 +17,10 @@ class MockTest(unittest.TestCase):
  #   self.assertTrue( isinstance(m.foo, types.MethodType) )
   def test_get_attribute_creates_a_mock_method(self):
     m = Mock()
+    self.assertEquals( 'mock', m._name )
     self.assertTrue( isinstance(m.foo, Mock) )
     self.assertFalse( m.foo is m )
+    self.assertEquals( 'mock.foo', m.foo._name )
 
   def test_get_attribute_caches_auto_methods(self):
     m = Mock()

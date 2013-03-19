@@ -4,11 +4,11 @@ except ImportError:
     from distutils.core import setup
 
 requirements = [r for r in map(str.strip, open('requirements.txt').readlines())]
-
+exec([v for v in open('chai/__init__.py') if '__version__' in v][0])
 
 setup(
     name='chai',
-    version='0.2.2',
+    version=__version__,
     author='Vitaly Babiy, Aaron Westendorf',
     author_email="vbabiy@agoragames.com, aaron@agoragames.com",
     packages=['chai'],

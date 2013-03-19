@@ -1,5 +1,7 @@
 '''
-The chai test class.
+Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+
+https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 
 try:
@@ -29,11 +31,17 @@ class ChaiTestType(type):
     type.__init__(cls, name, bases, d)
 
     # also get all the attributes from the base classes to account
-    # for a case when test class is not the immediate child of MoxTestBase
+    # for a case when test class is not the immediate child of Chai
+    # also alias all the cAmElCaSe methods to more helpful ones
     for base in bases:
       for attr_name in dir(base):
         d[attr_name] = getattr(base, attr_name)
-
+        if attr_name.startswith('assert') and attr_name!='assert_':
+          pieces = ['assert'] + re.findall('[A-Z][a-z]+', attr_name[5:])
+          name = '_'.join( [s.lower() for s in pieces] )
+          d[name] = getattr(base,attr_name)
+          setattr(cls, name, getattr(base,attr_name))
+    
     for func_name, func in d.items():
       if func_name.startswith('test') and callable(func):
         setattr(cls, func_name, ChaiTestType.test_wrapper(cls, func))
@@ -48,7 +56,7 @@ class ChaiTestType(type):
       try:
         func(self, *args, **kwargs)
       except UnexpectedCall as e:
-        raise AssertionError, e.args, sys.exc_info()[-1]
+        raise AssertionError, '\n\n'+str(e), sys.exc_info()[-1]
 
       exceptions = []
       for stub in self._stubs:
@@ -67,17 +75,8 @@ class Chai(unittest.TestCase):
   '''
   Base class for all tests
   '''
-  
   __metaclass__ = ChaiTestType
 
-  # When initializing, alias all the cAmElCaSe methods to more helpful ones
-  def __init__(self, *args, **kwargs):
-    super(Chai,self).__init__(*args, **kwargs)
-    for attr in dir(self):
-      if attr.startswith('assert') and attr!='assert_':
-        pieces = ['assert'] + re.findall('[A-Z][a-z]+', attr[5:])
-        name = '_'.join( [s.lower() for s in pieces] )
-        setattr(self, name, getattr(self,attr))
 
   # Load in the comparators
   equals = Equals
@@ -110,11 +109,13 @@ class Chai(unittest.TestCase):
     # because we need the reference to be correct at the time of test run, not
     # when the class is defined or an instance is created.
     mod = sys.modules[ self.__class__.__module__ ]
-    for attr in dir(self):
-      if attr.startswith('assert'):
-        setattr(mod, attr, getattr(self, attr) )
-      elif isinstance(getattr(self,attr), type) and issubclass( getattr(self,attr), Comparator ):
-        setattr(mod, attr, getattr(self, attr) )
+    for cls in inspect.getmro(self.__class__):
+      for attr in dir(cls):
+        if hasattr(mod, attr): continue
+        if attr.startswith('assert'):
+          setattr(mod, attr, getattr(self, attr) )
+        elif isinstance(getattr(self,attr), type) and issubclass( getattr(self,attr), Comparator ):
+          setattr(mod, attr, getattr(self, attr) )
     setattr(mod, 'stub', self.stub)
     setattr(mod, 'expect', self.expect)
     setattr(mod, 'mock', self.mock)

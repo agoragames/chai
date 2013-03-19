@@ -1,3 +1,9 @@
+0.2.3
+=====
+
+* Mock objects report parameters and method name when raising UnexpectedCall
+* Fixed global namespace manipulation on deeply nested Chai subclasses
+
 0.2.2
 =====
 

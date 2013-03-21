@@ -184,6 +184,10 @@ class Stub(object):
   def name(self):
     return None # The base class implement this.
 
+  @property
+  def expectations(self):
+    return self._expectations
+
   def unmet_expectations(self):
     '''
     Assert that all expectations on the stub have been met.

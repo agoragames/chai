@@ -406,14 +406,18 @@ class StubNew(StubFunction):
     rval = self._cache.get(klass)
     if not rval:
       rval = self._cache[klass] = super(StubNew,self).__new__(self, *args)
+      rval._allow_init = True
+    else:
+      rval._allow_init = False
     return rval
 
   def __init__(self, obj):
     '''
     Overload the initialization so that we can hack access to __new__.
     '''
-    super(StubNew,self).__init__(obj, '__new__')
-    self._type = obj
+    if self._allow_init:
+      super(StubNew,self).__init__(obj, '__new__')
+      self._type = obj
 
   def __call__(self, *args, **kwargs):
     '''

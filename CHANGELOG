@@ -1,3 +1,8 @@
+0.2.4
+=====
+
+* Fixes bug in stubs on types by preventing secondary initialization
+
 0.2.3
 =====
 

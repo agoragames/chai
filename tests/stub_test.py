@@ -96,6 +96,12 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, Foo.__new__ )
     self.assertEquals( res, stub(Foo) )
 
+    # test that __init__ called only once
+    res.expect()
+    self.assertEquals( 1, len(res._expectations) )
+    res = stub( Foo )
+    self.assertEquals( 1, len(res._expectations) )
+
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):
       def bar(self): pass

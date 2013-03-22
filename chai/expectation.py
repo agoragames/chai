@@ -116,7 +116,7 @@ class Expectation(object):
         prev_expect._met = True
         prev_expect._max_count = prev_expect._run_count
       else:
-        prev_expect._max_count = 1
+        prev_expect._max_count = prev_expect._min_count
 
   # Support expectations as context managers. See
   #   https://github.com/agoragames/chai/issues/1
@@ -201,6 +201,12 @@ class Expectation(object):
 
   def teardown(self):
     self._teardown = True
+    
+    # If counts have not been defined yet, then there's an implied use case
+    # here where once the expectation has been run, it should be torn down,
+    # i.e. max_count is same as min_count, i.e. 1
+    if not self._counts_defined:
+      self._max_count = self._min_count
     return self
   
   def return_value(self):

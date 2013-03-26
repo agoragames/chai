@@ -253,7 +253,7 @@ class StubProperty(Stub, property):
     # Annoying circular reference requires importing here. Would like to see
     # this cleaned up. @AW
     from mock import Mock
-    self._obj = getattr(obj, attr)
+    self._obj = getattr(self._instance, attr)
     self.setter = Mock()
     self.deleter = Mock()
 

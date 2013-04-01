@@ -35,7 +35,8 @@ class FunctionalTest(Chai):
     assert_equals( 'foo', Foo().prop )
     Foo().prop = 42
     del Foo().prop
-    assert_raises( UnexpectedCall, lambda: Foo().prop )
+    with assert_raises( UnexpectedCall ):
+      Foo().prop
 
   def test_properties_using_obj_ref_on_a_class_and_using_set_first(self):
     class Foo(object):
@@ -49,3 +50,32 @@ class FunctionalTest(Chai):
     Foo().prop = 42
     assert_equals( 'foo', Foo().prop )
     del Foo().prop
+
+  def test_iterative_expectations(self):
+    class Foo(object):
+      def bar(self, x):
+        return x
+    f = Foo()
+
+    assert_equals( 3, f.bar(3) )
+
+    expect( f.bar )
+    assert_equals( None, f.bar() )
+
+    expect( f.bar ).returns( 4 )
+    assert_equals( 4, f.bar() )
+    assert_equals( 4, f.bar() )
+
+    expect( f.bar ).returns( 5 ).times(1) 
+    assert_equals( 5, f.bar() )
+    with assert_raises( UnexpectedCall ):
+      f.bar()
+
+    expect( f.bar ).args( 6 ).returns( 7 )
+    assert_equals( 7, f.bar(6) )
+
+    expect( f.bar ).returns( 8 )
+    expect( f.bar ).returns( 9 )
+    assert_equals( 8, f.bar() )
+    assert_equals( 9, f.bar() )
+    assert_equals( 9, f.bar() )

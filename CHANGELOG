@@ -1,3 +1,10 @@
+better-expects
+==============
+
+* Improve iterative expectations by not insisting that one knows how many
+  times an expectation will be called unless explicitly set
+* Assume any arguments on an expectation unless explicitly set
+
 0.2.4
 =====
 

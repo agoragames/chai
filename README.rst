@@ -81,6 +81,29 @@ Additionally, ``Chai`` loads in all assertions, comparators and mocking methods 
             assert_equals('ok', obj.get_result(data))
             assert_complicated_state(data)
 
+As of 0.3.0, the Chai API has significantly changed such that the default behavior of an expectation is least specific. This supports rapid iterative testing with minimal pain and verbosity. An example of the differences: ::
+    
+    class CustomObject (object): 
+        def get(self, arg):
+            return arg
+
+    class TestCase(Chai):
+        def test_0_2_0(self):
+            obj = CustomObject()
+            expect(obj.get).args(5)
+            assert_equals( None, obj.get(5) )
+            expect(obj.get).any_args().returns( 'test' ).times(2)
+            assert_equals( 'test', obj.get(5) )
+            assert_equals( 'test', obj.get(5) )
+        
+        def test_0_3_0(self):
+            obj = CustomObject()
+            expect(obj.get)
+            assert_equals( None, obj.get() )
+            expect(obj.get).returns( 'test' )
+            assert_equals( 'test', obj.get(5) )
+            assert_equals( 'test', obj.get(5) )
+
 Stubbing
 --------
 

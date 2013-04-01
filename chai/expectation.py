@@ -93,14 +93,30 @@ class Expectation(object):
     self._arguments_rule = ArgumentsExpectationRule()
     self._raises = None
     self._returns = None
-    self._max_count = self._min_count = 1
+    self._max_count = None
+    self._min_count = 1
+    self._counts_defined = False
     self._run_count = 0 
     self._any_order = False
     self._side_effect = False
     self._side_effect_args = None
     self._side_effect_kwargs = None
     self._teardown = False
-    self._any_args = False
+    self._any_args = True
+
+    # If the last expectation has no counts defined yet, set it to the
+    # run count if it's already been used, else set it to 1 just like
+    # the original implementation. This makes iterative testing much
+    # simpler without needing to know ahead of time exactly how many
+    # times an expectation will be called.
+    prev_expect = None if not stub.expectations else stub.expectations[-1]
+    if prev_expect and not prev_expect._counts_defined:
+      if prev_expect._run_count:
+        # Close immediately
+        prev_expect._met = True
+        prev_expect._max_count = prev_expect._run_count
+      else:
+        prev_expect._max_count = prev_expect._min_count
 
   # Support expectations as context managers. See
   #   https://github.com/agoragames/chai/issues/1
@@ -143,28 +159,34 @@ class Expectation(object):
 
   def times(self, count):
     self._min_count = self._max_count = count
+    self._counts_defined = True
     return self
   
   def at_least(self, min_count):
     self._min_count = min_count
     self._max_count = None
+    self._counts_defined = True
     return self
   
   def at_least_once(self):
     self.at_least(1)
+    self._counts_defined = True
     return self
   
   def at_most(self, max_count):
     self._max_count = max_count
+    self._counts_defined = True
     return self
   
   def at_most_once(self):
     self.at_most(1)
+    self._counts_defined = True
     return self
   
   def once(self):
     self._min_count = 1
     self._max_count = 1
+    self._counts_defined = True
     return self
 
   def any_order(self):
@@ -179,6 +201,12 @@ class Expectation(object):
 
   def teardown(self):
     self._teardown = True
+    
+    # If counts have not been defined yet, then there's an implied use case
+    # here where once the expectation has been run, it should be torn down,
+    # i.e. max_count is same as min_count, i.e. 1
+    if not self._counts_defined:
+      self._max_count = self._min_count
     return self
   
   def return_value(self):

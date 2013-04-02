@@ -1,9 +1,10 @@
-better-expects
-==============
+0.3.0
+=====
 
 * Improve iterative expectations by not insisting that one knows how many
   times an expectation will be called unless explicitly set
 * Assume any arguments on an expectation unless explicitly set
+* Fixed stubbing properties on an instance
 
 0.2.4
 =====

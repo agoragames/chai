@@ -1,3 +1,8 @@
+0.3.1
+=====
+
+* Further fixed global namespace manipulation on test class hierarchies
+
 0.3.0
 =====
 

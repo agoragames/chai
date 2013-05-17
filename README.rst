@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.3.1
+:Version: 0.3.2
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -201,7 +201,7 @@ It is very common to need to run expectations on the constructor for an object, 
             assert_equals( obj, method() )
     
 
-Lastly, the arguments modifier supports several matching functions. For simplicity in covering the common cases, the arg expectation assumes an equals test for instances and an instanceof test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
+Lastly, the arguments modifier supports several matching functions. For simplicity in covering the common cases, the arg expectation assumes an equals test for instances and a logical or of ``[instanceof, equals]`` test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
 
     class TestCase(Chai):
         def test_mock_get(self):

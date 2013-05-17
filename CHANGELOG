@@ -1,3 +1,9 @@
+0.3.2
+=====
+
+* Expectations with a type argument are matched against either an instance 
+  of that type, or the type itself
+
 0.3.1
 =====
 

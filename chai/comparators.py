@@ -16,7 +16,7 @@ def build_comparators(*values_or_types):
       comparators.append( item )
     elif isinstance(item,type):
       # If you are passing around a type you will have to build a Equals comparator
-      comparators.append( IsA(item) )
+      comparators.append( Any(IsA(item),Is(item)) )
     else:
       comparators.append( Equals(item) )
   return comparators

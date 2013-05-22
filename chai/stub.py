@@ -11,7 +11,7 @@ import gc
 
 from expectation import Expectation, ArgumentsExpectationRule
 from exception import *
-from termcolor import colored
+from _termcolor import colored
 
 # For clarity here and in tests, could make these class or static methods on
 # Stub. Chai base class would hide that.

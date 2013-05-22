@@ -5,7 +5,7 @@ https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 
 import sys
-from termcolor import colored
+from _termcolor import colored
 import traceback
 
 # Refactored from ArgumentsExpectationRule

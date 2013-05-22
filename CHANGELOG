@@ -1,3 +1,8 @@
+0.3.4
+=====
+
+* Removed termcolor requirement. Both termcolor and unittest2 are optional.
+
 0.3.3
 =====
 

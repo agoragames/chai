@@ -22,7 +22,9 @@ class ComparatorsTest(unittest.TestCase):
   def test_build_comparators_is_a(self):
     class CustomObject(object): pass
     comp = build_comparators(CustomObject)[0]
-    self.assertTrue(isinstance(comp, IsA))
+    self.assertTrue(isinstance(comp, Any))
+    self.assertTrue( comp.test(CustomObject) )
+    self.assertTrue( comp.test(CustomObject()) )
     
   def test_build_comparators_passes_comparators(self):
     any_comp = Any()
@@ -111,7 +113,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_any_repr(self):
     comp = Any(1,2,3,str)
-    self.assertEquals(repr(comp), "Any([1, 2, 3, IsA(str)])")
+    self.assertEquals(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<type 'str'>)])])")
   
   def test_in(self):
     comp = In(['foo', 'bar'])

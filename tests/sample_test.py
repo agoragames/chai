@@ -11,8 +11,6 @@ from chai.exception import *
 import samples
 from samples import SampleBase, SampleChild
 
-import unittest2 as unittest
-
 class CustomException(Exception): pass
 
 class SampleModuleTest(Chai):

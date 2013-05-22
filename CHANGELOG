@@ -1,3 +1,8 @@
+0.3.3
+=====
+
+* Removed unittest2 requirement, fixes https://github.com/agoragames/chai/issues/5
+
 0.3.2
 =====
 

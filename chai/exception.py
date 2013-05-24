@@ -3,10 +3,12 @@ Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
+from __future__ import absolute_import
 
 import sys
-from _termcolor import colored
 import traceback
+
+from chai._termcolor import colored
 
 # Refactored from ArgumentsExpectationRule
 def pretty_format_args(*args, **kwargs):
@@ -14,7 +16,7 @@ def pretty_format_args(*args, **kwargs):
   Take the args, and kwargs that are passed them and format in a prototype style.
   """
   args = list([repr(a) for a in args])
-  for key, value in kwargs.iteritems():
+  for key, value in kwargs.items():
     args.append("%s=%s" % (key, repr(value)))
   return "(%s)" % ", ".join([a for a in args])
 

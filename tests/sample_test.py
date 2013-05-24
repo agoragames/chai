@@ -8,8 +8,8 @@ import random
 from chai import Chai
 from chai.stub import stub
 from chai.exception import *
-import samples
-from samples import SampleBase, SampleChild
+import tests.samples as samples
+from tests.samples import SampleBase, SampleChild
 
 class CustomException(Exception): pass
 

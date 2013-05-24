@@ -4,7 +4,7 @@ import types
 
 from chai.stub import *
 from chai.mock import Mock
-import samples
+import tests.samples as samples
 
 class StubTest(unittest.TestCase):
   ###

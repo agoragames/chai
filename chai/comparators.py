@@ -261,7 +261,7 @@ class Like(Comparator):
 
     rval = True
     if isinstance(self._src, dict):
-      for k,v in self._src.iteritems():
+      for k,v in self._src.items():
         rval = rval and value.get(k)==v
 
     else:

@@ -280,6 +280,9 @@ equals(object)
 almost_equals(float, places)
   Identical to assertAlmostEquals, will match an argument to the comparator value to a most ``places`` digits beyond the decimal point.
 
+length(len)
+    Matches parameters with defined length. Must be either an integer or a set of integers that implements the ``in`` function.
+
 is_a(type)
   Match an argument of a given type. Supports same arguments as builtin function ``isinstance``.
 

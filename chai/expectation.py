@@ -6,9 +6,10 @@ https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 
 import inspect
-from comparators import *
-from exception import *
-from _termcolor import colored
+
+from .comparators import *
+from .exception import *
+from ._termcolor import colored
 
 
 class ExpectationRule(object):
@@ -29,7 +30,7 @@ class ArgumentsExpectationRule(ExpectationRule):
     
     # Convert all of the arguments to comparators
     self.args = build_comparators(*args)
-    self.kwargs = dict([(k, build_comparators(v)[0]) for k, v in kwargs.iteritems()])
+    self.kwargs = dict([(k, build_comparators(v)[0]) for k, v in kwargs.items()])
 
   def validate(self, *args, **kwargs):
     self.in_args = args[:]
@@ -40,12 +41,12 @@ class ArgumentsExpectationRule(ExpectationRule):
       self._passed = False
       return False
 
-    for x in xrange(len(self.args)):
+    for x in range(len(self.args)):
       if not self.args[x].test( args[x] ):
         self._passed = False
         return False
 
-    for arg_name,arg_test in self.kwargs.iteritems():
+    for arg_name,arg_test in self.kwargs.items():
       try:
         value=kwargs.pop(arg_name)
       except KeyError:
@@ -69,7 +70,7 @@ class ArgumentsExpectationRule(ExpectationRule):
     Take the args, and kwargs that are passed them and format in a prototype style.
     """
     args = list([repr(a) for a in args])
-    for key, value in kwargs.iteritems():
+    for key, value in kwargs.items():
       args.append("%s=%s" % (key, repr(value)))
     
     return "(%s)" % ", ".join([a for a in args])

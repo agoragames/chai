@@ -66,10 +66,16 @@ def _stub_attr(obj, attr_name):
   isinstance(attr, (types.FunctionType,types.BuiltinFunctionType,types.BuiltinMethodType)):
     return StubFunction(obj, attr_name)
 
+  # I thought that types.UnboundMethodType differentiated these cases but
+  # apparently not.
   if isinstance(attr, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
-    if attr.im_self==None:
-      return StubUnboundMethod(attr)
+    if getattr(attr, 'im_self', None)==None:
+      # Handle the python3 case
+      if hasattr(attr, '__self__'):
+        return StubMethod(obj, attr_name)
+      else:
+        return StubUnboundMethod(attr)
     else:
       return StubMethod(obj, attr_name)
 
@@ -117,9 +123,8 @@ def _stub_obj(obj):
     # Handle differently if unbound because it's an implicit "any instance"
     if getattr(obj, 'im_self', None)==None:
       # Handle the python3 case
-      if getattr(obj, '__self__', None):
+      if hasattr(obj, '__self__'):
         return StubMethod(obj)
-      #print("STUBBING ", obj, dir(obj), str(obj), obj.__self__)
       else:
         return StubUnboundMethod(obj)
     else:
@@ -300,12 +305,12 @@ class StubMethod(Stub):
     super(StubMethod,self).__init__(obj, attr)
     if not self._attr:
       # python3
-      if getattr(obj,'__func__',None):
+      if hasattr(obj,'__func__'):
         self._attr = obj.__func__.__name__
       else:
         self._attr = obj.im_func.func_name
 
-      if getattr(obj, '__self__',None):
+      if hasattr(obj, '__self__'):
         self._instance = obj.__self__
       else:
         self._instance = obj.im_self
@@ -377,16 +382,16 @@ class StubFunction(Stub):
     '''
     super(StubFunction, self).__init__(obj, attr)
     if not self._attr:
-      if getattr(obj, '__module__', None):
+      if hasattr(obj, '__module__'):
         self._instance = sys.modules[obj.__module__]
-      elif getattr(obj, '__self__', None):
+      elif hasattr(obj, '__self__'):
         self._instance = obj.__self__
       else:
         raise UnsupportedStub("Failed to find instance of %s"%(obj))
 
-      if getattr(obj,'func_name', None):
+      if hasattr(obj,'func_name'):
         self._attr = obj.func_name
-      elif getattr(obj,'__name__', None):
+      elif hasattr(obj,'__name__'):
         self._attr = obj.__name__
       else:
         raise UnsupportedStub("Failed to find name of %s"%(obj))

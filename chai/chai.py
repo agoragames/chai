@@ -21,7 +21,6 @@ from chai.mock import Mock
 from chai.stub import stub
 from chai.comparators import *
 
-
 class ChaiTestType(type):
   """
   Metaclass used to wrap all test methods to make sure the assert_expectations
@@ -34,11 +33,9 @@ class ChaiTestType(type):
     # also get all the attributes from the base classes to account
     # for a case when test class is not the immediate child of Chai
     # also alias all the cAmElCaSe methods to more helpful ones
-    print('WALKING ', bases)
     for base in bases:
       for attr_name in dir(base):
         d[attr_name] = getattr(base, attr_name)
-        print('LOOKING AT ', attr_name)
         if attr_name.startswith('assert') and attr_name!='assert_':
           pieces = ['assert'] + re.findall('[A-Z][a-z]+', attr_name[5:])
           name = '_'.join( [s.lower() for s in pieces] )
@@ -60,11 +57,11 @@ class ChaiTestType(type):
         func(self, *args, **kwargs)
       except UnexpectedCall as e:
         # if this is not python3, use python2 syntax
-        if hasattr(e, '__traceback__'):
+        if not hasattr(e, '__traceback__'):
           import python2
           python2.reraise(e, '\n\n'+str(e), sys.exc_info()[-1])
         exc = AssertionError('\n\n'+str(e))
-        setattr(exc, '__traceback__', sys.exc_info()[1])
+        setattr(exc, '__traceback__', sys.exc_info()[-1])
         raise exc
 
       exceptions = []
@@ -90,6 +87,7 @@ class ChaiBase(unittest.TestCase):
   # Load in the comparators
   equals = Equals
   almost_equals = AlmostEqual
+  length = Length
   is_a = IsA
   is_arg = Is
   any_of = Any
@@ -105,8 +103,7 @@ class ChaiBase(unittest.TestCase):
   like = Like
 
   def setUp(self):
-    print('SUPER IS ', super(Chai,self))
-    super(Chai,self).setUp()
+    super(ChaiBase,self).setUp()
 
     # Setup stub tracking
     self._stubs = deque()
@@ -121,18 +118,16 @@ class ChaiBase(unittest.TestCase):
     # method resolution order to set it on every module for Chai subclasses
     # to handle when tests are defined in subclasses.
     for cls in inspect.getmro(self.__class__):
-      #print('GLOBAL SET ON ', cls)
       if cls.__module__.startswith('chai'):
         break
       mod = sys.modules[ cls.__module__ ]
       for attr in dir(cls):
-        #print('SETTING ATTR', attr , "ON", cls.__module__, sys.modules[cls.__module__])
         if hasattr(mod, attr): continue
         if attr.startswith('assert'):
           setattr(mod, attr, getattr(self, attr) )
         elif isinstance(getattr(self,attr), type) and issubclass( getattr(self,attr), Comparator ):
           setattr(mod, attr, getattr(self, attr) )
-      setattr(mod, 'stub', self.stub)
+      #setattr(mod, 'stub', self.stub)
       setattr(mod, 'expect', self.expect)
       setattr(mod, 'mock', self.mock)
     
@@ -141,7 +136,7 @@ class ChaiBase(unittest.TestCase):
   setup = setUp
 
   def tearDown(self):
-    super(Chai,self).tearDown()
+    super(ChaiBase,self).tearDown()
 
     # Docs insist that this will be called no matter what happens in runTest(),
     # so this should be a safe spot to unstub everything
@@ -185,7 +180,7 @@ class ChaiBase(unittest.TestCase):
     Open and return an expectation on an object. Will automatically create a
     stub for the object. See stub documentation for argument information.
     '''
-    return self.stub(obj,attr).expect()
+    return self.stub(obj, attr).expect()
 
   def mock(self, obj=None, attr=None, **kwargs):
     '''
@@ -206,4 +201,4 @@ class ChaiBase(unittest.TestCase):
     return rval
 
 
-Chai = ChaiTestType('Chai', (ChaiBase,), globals())
+Chai = ChaiTestType('Chai', (ChaiBase,), {})

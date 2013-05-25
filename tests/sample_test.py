@@ -158,8 +158,10 @@ class SampleBaseTest(Chai):
 
   def test_expect_bound_method_with_allof_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( all_of(bytearray,'hello') )
-    obj.bound_method( bytearray('hello') )
+    expect(obj.bound_method).args( all_of(length(5),'hello') )
+    obj.bound_method( 'hello' )
+
+    expect(obj.bound_method).args( all_of(length(3),'hello') )
     assert_raises(UnexpectedCall, obj.bound_method, 'hello' )
   
   def test_expect_bound_method_with_notof_comparator(self):

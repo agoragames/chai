@@ -42,6 +42,22 @@ class Equals(Comparator):
     return repr(self._value)
   __str__ = __repr__
 
+class Length(Comparator):
+  '''
+  Compare the length of the argument.
+  '''
+  def __init__(self, value):
+    self._value = value
+
+  def test(self, value):
+    if isinstance(self._value,int):
+      return len(value)==self._value
+    return len(value) in self._value
+
+  def __repr__(self):
+    return repr(self._value)
+  __str__ = __repr__
+
 class IsA(Comparator):
   '''
   Test to see if a value is an instance of something. Arguments match

@@ -114,7 +114,7 @@ def _stub_obj(obj):
   #if isinstance(obj, types.TypeType):
   if hasattr(types,'TypeType') and isinstance(obj, types.TypeType):
     return StubNew(obj)
-  elif hasattr(__builtins__,'type') and isinstance(obj, __builtins__.type):
+  elif hasattr(__builtins__,'type') and isinstance(obj, __builtins__['type']):
     return StubNew(obj)
 
   # I thought that types.UnboundMethodType differentiated these cases but
@@ -364,7 +364,7 @@ class StubMethod(Stub):
     # to which it belongs. This addresses an edge case where a module can 
     # expose a method of an instance. gevent does this, for example.
     if hasattr(self._obj,'__self__') and inspect.isclass(self._obj.__self__) and self._obj.__self__ is self._instance:
-      print('teardown class python3')
+      setattr(self._instance, self._attr, classmethod(self._obj.__func__))
     elif hasattr(self._obj,'im_self') and inspect.isclass(self._obj.im_self) and self._obj.im_self is self._instance:
       # Wrap it and set it back on the class
       setattr(self._instance, self._attr, classmethod(self._obj.im_func))
@@ -483,6 +483,9 @@ class StubUnboundMethod(Stub):
     '''
     Initialize with an object that is an unbound method
     '''
+    # NOTE: It doesn't appear that there's any way to support this in python3
+    # because an unbound method has no reference to its parent class, it looks
+    # just like a regular function
     super(StubUnboundMethod,self).__init__(obj)
     self._instance = obj.im_class
     self._attr = obj.im_func.func_name

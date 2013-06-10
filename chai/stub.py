@@ -219,10 +219,12 @@ class Stub(object):
       if exp.closed():
         continue
 
-      # If args don't match the expectation, close it and move on, else
-      # pass to it for testing.
+      # If args don't match the expectation but its minimum counts have been
+      # met, close it and move on, else it's an unexpected call. Have to check
+      # counts here now due to the looser definitions of expectations in 0.3.x
       if not exp.match(*args, **kwargs):
-        exp.close(*args, **kwargs)
+        if exp.counts_met():
+          exp.close(*args, **kwargs)
       else:
         return exp.test(*args, **kwargs)
 

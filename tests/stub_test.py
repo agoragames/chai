@@ -265,6 +265,8 @@ class StubClassTest(unittest.TestCase):
       def close(self, *args, **kwargs):
         self._close_count += 1
         self._close_args = (args,kwargs)
+      def counts_met(self):
+        return self._closed
     
     s = Stub('obj')
     s._expectations = [ Expect(True), Expect(False) ]
@@ -272,9 +274,7 @@ class StubClassTest(unittest.TestCase):
     self.assertEquals( 0, s._expectations[0]._match_count )
     self.assertEquals( 1, s._expectations[1]._match_count )
     self.assertEquals( 0, s._expectations[0]._close_count )
-    self.assertEquals( 1, s._expectations[1]._close_count )
-    self.assertEquals( (('foo',),{}), s._expectations[1]._close_args )
-    
+    self.assertEquals( 0, s._expectations[1]._close_count )
 
 class StubPropertyTest(unittest.TestCase):
   # FIXME: Need to test teardown and init, these test might be in the base stub tests.

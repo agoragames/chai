@@ -222,9 +222,13 @@ class Stub(object):
       # If args don't match the expectation but its minimum counts have been
       # met, close it and move on, else it's an unexpected call. Have to check
       # counts here now due to the looser definitions of expectations in 0.3.x
+      # If we dont match, the counts aren't met and we're not allowing 
+      # out-of-order, then break out and raise an exception.
       if not exp.match(*args, **kwargs):
         if exp.counts_met():
           exp.close(*args, **kwargs)
+        elif not exp.is_any_order():
+          break
       else:
         return exp.test(*args, **kwargs)
 

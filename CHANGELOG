@@ -1,3 +1,9 @@
+0.3.6
+=====
+
+* Fix logic of raising UnexpectedCall when calling a stub and an unclosed, 
+  non-matching, in-order expectation does not have its counts met
+
 0.3.5
 =====
 

@@ -267,6 +267,8 @@ class StubClassTest(unittest.TestCase):
         self._close_args = (args,kwargs)
       def counts_met(self):
         return self._closed
+      def is_any_order(self):
+        return False
     
     s = Stub('obj')
     s._expectations = [ Expect(True), Expect(False) ]

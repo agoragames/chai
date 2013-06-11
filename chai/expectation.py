@@ -193,6 +193,9 @@ class Expectation(object):
     self._any_order = True
     return self
 
+  def is_any_order(self):
+    return self._any_order
+
   def side_effect(self, func, *args, **kwargs):
     self._side_effect = func
     self._side_effect_args = args

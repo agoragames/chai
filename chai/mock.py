@@ -4,9 +4,9 @@ Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 from types import MethodType
-from chai.stub import stub, Stub
-from chai.exception import UnexpectedCall
-from chai.expectation import ArgumentsExpectationRule
+from .stub import Stub
+from .exception import UnexpectedCall
+from .expectation import ArgumentsExpectationRule
 
 class Mock(object):
   '''

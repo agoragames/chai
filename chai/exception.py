@@ -8,7 +8,7 @@ from __future__ import absolute_import
 import sys
 import traceback
 
-from chai._termcolor import colored
+from ._termcolor import colored
 
 # Refactored from ArgumentsExpectationRule
 def pretty_format_args(*args, **kwargs):

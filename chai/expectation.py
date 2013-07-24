@@ -7,9 +7,9 @@ https://github.com/agoragames/chai/blob/master/LICENSE.txt
 
 import inspect
 
-from chai.comparators import *
-from chai.exception import *
-from chai._termcolor import colored
+from .comparators import *
+from .exception import *
+from ._termcolor import colored
 
 
 class ExpectationRule(object):

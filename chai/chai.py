@@ -16,10 +16,10 @@ import sys
 import inspect
 from collections import deque
 
-from chai.exception import *
-from chai.mock import Mock
-from chai.stub import stub
-from chai.comparators import *
+from .exception import *
+from .mock import Mock
+from .stub import stub
+from .comparators import *
 
 class ChaiTestType(type):
   """
@@ -127,7 +127,7 @@ class ChaiBase(unittest.TestCase):
           setattr(mod, attr, getattr(self, attr) )
         elif isinstance(getattr(self,attr), type) and issubclass( getattr(self,attr), Comparator ):
           setattr(mod, attr, getattr(self, attr) )
-      #setattr(mod, 'stub', self.stub)
+      setattr(mod, 'stub', self.stub)
       setattr(mod, 'expect', self.expect)
       setattr(mod, 'mock', self.mock)
     

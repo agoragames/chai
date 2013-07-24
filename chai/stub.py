@@ -9,9 +9,9 @@ import os
 import sys
 import gc
 
-from chai.expectation import Expectation, ArgumentsExpectationRule
-from chai.exception import *
-from chai._termcolor import colored
+from .expectation import Expectation, ArgumentsExpectationRule
+from .exception import *
+from ._termcolor import colored
 
 # For clarity here and in tests, could make these class or static methods on
 # Stub. Chai base class would hide that.
@@ -33,7 +33,7 @@ def _stub_attr(obj, attr_name):
   '''
   # Annoying circular reference requires importing here. Would like to see
   # this cleaned up. @AW
-  from chai.mock import Mock
+  from .mock import Mock
 
   # Check to see if this a property, this check is only for when dealing with an
   # instance. getattr will work for classes.
@@ -71,11 +71,11 @@ def _stub_attr(obj, attr_name):
   if isinstance(attr, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
     if getattr(attr, 'im_self', None)==None:
-      # Handle the python3 case
+      # Handle the python3 case and py2 filter
       if hasattr(attr, '__self__'):
-        return StubMethod(obj, attr_name)
-      else:
-        return StubUnboundMethod(attr)
+        if attr.__self__!=None:
+          return StubMethod(obj, attr_name)
+      return StubUnboundMethod(attr)
     else:
       return StubMethod(obj, attr_name)
 
@@ -99,7 +99,7 @@ def _stub_obj(obj):
   '''
   # Annoying circular reference requires importing here. Would like to see
   # this cleaned up. @AW
-  from chai.mock import Mock
+  from .mock import Mock
 
   # Return an existing stub
   if isinstance(obj, Stub):
@@ -122,11 +122,11 @@ def _stub_obj(obj):
   if isinstance(obj, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
     if getattr(obj, 'im_self', None)==None:
-      # Handle the python3 case
+      # Handle the python3 case and py2 filter
       if hasattr(obj, '__self__'):
-        return StubMethod(obj)
-      else:
-        return StubUnboundMethod(obj)
+        if obj.__self__!=None:
+          return StubMethod(obj)
+      return StubUnboundMethod(obj)
     else:
       return StubMethod(obj)
 
@@ -275,7 +275,7 @@ class StubProperty(Stub, property):
     # as property type so that it simply works.
     # Annoying circular reference requires importing here. Would like to see
     # this cleaned up. @AW
-    from chai.mock import Mock
+    from .mock import Mock
     self._obj = getattr(self._instance, attr)
     self.setter = Mock()
     self.deleter = Mock()
@@ -305,12 +305,12 @@ class StubMethod(Stub):
     super(StubMethod,self).__init__(obj, attr)
     if not self._attr:
       # python3
-      if hasattr(obj,'__func__'):
+      if sys.version_info.major==3: #hasattr(obj,'__func__'):
         self._attr = obj.__func__.__name__
       else:
         self._attr = obj.im_func.func_name
 
-      if hasattr(obj, '__self__'):
+      if sys.version_info.major==3: #hasattr(obj, '__self__'):
         self._instance = obj.__self__
       else:
         self._instance = obj.im_self
@@ -321,7 +321,7 @@ class StubMethod(Stub):
 
   @property
   def name(self):
-    from chai.mock import Mock # Import here for the same reason as above.
+    from .mock import Mock # Import here for the same reason as above.
     if hasattr(self._obj, 'im_class'):
       if issubclass(self._obj.im_class, Mock):
         return self._obj.im_self._name

@@ -4,6 +4,8 @@ Tests for the sample module
 
 import os
 import random
+import unittest
+import sys
 
 from chai import Chai
 from chai.stub import stub
@@ -184,6 +186,7 @@ class SampleBaseTest(Chai):
     assert_equals( 'mars', obj1.bound_method('hello') )
     assert_raises(UnexpectedCall, obj2.bound_method)
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_stub_unbound_method_acts_as_no_instance(self):
     stub( SampleBase.bound_method )
 

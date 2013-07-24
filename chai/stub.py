@@ -75,7 +75,8 @@ def _stub_attr(obj, attr_name):
       if hasattr(attr, '__self__'):
         if attr.__self__!=None:
           return StubMethod(obj, attr_name)
-      return StubUnboundMethod(attr)
+      if sys.version_info.major==2:
+        return StubUnboundMethod(attr)
     else:
       return StubMethod(obj, attr_name)
 
@@ -126,7 +127,8 @@ def _stub_obj(obj):
       if hasattr(obj, '__self__'):
         if obj.__self__!=None:
           return StubMethod(obj)
-      return StubUnboundMethod(obj)
+      if sys.version_info.major==2:
+        return StubUnboundMethod(obj)
     else:
       return StubMethod(obj)
 

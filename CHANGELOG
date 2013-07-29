@@ -1,3 +1,8 @@
+0.3.7
+=====
+
+* Fixed teardown of __new__ on types that overload the method
+
 0.3.6
 =====
 

@@ -426,6 +426,7 @@ class StubNew(StubFunction):
     Overload the initialization so that we can hack access to __new__.
     '''
     if self._allow_init:
+      self._new = obj.__new__
       super(StubNew,self).__init__(obj, '__new__')
       self._type = obj
 
@@ -441,7 +442,13 @@ class StubNew(StubFunction):
     '''
     Overload so that we can clear out the cache after a test run.
     '''
-    super(StubNew,self).teardown()
+    # __new__ is a super-special case in that even when stubbing a class 
+    # which implements its own __new__ and subclasses object, the 
+    # "Class.__new__" reference is a staticmethod and not a method (or 
+    # function). That confuses the "was_object_method" logic in StubFunction
+    # which then fails to delattr and from then on the class is corrupted.
+    # So skip that teardown and use a __new__-specific case.
+    setattr( self._instance, self._attr, staticmethod(self._new) )
     StubNew._cache.pop(self._type)
 
 class StubUnboundMethod(Stub):

@@ -426,6 +426,26 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( 0, len(StubNew._cache) )
     self.assertEquals( orig, Foo.__new__ )
 
+  def test_teardown_on_custom_new(self):
+    class Foo(object):
+      def __new__(cls, *args, **kwargs):
+        rval = object.__new__(cls)
+        rval.args = args
+        return rval
+
+    f1 = Foo('f1')
+    self.assertEquals( ('f1',), f1.args )
+    orig = Foo.__new__
+    self.assertEquals( 0, len(StubNew._cache) )
+    x = StubNew(Foo)
+    self.assertEquals( 1, len(StubNew._cache) )
+    x.teardown()
+    self.assertEquals( 0, len(StubNew._cache) )
+    self.assertEquals( orig, Foo.__new__ )
+    f2 = Foo('f2')
+    self.assertEquals( ('f2',), f2.args )
+    
+
 class StubUnboundMethodTest(unittest.TestCase):
   
   def test_init(self):

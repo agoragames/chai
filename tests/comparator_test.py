@@ -52,7 +52,10 @@ class ComparatorsTest(unittest.TestCase):
   def test_is_a(self):
     comp = IsA(str)
     self.assertTrue( comp.test('foo') )
-    self.assertFalse( comp.test(bytearray('foo')) )
+    if sys.version_info.major==2:
+      self.assertFalse( comp.test(bytearray('foo')) )
+    else:
+      self.assertFalse( comp.test(bytearray('foo'.encode('ascii'))) )
     
     comp = IsA((str,int))
     self.assertTrue( comp.test('') )
@@ -116,7 +119,10 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_any_repr(self):
     comp = Any(1,2,3,str)
-    self.assertEquals(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<type 'str'>)])])")
+    if sys.version_info.major==2:
+      self.assertEquals(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<type 'str'>)])])")
+    else:
+      self.assertEquals(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<class 'str'>)])])")
   
   def test_in(self):
     comp = In(['foo', 'bar'])
@@ -141,9 +147,9 @@ class ComparatorsTest(unittest.TestCase):
 
   def test_all(self):
     comp = All(IsA(bytearray), Equals('foo'))
-    self.assertTrue( comp.test(bytearray('foo')) )
+    self.assertTrue( comp.test(bytearray('foo'.encode('ascii'))) )
     self.assertFalse( comp.test('foo') )
-    self.assertEquals( 'foo', bytearray('foo') )
+    self.assertEquals( 'foo', bytearray('foo'.encode('ascii')) )
   
   def test_all_repr(self):
     comp = All(IsA(bytearray), Equals('foobar'))

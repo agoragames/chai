@@ -176,6 +176,7 @@ class SampleBaseTest(Chai):
     expect(obj.bound_method).args( not_of(float,int) )
     obj.bound_method( 'hello' )
     
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_expect_unbound_method_acts_as_any_instance(self):
     expect( SampleBase.bound_method ).args('hello').returns('world')
     expect( SampleBase.bound_method ).args('hello').returns('mars')

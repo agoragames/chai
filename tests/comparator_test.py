@@ -1,7 +1,11 @@
 
 import unittest
+import sys
 
 from chai.comparators import *
+
+if sys.version_info.major==2:
+  from comparator_test_py2 import *
 
 class ComparatorsTest(unittest.TestCase):
   
@@ -48,7 +52,6 @@ class ComparatorsTest(unittest.TestCase):
   def test_is_a(self):
     comp = IsA(str)
     self.assertTrue( comp.test('foo') )
-    self.assertFalse( comp.test(u'foo') )
     self.assertFalse( comp.test(bytearray('foo')) )
     
     comp = IsA((str,int))

@@ -321,7 +321,7 @@ like(container)
 var(name)
   A variable match against the first time that the argument is called. In the case of multiple calls, the second one must match the previous value of ``name``. After your tests have run, you can check the value against expected arguments through ``var(name).value``. This is really useful when you're testing a deep stack and it's simpler to assert that "value A was used in method call X". Variables can also be used to capture an argument and return it. ::
 
-  expect( encode ).args( var('src'), 'gzip' ).returns( var('src') )
+    expect( encode ).args( var('src'), 'gzip' ).returns( var('src') )
 
 
 **A note of caution**

@@ -1,10 +1,11 @@
 import re
 import unittest
 import types
+import sys
 
 from chai.stub import *
 from chai.mock import Mock
-import samples
+import tests.samples as samples
 
 class StubTest(unittest.TestCase):
   ###
@@ -102,6 +103,7 @@ class StubTest(unittest.TestCase):
     res = stub( Foo )
     self.assertEquals( 1, len(res._expectations) )
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):
       def bar(self): pass
@@ -111,6 +113,7 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, stub(Foo,'bar') )
     self.assertEquals( res, getattr(Foo,'bar') )
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_stub_unbound_method_with_obj_ref(self):
     class Foo(object):
       def bar(self): pass
@@ -446,6 +449,7 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( ('f2',), f2.args )
     
 
+@unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
 class StubUnboundMethodTest(unittest.TestCase):
   
   def test_init(self):

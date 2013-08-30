@@ -18,9 +18,10 @@ class CupOf(Chai):
     '''
     A Comparator used for check message equality
     '''
-    def __init__(self, (key,value)):
-      self._key = key
-      self._value = value
+    #def __init__(self, (key,value)):
+    def __init__(self, pair):
+      self._key = pair[0]
+      self._value = pair[1]
 
     def test(self, value):
       if isinstance(value,dict):

@@ -100,7 +100,7 @@ class ExpectationRule(unittest.TestCase):
   def test_at_least(self):
     exp = Expectation(self.stub)
     self.assertEquals( exp, exp.at_least(10) )
-    for x in xrange(10):
+    for x in range(10):
       exp.test()
     self.assertTrue(exp.closed(with_counts=True))
 
@@ -113,7 +113,7 @@ class ExpectationRule(unittest.TestCase):
   def test_at_most(self):
     exp = Expectation(self.stub)
     self.assertEquals( exp, exp.args(1).at_most(10) )
-    for x in xrange(10):
+    for x in range(10):
       exp.test(1)
     self.assertTrue(exp.closed(with_counts=True))
   

@@ -3,6 +3,7 @@ Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
+from __future__ import absolute_import
 
 try:
   import unittest2
@@ -13,13 +14,12 @@ except ImportError:
 import re
 import sys
 import inspect
-
-from exception import *
-from mock import Mock
-from stub import stub
 from collections import deque
-from comparators import *
 
+from .exception import *
+from .mock import Mock
+from .stub import stub
+from .comparators import *
 
 class ChaiTestType(type):
   """
@@ -56,7 +56,13 @@ class ChaiTestType(type):
       try:
         func(self, *args, **kwargs)
       except UnexpectedCall as e:
-        raise AssertionError, '\n\n'+str(e), sys.exc_info()[-1]
+        # if this is not python3, use python2 syntax
+        if not hasattr(e, '__traceback__'):
+          import python2
+          python2.reraise(e, '\n\n'+str(e), sys.exc_info()[-1])
+        exc = AssertionError('\n\n'+str(e))
+        setattr(exc, '__traceback__', sys.exc_info()[-1])
+        raise exc
 
       exceptions = []
       for stub in self._stubs:
@@ -71,16 +77,17 @@ class ChaiTestType(type):
     wrapper.__wrapped__ = func
     return wrapper
 
-class Chai(unittest.TestCase):
+class ChaiBase(unittest.TestCase):
   '''
   Base class for all tests
   '''
-  __metaclass__ = ChaiTestType
+  #__metaclass__ = ChaiTestType
 
 
   # Load in the comparators
   equals = Equals
   almost_equals = AlmostEqual
+  length = Length
   is_a = IsA
   is_arg = Is
   any_of = Any
@@ -96,7 +103,7 @@ class Chai(unittest.TestCase):
   like = Like
 
   def setUp(self):
-    super(Chai,self).setUp()
+    super(ChaiBase,self).setUp()
 
     # Setup stub tracking
     self._stubs = deque()
@@ -129,7 +136,7 @@ class Chai(unittest.TestCase):
   setup = setUp
 
   def tearDown(self):
-    super(Chai,self).tearDown()
+    super(ChaiBase,self).tearDown()
 
     # Docs insist that this will be called no matter what happens in runTest(),
     # so this should be a safe spot to unstub everything
@@ -173,7 +180,7 @@ class Chai(unittest.TestCase):
     Open and return an expectation on an object. Will automatically create a
     stub for the object. See stub documentation for argument information.
     '''
-    return self.stub(obj,attr).expect()
+    return self.stub(obj, attr).expect()
 
   def mock(self, obj=None, attr=None, **kwargs):
     '''
@@ -192,3 +199,6 @@ class Chai(unittest.TestCase):
         self._mocks.append( (obj,attr) )
         setattr(obj, attr, rval)
     return rval
+
+
+Chai = ChaiTestType('Chai', (ChaiBase,), {})

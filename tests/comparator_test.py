@@ -146,10 +146,10 @@ class ComparatorsTest(unittest.TestCase):
     self.assertEqual(repr(comp), "Contains('foo')")
 
   def test_all(self):
-    comp = All(IsA(bytearray), Equals('foo'))
+    comp = All(IsA(bytearray), Equals('foo'.encode('ascii')))
     self.assertTrue( comp.test(bytearray('foo'.encode('ascii'))) )
     self.assertFalse( comp.test('foo') )
-    self.assertEquals( 'foo', bytearray('foo'.encode('ascii')) )
+    self.assertEquals( 'foo'.encode('ascii'), bytearray('foo'.encode('ascii')) )
   
   def test_all_repr(self):
     comp = All(IsA(bytearray), Equals('foobar'))

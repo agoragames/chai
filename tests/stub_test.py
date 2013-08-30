@@ -449,6 +449,7 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( ('f2',), f2.args )
     
 
+@unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
 class StubUnboundMethodTest(unittest.TestCase):
   
   def test_init(self):

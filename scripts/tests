@@ -9,6 +9,8 @@ import sys
 
 project_root = os.path.split(os.path.abspath(os.path.dirname(__file__)))[0]
 
+sys.path.insert(0, project_root)
+
 loader = unittest.TestLoader()
 # Run Tests
 suite = loader.discover('tests', pattern='*_test.py', top_level_dir=project_root)

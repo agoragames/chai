@@ -9,9 +9,9 @@ import os
 import sys
 import gc
 
-from expectation import Expectation, ArgumentsExpectationRule
-from exception import *
-from _termcolor import colored
+from .expectation import Expectation, ArgumentsExpectationRule
+from .exception import *
+from ._termcolor import colored
 
 # For clarity here and in tests, could make these class or static methods on
 # Stub. Chai base class would hide that.
@@ -33,7 +33,7 @@ def _stub_attr(obj, attr_name):
   '''
   # Annoying circular reference requires importing here. Would like to see
   # this cleaned up. @AW
-  from mock import Mock
+  from .mock import Mock
 
   # Check to see if this a property, this check is only for when dealing with an
   # instance. getattr will work for classes.
@@ -66,10 +66,17 @@ def _stub_attr(obj, attr_name):
   isinstance(attr, (types.FunctionType,types.BuiltinFunctionType,types.BuiltinMethodType)):
     return StubFunction(obj, attr_name)
 
+  # I thought that types.UnboundMethodType differentiated these cases but
+  # apparently not.
   if isinstance(attr, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
-    if attr.im_self==None:
-      return StubUnboundMethod(attr)
+    if getattr(attr, 'im_self', None)==None:
+      # Handle the python3 case and py2 filter
+      if hasattr(attr, '__self__'):
+        if attr.__self__!=None:
+          return StubMethod(obj, attr_name)
+      if sys.version_info.major==2:
+        return StubUnboundMethod(attr)
     else:
       return StubMethod(obj, attr_name)
 
@@ -93,7 +100,7 @@ def _stub_obj(obj):
   '''
   # Annoying circular reference requires importing here. Would like to see
   # this cleaned up. @AW
-  from mock import Mock
+  from .mock import Mock
 
   # Return an existing stub
   if isinstance(obj, Stub):
@@ -105,15 +112,25 @@ def _stub_obj(obj):
 
   # If passed-in a type, assume that we're going to stub out the creation.
   # See StubNew for the awesome sauce.
-  if isinstance(obj, types.TypeType):
+  #if isinstance(obj, types.TypeType):
+  if hasattr(types,'TypeType') and isinstance(obj, types.TypeType):
+    return StubNew(obj)
+  elif hasattr(__builtins__,'type') and isinstance(obj, __builtins__['type']):
+    return StubNew(obj)
+  elif inspect.isclass(obj):
     return StubNew(obj)
 
   # I thought that types.UnboundMethodType differentiated these cases but
   # apparently not.
   if isinstance(obj, types.MethodType):
     # Handle differently if unbound because it's an implicit "any instance"
-    if obj.im_self==None:
-      return StubUnboundMethod(obj)
+    if getattr(obj, 'im_self', None)==None:
+      # Handle the python3 case and py2 filter
+      if hasattr(obj, '__self__'):
+        if obj.__self__!=None:
+          return StubMethod(obj)
+      if sys.version_info.major==2:
+        return StubUnboundMethod(obj)
     else:
       return StubMethod(obj)
 
@@ -146,7 +163,7 @@ def _stub_obj(obj):
       if klass and attr: break
       if isinstance(ref,dict) and ref.get('prop',None) is obj :
         klass = getattr( ref.get('__dict__',None), '__objclass__', None )
-        for name,val in getattr(klass,'__dict__',{}).iteritems():
+        for name,val in getattr(klass,'__dict__',{}).items():
           if val is obj:
             attr = name
             break
@@ -262,7 +279,7 @@ class StubProperty(Stub, property):
     # as property type so that it simply works.
     # Annoying circular reference requires importing here. Would like to see
     # this cleaned up. @AW
-    from mock import Mock
+    from .mock import Mock
     self._obj = getattr(self._instance, attr)
     self.setter = Mock()
     self.deleter = Mock()
@@ -291,8 +308,16 @@ class StubMethod(Stub):
     '''
     super(StubMethod,self).__init__(obj, attr)
     if not self._attr:
-      self._attr = obj.im_func.func_name
-      self._instance = obj.im_self
+      # python3
+      if sys.version_info.major==3: #hasattr(obj,'__func__'):
+        self._attr = obj.__func__.__name__
+      else:
+        self._attr = obj.im_func.func_name
+
+      if sys.version_info.major==3: #hasattr(obj, '__self__'):
+        self._instance = obj.__self__
+      else:
+        self._instance = obj.im_self
     else:
       self._instance = self._obj
       self._obj = getattr( self._instance, self._attr )
@@ -300,7 +325,7 @@ class StubMethod(Stub):
 
   @property
   def name(self):
-    from mock import Mock # Import here for the same reason as above.
+    from .mock import Mock # Import here for the same reason as above.
     if hasattr(self._obj, 'im_class'):
       if issubclass(self._obj.im_class, Mock):
         return self._obj.im_self._name
@@ -342,7 +367,9 @@ class StubMethod(Stub):
     # Figure out if this is a class method and we're unstubbing it on the class
     # to which it belongs. This addresses an edge case where a module can 
     # expose a method of an instance. gevent does this, for example.
-    if inspect.isclass(self._obj.im_self) and self._obj.im_self is self._instance:
+    if hasattr(self._obj,'__self__') and inspect.isclass(self._obj.__self__) and self._obj.__self__ is self._instance:
+      setattr(self._instance, self._attr, classmethod(self._obj.__func__))
+    elif hasattr(self._obj,'im_self') and inspect.isclass(self._obj.im_self) and self._obj.im_self is self._instance:
       # Wrap it and set it back on the class
       setattr(self._instance, self._attr, classmethod(self._obj.im_func))
     else:
@@ -359,16 +386,16 @@ class StubFunction(Stub):
     '''
     super(StubFunction, self).__init__(obj, attr)
     if not self._attr:
-      if getattr(obj, '__module__', None):
+      if hasattr(obj, '__module__'):
         self._instance = sys.modules[obj.__module__]
-      elif getattr(obj, '__self__', None):
+      elif hasattr(obj, '__self__'):
         self._instance = obj.__self__
       else:
         raise UnsupportedStub("Failed to find instance of %s"%(obj))
 
-      if getattr(obj,'func_name', None):
+      if hasattr(obj,'func_name'):
         self._attr = obj.func_name
-      elif getattr(obj,'__name__', None):
+      elif hasattr(obj,'__name__'):
         self._attr = obj.__name__
       else:
         raise UnsupportedStub("Failed to find name of %s"%(obj))
@@ -460,6 +487,9 @@ class StubUnboundMethod(Stub):
     '''
     Initialize with an object that is an unbound method
     '''
+    # NOTE: It doesn't appear that there's any way to support this in python3
+    # because an unbound method has no reference to its parent class, it looks
+    # just like a regular function
     super(StubUnboundMethod,self).__init__(obj)
     self._instance = obj.im_class
     self._attr = obj.im_func.func_name

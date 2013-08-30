@@ -4,9 +4,9 @@ Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 from types import MethodType
-from stub import stub, Stub
-from exception import UnexpectedCall
-from expectation import ArgumentsExpectationRule
+from .stub import Stub
+from .exception import UnexpectedCall
+from .expectation import ArgumentsExpectationRule
 
 class Mock(object):
   '''
@@ -14,7 +14,7 @@ class Mock(object):
   '''
 
   def __init__(self, **kwargs):
-    for name, value in kwargs.iteritems():
+    for name, value in kwargs.items():
       setattr(self, name, value)
     self._name = 'mock'
 

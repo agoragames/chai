@@ -4,12 +4,14 @@ Tests for the sample module
 
 import os
 import random
+import unittest
+import sys
 
 from chai import Chai
 from chai.stub import stub
 from chai.exception import *
-import samples
-from samples import SampleBase, SampleChild
+import tests.samples as samples
+from tests.samples import SampleBase, SampleChild
 
 class CustomException(Exception): pass
 
@@ -158,8 +160,10 @@ class SampleBaseTest(Chai):
 
   def test_expect_bound_method_with_allof_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( all_of(bytearray,'hello') )
-    obj.bound_method( bytearray('hello') )
+    expect(obj.bound_method).args( all_of(length(5),'hello') )
+    obj.bound_method( 'hello' )
+
+    expect(obj.bound_method).args( all_of(length(3),'hello') ).at_least(0)
     assert_raises(UnexpectedCall, obj.bound_method, 'hello' )
   
   def test_expect_bound_method_with_notof_comparator(self):
@@ -172,6 +176,7 @@ class SampleBaseTest(Chai):
     expect(obj.bound_method).args( not_of(float,int) )
     obj.bound_method( 'hello' )
     
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_expect_unbound_method_acts_as_any_instance(self):
     expect( SampleBase.bound_method ).args('hello').returns('world')
     expect( SampleBase.bound_method ).args('hello').returns('mars')
@@ -182,6 +187,7 @@ class SampleBaseTest(Chai):
     assert_equals( 'mars', obj1.bound_method('hello') )
     assert_raises(UnexpectedCall, obj2.bound_method)
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_stub_unbound_method_acts_as_no_instance(self):
     stub( SampleBase.bound_method )
 

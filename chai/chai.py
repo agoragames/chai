@@ -59,7 +59,7 @@ class ChaiTestType(type):
         # if this is not python3, use python2 syntax
         if not hasattr(e, '__traceback__'):
           from .python2 import reraise
-          reraise(type(e), '\n\n'+str(e), sys.exc_info()[-1])
+          reraise(AssertionError, '\n\n'+str(e), sys.exc_info()[-1])
         exc = AssertionError('\n\n'+str(e))
         setattr(exc, '__traceback__', sys.exc_info()[-1])
         raise exc

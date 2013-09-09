@@ -1,3 +1,9 @@
+0.4.1
+=====
+
+* Fixed UnexpectedCall handling in Python 2. Fixes 
+  https://github.com/agoragames/chai/issues/8.
+
 0.4.0
 =====
 

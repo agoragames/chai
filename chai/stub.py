@@ -386,16 +386,17 @@ class StubFunction(Stub):
     '''
     super(StubFunction, self).__init__(obj, attr)
     if not self._attr:
-      if hasattr(obj, '__module__'):
+      if getattr(obj, '__module__', None):
         self._instance = sys.modules[obj.__module__]
-      elif hasattr(obj, '__self__'):
+      elif getattr(obj, '__self__', None):
         self._instance = obj.__self__
       else:
+        
         raise UnsupportedStub("Failed to find instance of %s"%(obj))
 
-      if hasattr(obj,'func_name'):
+      if getattr(obj,'func_name', None):
         self._attr = obj.func_name
-      elif hasattr(obj,'__name__'):
+      elif getattr(obj,'__name__', None):
         self._attr = obj.__name__
       else:
         raise UnsupportedStub("Failed to find name of %s"%(obj))

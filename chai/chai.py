@@ -75,6 +75,9 @@ class ChaiTestType(type):
     wrapper.__doc__ = func.__doc__
     wrapper.__module__ = func.__module__
     wrapper.__wrapped__ = func
+    if getattr(func, '__unittest_skip__',False):
+      wrapper.__unittest_skip__ = True
+      wrapper.__unittest_skip_why__ = func.__unittest_skip_why__
     return wrapper
 
 class ChaiBase(unittest.TestCase):

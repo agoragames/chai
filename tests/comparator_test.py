@@ -5,7 +5,7 @@ import sys
 from chai.comparators import *
 
 if sys.version_info.major==2:
-  from comparator_test_py2 import *
+  from comparator_py2 import *
 
 class ComparatorsTest(unittest.TestCase):
   

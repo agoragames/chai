@@ -1,3 +1,6 @@
 include *.rst
+include LICENSE.txt
 include requirements.txt
 recursive-include scripts *
+recursive-include examples *
+recursive-include tests *

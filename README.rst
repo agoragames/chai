@@ -437,6 +437,15 @@ You can clone the repository by doing the following::
 
     $ git clone git://github.com/agoragames/chai.git
 
+.. _testing:
+
+Testing
+=======
+
+Use `nose <https://github.com/nose-devs/nose/>`_ to run the test suite. ::
+
+  $ nosetests
+
 .. _bug-tracker:
 
 Bug tracker
@@ -450,7 +459,7 @@ to our issue tracker at https://github.com/agoragames/chai/issues
 License
 =======
 
-This software is licensed under the `New BSD License`. See the ``LICENSE``
+This software is licensed under the `New BSD License`. See the ``LICENSE.txt``
 file in the top distribution directory for the full license text.
 
 .. _contributors:

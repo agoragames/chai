@@ -5,5 +5,5 @@ https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 
 from __future__ import absolute_import
-__version__ = '0.4.5'
+__version__ = '0.4.6'
 from .chai import Chai

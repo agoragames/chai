@@ -1,3 +1,10 @@
+0.4.6
+=====
+
+* Immediately after running a test, teardown the stubs. This fixes any problems
+  with exception handling, such as UnexpectedCall, when methods involved in
+  exception handling, such as `open`, have been stubbed.
+
 0.4.5
 =====
 

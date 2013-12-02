@@ -14,6 +14,7 @@ except ImportError:
 import re
 import sys
 import inspect
+import traceback
 from collections import deque
 
 from .exception import *
@@ -63,6 +64,18 @@ class ChaiTestType(type):
         exc = AssertionError('\n\n'+str(e))
         setattr(exc, '__traceback__', sys.exc_info()[-1])
         raise exc
+      finally:
+        # Teardown all stubs so that if anyone stubbed methods that would be
+        # called during exception handling (e.g. "open"), the original method
+        # is used. Without, recursion limits are common with little insight
+        # into what went wrong.
+        try:
+          for stub in self._stubs:
+            stub.teardown()
+        except:
+          # A rare case where this is about the best that can be done, as we
+          # don't want to supersede the actual exception if there is one.
+          traceback.print_exc()
 
       exceptions = []
       for stub in self._stubs:
@@ -142,8 +155,9 @@ class ChaiBase(unittest.TestCase):
     super(ChaiBase,self).tearDown()
 
     # Docs insist that this will be called no matter what happens in runTest(),
-    # so this should be a safe spot to unstub everything
-    exception = None
+    # so this should be a safe spot to unstub everything.
+    # Even with teardown at the end of test_wrapper, tear down here in case the
+    # test was skipped or there was otherwise a problem with that test.
     while len(self._stubs):
       stub = self._stubs.popleft()
       stub.teardown() # Teardown the reset of the stub
@@ -159,10 +173,6 @@ class ChaiBase(unittest.TestCase):
 
     # Clear out any cached variables
     Variable.clear()
-    
-    # Lastly, if there were any errors, raise them
-    if exception:
-      raise exception
 
   # Because cAmElCaSe sucks
   teardown = tearDown

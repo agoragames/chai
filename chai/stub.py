@@ -196,6 +196,7 @@ class Stub(object):
     self._obj = obj
     self._attr = attr
     self._expectations = []
+    self._torn = False
 
   @property
   def name(self):
@@ -220,7 +221,15 @@ class Stub(object):
     Clean up all expectations and restore the original attribute of the mocked
     object.
     '''
-    self._expectations = []
+    if not self._torn:
+      self._expectations = []
+      self._torn = True
+      self._teardown()
+
+  def _teardown(self):
+    '''
+    Hook for subclasses to teardown their stubs. Called only once.
+    '''
 
   def expect(self):
     '''
@@ -291,7 +300,7 @@ class StubProperty(Stub, property):
     return "%s.%s" % (self._instance.__name__, self._attr)
 
 
-  def teardown(self):
+  def _teardown(self):
     '''
     Replace the original method.
     '''
@@ -337,7 +346,7 @@ class StubMethod(Stub):
 
     return "%s.%s" % (klass.__name__, self._attr)
 
-  def teardown(self):
+  def _teardown(self):
     '''
     Put the original method back in place. This will also handle the special case
     when it putting back a class method.
@@ -419,7 +428,7 @@ class StubFunction(Stub):
   def name(self):
     return "%s.%s" % (self._instance.__name__, self._attr)
 
-  def teardown(self):
+  def _teardown(self):
     '''
     Replace the original method.
     '''
@@ -466,7 +475,7 @@ class StubNew(StubFunction):
     '''
     return super(StubNew,self).__call__( *(args[1:]), **kwargs )
   
-  def teardown(self):
+  def _teardown(self):
     '''
     Overload so that we can clear out the cache after a test run.
     '''
@@ -500,7 +509,7 @@ class StubUnboundMethod(Stub):
   def name(self):
     return "%s.%s" % (self._instance.__name__, self._attr)
 
-  def teardown(self):
+  def _teardown(self):
     '''
     Replace the original method.
     '''
@@ -524,7 +533,7 @@ class StubMethodWrapper(Stub):
   def name(self):
     return "%s.%s" % (self._instance.__class__.__name__, self._attr)
 
-  def teardown(self):
+  def _teardown(self):
     '''
     Replace the original method.
     '''
@@ -550,7 +559,7 @@ class StubWrapperDescriptor(Stub):
   def name(self):
     return "%s.%s" % (self._obj.__name__, self._attr)
 
-  def teardown(self):
+  def _teardown(self):
     '''
     Replace the original method.
     '''

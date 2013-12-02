@@ -155,9 +155,10 @@ class ChaiTest(unittest.TestCase):
     
   def test_runs_unmet_expectations(self):
     class Stub(object):
-      calls = 0
-      def unmet_expectations(self): self.calls += 1; return []
-      def teardown(self): self.calls += 1
+      unmet_calls = 0
+      teardown_calls = 0
+      def unmet_expectations(self): self.unmet_calls += 1; return []
+      def teardown(self): self.teardown_calls += 1
 
     # obj = type('test',(object,),{})()
     # setattr(obj, 'mock1', 'foo')
@@ -168,4 +169,5 @@ class ChaiTest(unittest.TestCase):
     case._stubs = deque([stub])
     
     case.test_local_definitions_work_and_are_global()
-    self.assertEquals(stub.calls, 1)
+    self.assertEquals(1, stub.unmet_calls)
+    self.assertEquals(1, stub.teardown_calls)

@@ -171,3 +171,13 @@ class ChaiTest(unittest.TestCase):
     case.test_local_definitions_work_and_are_global()
     self.assertEquals(1, stub.unmet_calls)
     self.assertEquals(1, stub.teardown_calls)
+
+  def test_raises_if_unmet_expectations(self):
+    class Milk(object):
+        def pour(self): pass
+    milk = Milk()
+    case = CupOf()
+    stub = Stub(milk.pour)
+    stub.expect()
+    case._stubs = deque([stub])
+    self.assertRaises(ExpectationNotSatisfied, case.test_something)

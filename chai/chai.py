@@ -69,18 +69,17 @@ class ChaiTestType(type):
         # called during exception handling (e.g. "open"), the original method
         # is used. Without, recursion limits are common with little insight
         # into what went wrong.
+        exceptions = []
         try:
           for stub in self._stubs:
+            # Make sure we collect any unmet expectations before teardown.
+            exceptions.extend(stub.unmet_expectations())
             stub.teardown()
         except:
           # A rare case where this is about the best that can be done, as we
           # don't want to supersede the actual exception if there is one.
           traceback.print_exc()
 
-      exceptions = []
-      for stub in self._stubs:
-        exceptions.extend(stub.unmet_expectations())
-      
       if exceptions:
         raise ExpectationNotSatisfied(*exceptions)
       

@@ -74,7 +74,7 @@ class ExpectationNotSatisfied(ChaiAssertion):
   '''
   
   def __init__(self, *expectations):
-    self._expections = expectations
+    self._expectations = expectations
   
   def __str__(self):
-    return str("\n".join([ str(e) for e in self._expections]))
+    return str("\n".join([ str(e) for e in self._expectations]))

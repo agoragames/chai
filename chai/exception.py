@@ -1,5 +1,5 @@
 '''
-Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+Copyright (c) 2011-2014, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
@@ -24,7 +24,7 @@ class ChaiException(RuntimeError):
   '''
   Base class for an actual error in chai.
   '''
-  
+
 class UnsupportedStub(ChaiException):
   '''
   Can't stub the requested object or attribute.
@@ -47,7 +47,7 @@ class UnexpectedCall(BaseException):
 
     if prefix:
       msg = '\n\n' + prefix.strip() + msg
-    
+
     if call:
       msg += colored('\n\nNo expectation in place for\n', 'white', attrs=['bold'])
       msg += colored(call, 'red')
@@ -62,7 +62,7 @@ class UnexpectedCall(BaseException):
     if sys.exc_info()[0]:
       msg += colored('\n\nWhile handling\n', 'white', attrs=['bold'])
       msg += colored(''.join(traceback.format_exception( *sys.exc_info() )), 'red')
-    
+
     if suffix:
       msg = msg + '\n\n' + suffix.strip()
 
@@ -72,9 +72,9 @@ class ExpectationNotSatisfied(ChaiAssertion):
   '''
   Raised when all expectations are not met
   '''
-  
+
   def __init__(self, *expectations):
     self._expectations = expectations
-  
+
   def __str__(self):
     return str("\n".join([ str(e) for e in self._expectations]))

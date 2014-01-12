@@ -1,5 +1,5 @@
 '''
-Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+Copyright (c) 2011-2014, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
@@ -248,7 +248,7 @@ class Stub(object):
       # If args don't match the expectation but its minimum counts have been
       # met, close it and move on, else it's an unexpected call. Have to check
       # counts here now due to the looser definitions of expectations in 0.3.x
-      # If we dont match, the counts aren't met and we're not allowing 
+      # If we dont match, the counts aren't met and we're not allowing
       # out-of-order, then break out and raise an exception.
       if not exp.match(*args, **kwargs):
         if exp.counts_met():
@@ -258,7 +258,7 @@ class Stub(object):
       else:
         return exp.test(*args, **kwargs)
 
-    raise UnexpectedCall(call=self.name, suffix=self._format_exception(), args=args, kwargs=kwargs) 
+    raise UnexpectedCall(call=self.name, suffix=self._format_exception(), args=args, kwargs=kwargs)
 
   def _format_exception(self):
     result = [
@@ -374,7 +374,7 @@ class StubMethod(Stub):
 
     '''
     # Figure out if this is a class method and we're unstubbing it on the class
-    # to which it belongs. This addresses an edge case where a module can 
+    # to which it belongs. This addresses an edge case where a module can
     # expose a method of an instance. gevent does this, for example.
     if hasattr(self._obj,'__self__') and inspect.isclass(self._obj.__self__) and self._obj.__self__ is self._instance:
       setattr(self._instance, self._attr, classmethod(self._obj.__func__))
@@ -400,7 +400,7 @@ class StubFunction(Stub):
       elif getattr(obj, '__self__', None):
         self._instance = obj.__self__
       else:
-        
+
         raise UnsupportedStub("Failed to find instance of %s"%(obj))
 
       if getattr(obj,'func_name', None):
@@ -474,14 +474,14 @@ class StubNew(StubFunction):
     was an __init__.
     '''
     return super(StubNew,self).__call__( *(args[1:]), **kwargs )
-  
+
   def _teardown(self):
     '''
     Overload so that we can clear out the cache after a test run.
     '''
-    # __new__ is a super-special case in that even when stubbing a class 
-    # which implements its own __new__ and subclasses object, the 
-    # "Class.__new__" reference is a staticmethod and not a method (or 
+    # __new__ is a super-special case in that even when stubbing a class
+    # which implements its own __new__ and subclasses object, the
+    # "Class.__new__" reference is a staticmethod and not a method (or
     # function). That confuses the "was_object_method" logic in StubFunction
     # which then fails to delattr and from then on the class is corrupted.
     # So skip that teardown and use a __new__-specific case.

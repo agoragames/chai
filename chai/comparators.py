@@ -1,5 +1,5 @@
 '''
-Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+Copyright (c) 2011-2014, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
@@ -37,7 +37,7 @@ class Equals(Comparator):
 
   def test(self, value):
     return self._value == value
-	
+
   def __repr__(self):
     return repr(self._value)
   __str__ = __repr__
@@ -68,13 +68,13 @@ class IsA(Comparator):
 
   def test(self, value):
     return isinstance(value, self._types)
-  
+
   def _format_name(self):
     if isinstance(self._types, type):
       return self._types.__name__
     else:
       return str([o.__name__ for o in self._types])
-  
+
   def __repr__(self):
     return "IsA(%s)" % (self._format_name())
   __str__ = __repr__
@@ -85,7 +85,7 @@ class Is(Comparator):
   '''
   def __init__(self, obj):
     self._obj = obj
-    
+
   def test(self, value):
     return self._obj is value
 
@@ -97,11 +97,11 @@ class AlmostEqual(Comparator):
   '''
   Compare a float value to n number of palces
   '''
-  
+
   def __init__(self, float_value, places=7):
     self._float_value = float_value
     self._places = places
-  
+
   def test(self, value):
     return round(value - self._float_value, self._places) == 0
 
@@ -113,7 +113,7 @@ class Regex(Comparator):
   '''
   Checks to see if a string matches a regex
   '''
-  
+
   def __init__(self, pattern, flags=0):
     self._pattern = pattern
     self._flags = flags
@@ -141,7 +141,7 @@ class Any(Comparator):
   def __repr__(self):
     return "Any(%s)" % str(self._comparators)
   __str__ = __repr__
-  
+
 class In(Comparator):
   '''
   Test if a key is in a list or dict
@@ -237,7 +237,7 @@ class Variable(Comparator):
     Delete all cached values. Should only be used by the test suite.
     '''
     self._cache.clear()
-  
+
   def __init__(self, name):
     self._name = name
 

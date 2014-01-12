@@ -1,5 +1,5 @@
 '''
-Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+Copyright (c) 2011-2014, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
@@ -23,12 +23,12 @@ class Mock(object):
   # appears to be a bug/feature in new classes where special members, or at least
   # __call__, have to defined when the instance is created. Also, if it's already
   # defined on the instance, getattr() will return the stub but the original
-  # method will always be called. Anyway, it's all crazy, but that's why the 
+  # method will always be called. Anyway, it's all crazy, but that's why the
   # implementation of __call__ is so weird.
   def __call__(self, *args, **kwargs):
     if isinstance(getattr(self,'__call__'), Stub):
       return getattr(self,'__call__')(*args, **kwargs)
-    
+
     raise UnexpectedCall(call=self._name, args=args, kwargs=kwargs)
 
   def __getattr__(self,name):
@@ -60,7 +60,7 @@ class Mock(object):
     if isinstance(getattr(self,'__len__'), Stub):
       return getattr(self,'__len__')()
     raise UnexpectedCall(call=self._name+'.__len__')
-    
+
   def __getitem__(self, key):
     if isinstance(getattr(self,'__getitem__'), Stub):
       return getattr(self,'__getitem__')(key)
@@ -99,7 +99,7 @@ class Mock(object):
     if isinstance(getattr(self,'__enter__'), Stub):
       return getattr(self,'__enter__')()
     raise UnexpectedCall(call=self._name+'.__enter__')
-  
+
   def __exit__(self, exc_type, exc_value, traceback):
     if isinstance(getattr(self,'__exit__'), Stub):
       return getattr(self,'__exit__')(exc_type, exc_value, traceback)

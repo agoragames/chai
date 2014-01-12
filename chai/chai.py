@@ -1,5 +1,5 @@
 '''
-Copyright (c) 2011-2013, Agora Games, LLC All rights reserved.
+Copyright (c) 2011-2014, Agora Games, LLC All rights reserved.
 
 https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
@@ -42,7 +42,7 @@ class ChaiTestType(type):
           name = '_'.join( [s.lower() for s in pieces] )
           d[name] = getattr(base,attr_name)
           setattr(cls, name, getattr(base,attr_name))
-    
+
     for func_name, func in d.items():
       if func_name.startswith('test') and callable(func):
         setattr(cls, func_name, ChaiTestType.test_wrapper(cls, func))
@@ -50,7 +50,7 @@ class ChaiTestType(type):
   @staticmethod
   def test_wrapper(cls, func):
     """
-    Wraps a test method, when that test method has completed it 
+    Wraps a test method, when that test method has completed it
     calls assert_expectations on the stub. This is to avoid getting to exceptions about the same error.
     """
     def wrapper(self, *args, **kwargs):
@@ -82,7 +82,7 @@ class ChaiTestType(type):
 
       if exceptions:
         raise ExpectationNotSatisfied(*exceptions)
-      
+
     wrapper.__name__ = func.__name__
     wrapper.__doc__ = func.__doc__
     wrapper.__module__ = func.__module__
@@ -109,7 +109,7 @@ class ChaiBase(unittest.TestCase):
   all_of = All
   not_of = Not
   matches = Regex
-  func = Function 
+  func = Function
   ignore_arg = Ignore
   ignore = Ignore
   in_arg = In
@@ -145,7 +145,7 @@ class ChaiBase(unittest.TestCase):
       setattr(mod, 'stub', self.stub)
       setattr(mod, 'expect', self.expect)
       setattr(mod, 'mock', self.mock)
-    
+
 
   # Because cAmElCaSe sucks
   setup = setUp
@@ -160,7 +160,7 @@ class ChaiBase(unittest.TestCase):
     while len(self._stubs):
       stub = self._stubs.popleft()
       stub.teardown() # Teardown the reset of the stub
-    
+
     # Do the mocks in reverse order in the rare case someone called mock(obj,attr)
     # twice.
     while len(self._mocks):
@@ -202,7 +202,7 @@ class ChaiBase(unittest.TestCase):
     if obj!=None and attr!=None:
       rval._object = obj
       rval._attr = attr
-      
+
       if hasattr(obj,attr):
         orig = getattr(obj, attr)
         self._mocks.append( (obj,attr,orig) )

@@ -5,7 +5,7 @@ https://github.com/agoragames/chai/blob/master/LICENSE.txt
 '''
 
 try:
-  from termcolor import colored
+    from termcolor import colored
 except ImportError:
-  def colored(s, *args, **kargs):
-    return s
+    def colored(s, *args, **kargs):
+        return s

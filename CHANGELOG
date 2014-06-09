@@ -1,3 +1,11 @@
+0.4.8
+=====
+
+Fix PEP8 compliance.
+
+Fix #18; don't overwrite test module's global namespace where names match
+Chai methods.
+
 0.4.7
 =====
 

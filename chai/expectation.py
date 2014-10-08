@@ -274,6 +274,7 @@ class Expectation(object):
         Validate all the rules with in this expectation to see if this
         expectation has been met.
         """
+        side_effect_return = None
         if not self._met:
             if self.match(*args, **kwargs):
                 self._run_count += 1
@@ -282,11 +283,11 @@ class Expectation(object):
                     self._met = True
                 if self._side_effect:
                     if self._side_effect_args or self._side_effect_kwargs:
-                        self._side_effect(
+                        side_effect_return = self._side_effect(
                             *self._side_effect_args,
                             **self._side_effect_kwargs)
                     else:
-                        self._side_effect(*args, **kwargs)
+                        side_effect_return = self._side_effect(*args, **kwargs)
             else:
                 self._met = False
 
@@ -295,7 +296,11 @@ class Expectation(object):
             if self._met and self._teardown:
                 self._stub.teardown()
 
-        return self.return_value()
+        # return_value has priority to not break existing uses of side effects
+        rval = self.return_value()
+        if rval is None:
+          rval = side_effect_return
+        return rval
 
     def __str__(self):
         runs_string = "     Ran: %s, Min Runs: %s, Max Runs: %s" % (

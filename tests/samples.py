@@ -11,6 +11,12 @@ def mod_func_1(*args, **kwargs):
 def mod_func_2(*args, **kwargs):
   mod_func_1(*args, **kwargs)
 
+def mod_func_3(val):
+  return 3*val
+
+def mod_func_4(val):
+  return 3*mod_func_3(val)
+
 # For testing when the module has an instance's classmethod bound
 class ModInstance(object):
   @classmethod

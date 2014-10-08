@@ -2,7 +2,7 @@
  Chai - Python Mocking Made Easy
 =================================
 
-:Version: 0.4.8
+:Version: 1.0.0
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -15,7 +15,7 @@
 Overview
 ========
 
-Chai provides a very easy to use api for mocking/stubbing your python objects, patterned after the `Mocha <http://mocha.rubyforge.org/>`_ library for Ruby.
+Chai provides a very easy to use api for mocking, stubbing and spying your python objects, patterned after the `Mocha <http://mocha.rubyforge.org/>`_ library for Ruby.
 
 .. _chai-example:
 
@@ -163,8 +163,8 @@ Using the class, you can directly refer to all 3 methods of the property. To ref
         assert_raises( UnexpectedCall, lambda: CustomObject().prop )
 
 
-Expectation
------------
+Expectations and Spies
+----------------------
 
 Expectations are individual test cases that can be applied to a stub. They are expected to be run in order (unless otherwise noted). They are greedy, in that so long as an expectation has not been met and the arguments match, the arguments will be processed by that expectation. This mostly applies to the "at_least" and "any_order" expectations, which (may) stay open throughout the test and will handle any matching call.
 
@@ -203,7 +203,7 @@ It is very common to need to run expectations on the constructor for an object, 
             assert_equals( obj, method() )
     
 
-Lastly, the arguments modifier supports several matching functions. For simplicity in covering the common cases, the arg expectation assumes an equals test for instances and a logical or of ``[instanceof, equals]`` test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
+The arguments modifier supports several matching functions. For simplicity in covering the common cases, the ``args`` modifier assumes an equals test for instances and a logical or of ``[instanceof, equals]`` test for types. All rules that apply to positional arguments also apply to keyword arguments. ::
 
     class TestCase(Chai):
         def test_mock_get(self):
@@ -218,6 +218,42 @@ Lastly, the arguments modifier supports several matching functions. For simplici
             expect(obj.get).args(is_arg(list)).return('yes')
             assert_raises( UnexpectedCall, obj.get, [] )
             assert_equals( 'yes', obj.get(list) )
+
+Lastly, Chai 1.0.0 supports spies. These are an extension of expectations and support most of the same features. The modifiers ``returns``, ``raises`` and ``side_effect`` raise ``UnsupportedModifier`` because the spy passes arguments and returns or raises the results of the stubbed function. Additionally, there are a few types of stubs which are not (currently) supported by spies:
+
+* properties
+* unbound methods
+
+Spies can be used just like any expectation. ::
+
+    class TestCase(Chai):
+        def test_spy(self):
+            class Spy(object):
+                def __init__(self, val):
+                    self._val = val
+                def set(self, val):
+                    self._val = val
+                def get(self):
+                    return self._val
+
+            # Spy on the constructor
+            spy(Spy)
+            obj = Spy(3)
+            assert_true(isinstance(obj,Spy))
+            assert_equals(3, obj._val)
+
+            # Spy on the set function
+            spy(obj.set).args(5)
+            obj.set(5)
+            assert_equals(5, obj._val)
+
+            # Spy on the get function
+            spy(obj.get)
+            assert_equals(5, obj.get())
+
+            # Spy on the hash function
+            spy(Spy, '__hash__')
+            dict()[obj] = "I spy with my little eye"
 
 Modifiers
 +++++++++

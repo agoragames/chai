@@ -9,6 +9,7 @@ import sys
 import gc
 
 from .expectation import Expectation
+from .spy import Spy
 from .exception import *
 from ._termcolor import colored
 
@@ -246,11 +247,25 @@ class Stub(object):
 
     def expect(self):
         '''
-        Add an expectation to this stub. Return the expectation
+        Add an expectation to this stub. Return the expectation.
         '''
         exp = Expectation(self)
         self._expectations.append(exp)
         return exp
+
+    def spy(self):
+        '''
+        Add a spy to this stub. Return the spy.
+        '''
+        spy = Spy(self)
+        self._expectations.append(spy)
+        return spy
+
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        raise NotImplementedError("Must be implemented by subclasses")
 
     def __call__(self, *args, **kwargs):
         for exp in self._expectations:
@@ -314,6 +329,14 @@ class StubProperty(Stub, property):
 
         setattr(self._instance, self._attr, self)
 
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        # TODO: this is probably the most complicated one to implement. Will
+        # figure it out eventually.
+        raise NotImplementedError("property spies are not supported")
+
     @property
     def name(self):
         return "%s.%s" % (self._instance.__name__, self._attr)
@@ -365,6 +388,21 @@ class StubMethod(Stub):
             klass = self._instance.__class__
 
         return "%s.%s" % (klass.__name__, self._attr)
+
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        if hasattr(self._obj, '__self__') and \
+                inspect.isclass(self._obj.__self__) and \
+                self._obj.__self__ is self._instance:
+            return classmethod(self._obj.__func__)(self._instance, *args, **kwargs)
+        elif hasattr(self._obj, 'im_self') and \
+                inspect.isclass(self._obj.im_self) and \
+                self._obj.im_self is self._instance:
+            return classmethod(self._obj.im_func)(self._instance, *args, **kwargs)
+        else:
+            return self._obj(*args, **kwargs)
 
     def _teardown(self):
         '''
@@ -456,6 +494,13 @@ class StubFunction(Stub):
     def name(self):
         return "%s.%s" % (self._instance.__name__, self._attr)
 
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        # TODO: Does this change if was_object_method?
+        return self._obj(*args, **kwargs)
+
     def _teardown(self):
         '''
         Replace the original method.
@@ -506,6 +551,14 @@ class StubNew(StubFunction):
         '''
         return super(StubNew, self).__call__(*(args[1:]), **kwargs)
 
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function. Simulates __new__ and __init__ together.
+        '''
+        rval = super(StubNew, self).call_orig(self._type, *args, **kwargs)
+        rval.__init__(*args, **kwargs)
+        return rval
+
     def _teardown(self):
         '''
         Overload so that we can clear out the cache after a test run.
@@ -542,6 +595,16 @@ class StubUnboundMethod(Stub):
     def name(self):
         return "%s.%s" % (self._instance.__name__, self._attr)
 
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        # TODO: Figure out if this can be implemented. The challenge is that
+        # the context of "self" has to be passed in as an argument, but there's
+        # not necessarily a generic way of doing that. It may fall out as a
+        # side-effect of the actual implementation of spies.
+        raise NotImplementedError("unbound method spies are not supported")
+
     def _teardown(self):
         '''
         Replace the original method.
@@ -567,6 +630,12 @@ class StubMethodWrapper(Stub):
     @property
     def name(self):
         return "%s.%s" % (self._instance.__class__.__name__, self._attr)
+
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        return self._obj(*args, **kwargs)
 
     def _teardown(self):
         '''
@@ -595,6 +664,12 @@ class StubWrapperDescriptor(Stub):
     @property
     def name(self):
         return "%s.%s" % (self._obj.__name__, self._attr)
+
+    def call_orig(self, *args, **kwargs):
+        '''
+        Calls the original function.
+        '''
+        return self._orig(self._obj, *args, **kwargs)
 
     def _teardown(self):
         '''

@@ -155,6 +155,8 @@ class ChaiBase(unittest.TestCase):
                 setattr(mod, 'stub', self.stub)
             if not hasattr(mod, 'expect'):
                 setattr(mod, 'expect', self.expect)
+            if not hasattr(mod, 'spy'):
+                setattr(mod, 'spy', self.spy)
             if not hasattr(mod, 'mock'):
                 setattr(mod, 'mock', self.mock)
 
@@ -173,6 +175,8 @@ class ChaiBase(unittest.TestCase):
                 delattr(mod, 'stub')
             if getattr(mod, 'expect', None) == self.expect:
                 delattr(mod, 'expect')
+            if getattr(mod, 'spy', None) == self.spy:
+                delattr(mod, 'spy')
             if getattr(mod, 'mock', None) == self.mock:
                 delattr(mod, 'mock')
 
@@ -217,6 +221,13 @@ class ChaiBase(unittest.TestCase):
         a stub for the object. See stub documentation for argument information.
         '''
         return self.stub(obj, attr).expect()
+
+    def spy(self, obj, attr=None):
+        '''
+        Open and return a spy on an object. Will automatically create a stub
+        for the object. See stub documentation for argument information.
+        '''
+        return self.stub(obj, attr).spy()
 
     def mock(self, obj=None, attr=None, **kwargs):
         '''

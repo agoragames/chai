@@ -25,28 +25,27 @@ def pretty_format_args(*args, **kwargs):
 
 
 class ChaiException(RuntimeError):
-
     '''
     Base class for an actual error in chai.
     '''
 
-
 class UnsupportedStub(ChaiException):
-
     '''
     Can't stub the requested object or attribute.
     '''
 
+class UnsupportedModifier(ChaiException):
+    '''
+    Can't use the requested modifier.
+    '''
 
 class ChaiAssertion(AssertionError):
-
     '''
     Base class for all assertion errors.
     '''
 
 
 class UnexpectedCall(BaseException):
-
     '''
     Raised when a unexpected call occurs to a stub.
     '''

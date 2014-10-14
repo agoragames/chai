@@ -232,6 +232,12 @@ class StubClassTest(unittest.TestCase):
     self.assertEquals( [e], s._expectations )
     self.assertEquals( s, e._stub )
 
+  def test_call_orig_raises_notimplemented(self):
+    s = Stub('obj')
+
+    with self.assertRaises(NotImplementedError):
+      s.call_orig(1,2,a='b')
+
   def test_call_raises_unexpected_call_when_no_expectations(self):
     s = Stub('obj')
     self.assertRaises( UnexpectedCall, s, 'foo' )
@@ -326,6 +332,19 @@ class StubMethodTest(unittest.TestCase):
     self.assertEquals("Expect.closed", s.name)
     s.teardown()
 
+  def test_call_orig(self):
+    class Foo(object):
+      def __init__(self, val): self._val = val
+      def a(self): return self._val
+      def b(self, val): self._val = val
+
+    f = Foo(3)
+    sa = StubMethod( f.a )
+    sb = StubMethod( f.b )
+    self.assertEquals(3, sa.call_orig())
+    sb.call_orig(5)
+    self.assertEquals(5, sa.call_orig())
+
   def test_teardown(self):
     class Foo(object):
       def bar(self): pass
@@ -370,6 +389,11 @@ class StubFunctionTest(unittest.TestCase):
   def test_name(self):
     s = StubFunction( samples.mod_func_1 )
     self.assertEquals( 'tests.samples.mod_func_1', s.name )
+    s.teardown()
+
+  def test_call_orig(self):
+    s = StubFunction( samples.mod_func_3 )
+    self.assertEquals(12, s.call_orig(4))
     s.teardown()
 
   def test_teardown(self):
@@ -417,6 +441,19 @@ class StubNewTest(unittest.TestCase):
     s._expectations = [ Expect() ]
     self.assertEquals( 'success', Foo('state', a='b') )
     s.teardown()
+
+  def test_call_orig(self):
+    class Foo(object):
+      def __init__(self, val):
+        self._val = val
+
+    StubNew._cache.clear()
+    s = StubNew(Foo)
+    f = s.call_orig(3)
+    self.assertTrue(isinstance(f,Foo))
+    self.assertEquals(3, f._val)
+    s.teardown()
+    StubNew._cache.clear()
 
   def test_teardown(self):
     class Foo(object): pass
@@ -516,6 +553,20 @@ class StubMethodWrapperTest(unittest.TestCase):
     self.assertEquals("Foo.__hash__", s.name)
     s.teardown()
 
+  def test_call_orig(self):
+    class Foo(object):
+      def __init__(self, val): self._val = val
+      def get(self): return self._val
+      def set(self, val): self._val = val
+
+    f = Foo(3)
+    sg = StubMethodWrapper(f.get)
+    ss = StubMethodWrapper(f.set)
+
+    self.assertEquals(3, sg.call_orig())
+    ss.call_orig(5)
+    self.assertEquals(5, sg.call_orig())
+
   def test_teardown(self):
     class Foo(object):pass
     obj = Foo()
@@ -524,7 +575,7 @@ class StubMethodWrapperTest(unittest.TestCase):
     s.teardown()
     self.assertEquals( orig, obj.__hash__)
 
-class StubMethodWrapperDescriptionTest(unittest.TestCase):
+class StubWrapperDescriptionTest(unittest.TestCase):
   
   def test_init(self):
     class Foo(object):pass
@@ -538,6 +589,14 @@ class StubMethodWrapperDescriptionTest(unittest.TestCase):
 
     s = StubWrapperDescriptor(Foo, '__hash__')
     self.assertEquals("Foo.__hash__", s.name)
+    s.teardown()
+
+  def test_call_orig(self):
+    class Foo(object):pass
+
+    s = StubWrapperDescriptor(Foo, '__str__')
+    f = Foo()
+    self.assertEquals("<class 'tests.stub_test.Foo'>", s.call_orig())
     s.teardown()
 
   def test_teardown(self):

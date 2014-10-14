@@ -284,6 +284,31 @@ class SampleBaseTest(Chai):
     assert_equals( 'v2', var('value2').value )
     assert_equals( 'v3', var('value3').value )
 
+  def test_spy(self):
+    spy(SampleBase)
+    obj = SampleBase()
+    assert_true(isinstance(obj,SampleBase))
+
+    spy(obj.add_to_list)
+    obj.add_to_list('v1')
+    assert_equals(['v1'], list(obj._deque))
+
+    spy(obj.add_to_list).args( var('value2') )
+    obj.add_to_list('v2')
+    assert_equals(['v1','v2'], list(obj._deque))
+    assert_equals( 'v2', var('value2').value )
+
+    spy(SampleBase, '__hash__')
+    dict()[obj] = 'hello world'
+
+    # Have to use times(0) because we don't actually expect this to be called
+    with assert_raises(UnsupportedModifier):
+        spy(obj.add_to_list).times(0).side_effect(lambda x: x)
+    with assert_raises(UnsupportedModifier):
+        spy(obj.add_to_list).times(0).returns(3)
+    with assert_raises(UnsupportedModifier):
+        spy(obj.add_to_list).times(0).raises(Exception('oops'))
+
 class SampleChildTest(Chai):
 
   def test_stub_base_class_expect_child_classmethod(self):

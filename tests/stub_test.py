@@ -591,7 +591,7 @@ class StubWrapperDescriptionTest(unittest.TestCase):
 
   def test_call_orig(self):
     class Foo(object): pass
-    if sys.version_info.major == 2:
+    if sys.version_info < (3, 3):
       foo_str = "<class 'tests.stub_test.Foo'>"
     else:
       foo_str = "<class 'tests.stub_test.StubWrapperDescriptionTest.test_call_orig.<locals>.Foo'>"

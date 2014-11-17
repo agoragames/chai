@@ -555,7 +555,7 @@ class StubNew(StubFunction):
         '''
         Calls the original function. Simulates __new__ and __init__ together.
         '''
-        rval = super(StubNew, self).call_orig(self._type, *args, **kwargs)
+        rval = super(StubNew, self).call_orig(self._type)
         rval.__init__(*args, **kwargs)
         return rval
 

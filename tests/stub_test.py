@@ -592,11 +592,14 @@ class StubWrapperDescriptionTest(unittest.TestCase):
     s.teardown()
 
   def test_call_orig(self):
-    class Foo(object):pass
+    class Foo(object): pass
+    if sys.version_info.major == 2:
+      foo_str = "<class 'tests.stub_test.Foo'>"
+    else:
+      foo_str = "<class 'tests.stub_test.StubWrapperDescriptionTest.test_call_orig.<locals>.Foo'>"
 
     s = StubWrapperDescriptor(Foo, '__str__')
-    f = Foo()
-    self.assertEquals("<class 'tests.stub_test.Foo'>", s.call_orig())
+    self.assertEquals(foo_str, s.call_orig())
     s.teardown()
 
   def test_teardown(self):

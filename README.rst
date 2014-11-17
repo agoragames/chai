@@ -2,6 +2,9 @@
  Chai - Python Mocking Made Easy
 =================================
 
+.. image:: https://travis-ci.org/agoragames/chai.svg?branch=master
+    :target: https://travis-ci.org/agoragames/chai
+
 :Version: 1.0.0
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai

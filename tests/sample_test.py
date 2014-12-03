@@ -175,11 +175,10 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     expect(obj.bound_method).args( not_of(float,int) )
     obj.bound_method( 'hello' )
-    
-  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
+
   def test_expect_unbound_method_acts_as_any_instance(self):
-    expect( SampleBase.bound_method ).args('hello').returns('world')
-    expect( SampleBase.bound_method ).args('hello').returns('mars')
+    expect( SampleBase, 'bound_method' ).args('hello').returns('world')
+    expect( SampleBase, 'bound_method' ).args('hello').returns('mars')
 
     obj1 = SampleBase()
     obj2 = SampleBase()
@@ -187,9 +186,8 @@ class SampleBaseTest(Chai):
     assert_equals( 'mars', obj1.bound_method('hello') )
     assert_raises(UnexpectedCall, obj2.bound_method)
 
-  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_stub_unbound_method_acts_as_no_instance(self):
-    stub( SampleBase.bound_method )
+    stub( SampleBase, 'bound_method' )
 
     obj1 = SampleBase()
     obj2 = SampleBase()

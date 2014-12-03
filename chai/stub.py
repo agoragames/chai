@@ -70,6 +70,12 @@ def _stub_attr(obj, attr_name):
                                             types.BuiltinMethodType)):
         return StubFunction(obj, attr_name)
 
+    # In python3 unbound methods are treated as functions with no reference
+    # back to the parent class and no im_* fields. We can still make unbound
+    # methods work by passing these through to the stub
+    if inspect.isclass(obj) and isinstance(attr, types.FunctionType):
+        return StubUnboundMethod(obj, attr_name)
+
     # I thought that types.UnboundMethodType differentiated these cases but
     # apparently not.
     if isinstance(attr, types.MethodType):
@@ -466,7 +472,6 @@ class StubFunction(Stub):
             elif getattr(obj, '__self__', None):
                 self._instance = obj.__self__
             else:
-
                 raise UnsupportedStub("Failed to find instance of %s" % (obj))
 
             if getattr(obj, 'func_name', None):
@@ -555,7 +560,7 @@ class StubNew(StubFunction):
         '''
         Calls the original function. Simulates __new__ and __init__ together.
         '''
-        rval = super(StubNew, self).call_orig(self._type, *args, **kwargs)
+        rval = super(StubNew, self).call_orig(self._type)
         rval.__init__(*args, **kwargs)
         return rval
 
@@ -579,16 +584,20 @@ class StubUnboundMethod(Stub):
     Stub an unbound method.
     '''
 
-    def __init__(self, obj):
+    def __init__(self, obj, attr=None):
         '''
         Initialize with an object that is an unbound method
         '''
-        # NOTE: It doesn't appear that there's any way to support this in
-        # python3 because an unbound method has no reference to its parent
-        # class, it looks just like a regular function
-        super(StubUnboundMethod, self).__init__(obj)
-        self._instance = obj.im_class
-        self._attr = obj.im_func.func_name
+        # Note: It doesn't appear that there's any way to support stubbing
+        # by method in python3 because an unbound method has no reference
+        # to its parent class, it just looks like a regular function
+        super(StubUnboundMethod, self).__init__(obj, attr)
+        if self._attr is None:
+            self._instance = obj.im_class
+            self._attr = obj.im_func.func_name
+        else:
+            self._obj = getattr(obj, attr)
+            self._instance = obj
         setattr(self._instance, self._attr, self)
 
     @property

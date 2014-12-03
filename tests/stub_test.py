@@ -487,10 +487,6 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( orig, Foo.__new__ )
     f2 = Foo('f2')
     self.assertEquals( ('f2',), f2.args )
-<<<<<<< HEAD
-
-=======
->>>>>>> 19559da90d31150ba33a3a3f98daea64ba4a074a
 
 
 class StubUnboundMethodTest(unittest.TestCase):

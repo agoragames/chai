@@ -15,7 +15,7 @@ class StubTest(unittest.TestCase):
     class Foo(object):
       @property
       def prop(self): return 3
-    
+
     res = stub(Foo, 'prop')
     self.assertTrue( isinstance(res,StubProperty) )
     self.assertTrue( stub(Foo,'prop') is res )
@@ -25,7 +25,7 @@ class StubTest(unittest.TestCase):
       @property
       def prop(self): return 3
     foo = Foo()
-    
+
     res = stub(foo, 'prop')
     self.assertTrue( isinstance(res,StubProperty) )
     self.assertTrue( stub(foo,'prop') is res )
@@ -34,7 +34,7 @@ class StubTest(unittest.TestCase):
     class Foo(object):
       @property
       def prop(self): return 3
-    
+
     foo = Foo()
     res = stub(Foo, 'prop')
     self.assertTrue( stub(foo,'prop') is res )
@@ -196,12 +196,12 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, stub(samples,'mod_func_1') )
 
   def test_stub_module_function_with_obj_ref(self):
-    res = stub(samples.mod_func_1) 
+    res = stub(samples.mod_func_1)
     self.assertTrue( isinstance(res,StubFunction) )
     self.assertEquals( res, getattr(samples,'mod_func_1') )
     self.assertEquals( res, samples.mod_func_1 )
     self.assertEquals( res, stub(samples.mod_func_1) )
-  
+
 class StubClassTest(unittest.TestCase):
   ###
   ### Test Stub class (if only I could mock my mocking mocks)
@@ -215,9 +215,9 @@ class StubClassTest(unittest.TestCase):
   def test_unment_expectations(self):
     s = Stub('obj', 'attr')
     s.expect().args(123).returns(1)
-    
+
     self.assertTrue(all([isinstance(e, ExpectationNotSatisfied) for e in s.unmet_expectations()]))
-  
+
   def test_teardown(self):
     s = Stub('obj')
     s._expections = ['1','2']
@@ -247,22 +247,22 @@ class StubClassTest(unittest.TestCase):
       def closed(self): return False
       def match(self, *args, **kwargs): return True
       def test(self, *args, **kwargs): return 'success'
-    
+
     s = Stub('obj')
     s._expectations = [ Expect() ]
     self.assertEquals( 'success', s('foo') )
-  
+
   def test_call_raises_unexpected_call_when_all_expectations_closed(self):
     class Expect(object):
       def closed(self): return True
-    
+
     s = Stub('obj')
     s._expectations = [ Expect(), Expect() ]
     self.assertRaises( UnexpectedCall, s, 'foo' )
 
   def test_call_raises_unexpected_call_when_closed_and_no_matching(self):
     class Expect(object):
-      def __init__(self, closed): 
+      def __init__(self, closed):
         self._closed=closed
         self._match_count = 0
         self._close_count=0
@@ -278,7 +278,7 @@ class StubClassTest(unittest.TestCase):
         return self._closed
       def is_any_order(self):
         return False
-    
+
     s = Stub('obj')
     s._expectations = [ Expect(True), Expect(False) ]
     self.assertRaises( UnexpectedCall, s, 'foo' )
@@ -289,17 +289,17 @@ class StubClassTest(unittest.TestCase):
 
 class StubPropertyTest(unittest.TestCase):
   # FIXME: Need to test teardown and init, these test might be in the base stub tests.
-  
+
   def test_name(self):
     class Foo(object):
       @property
       def prop(self): return 3
-    
+
     s = StubProperty(Foo, 'prop')
     self.assertEquals(s.name, 'Foo.prop')
 
 class StubMethodTest(unittest.TestCase):
-  
+
   def test_init(self):
     class Foo(object):
       def bar(self): pass
@@ -311,7 +311,7 @@ class StubMethodTest(unittest.TestCase):
     self.assertEquals( s._instance, f )
     self.assertEquals( s._attr, 'bar' )
     self.assertEquals( s, getattr(f,'bar') )
-    
+
     f = Foo()
     orig = f.bar
     s = StubMethod( f, 'bar' )
@@ -359,7 +359,7 @@ class StubMethodTest(unittest.TestCase):
     class Foo(object):
       @classmethod
       def bar(self): pass
-    
+
     self.assertTrue(isinstance(Foo.__dict__['bar'], classmethod))
     s = StubMethod( Foo.bar )
     s.teardown()
@@ -412,6 +412,7 @@ class StubFunctionTest(unittest.TestCase):
 
 class StubNewTest(unittest.TestCase):
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_new(self):
     class Foo(object): pass
 
@@ -423,7 +424,7 @@ class StubNewTest(unittest.TestCase):
 
   def test_init(self):
     class Foo(object): pass
-    
+
     s = StubNew( Foo )
     self.assertEquals( s._instance, Foo )
     self.assertEquals( s._attr, '__new__' )
@@ -436,12 +437,13 @@ class StubNewTest(unittest.TestCase):
       def closed(self): return False
       def match(self, *args, **kwargs): return args==('state',) and kwargs=={'a':'b'}
       def test(self, *args, **kwargs): return 'success'
-    
+
     s = StubNew( Foo )
     s._expectations = [ Expect() ]
     self.assertEquals( 'success', Foo('state', a='b') )
     s.teardown()
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_call_orig(self):
     class Foo(object):
       def __init__(self, val):
@@ -455,6 +457,7 @@ class StubNewTest(unittest.TestCase):
     s.teardown()
     StubNew._cache.clear()
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_teardown(self):
     class Foo(object): pass
 
@@ -466,6 +469,7 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( 0, len(StubNew._cache) )
     self.assertEquals( orig, Foo.__new__ )
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_teardown_on_custom_new(self):
     class Foo(object):
       def __new__(cls, *args, **kwargs):
@@ -484,11 +488,11 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( orig, Foo.__new__ )
     f2 = Foo('f2')
     self.assertEquals( ('f2',), f2.args )
-    
+
 
 @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
 class StubUnboundMethodTest(unittest.TestCase):
-  
+
   def test_init(self):
     class Foo(object):
       def bar(self): pass
@@ -535,7 +539,7 @@ class StubUnboundMethodTest(unittest.TestCase):
     self.assertEquals( 2, s.calls )
 
 class StubMethodWrapperTest(unittest.TestCase):
-  
+
   def test_init(self):
     class Foo(object):pass
     foo = Foo()
@@ -576,7 +580,7 @@ class StubMethodWrapperTest(unittest.TestCase):
     self.assertEquals( orig, obj.__hash__)
 
 class StubWrapperDescriptionTest(unittest.TestCase):
-  
+
   def test_init(self):
     class Foo(object):pass
     s = StubWrapperDescriptor( Foo, '__hash__' )
@@ -596,7 +600,15 @@ class StubWrapperDescriptionTest(unittest.TestCase):
 
     s = StubWrapperDescriptor(Foo, '__str__')
     f = Foo()
-    self.assertEquals("<class 'tests.stub_test.Foo'>", s.call_orig())
+
+    if sys.version_info.major == 2:
+      self.assertEquals("<class 'tests.stub_test.Foo'>", s.call_orig())
+    else:
+      self.assertEquals(
+        "<class 'tests.stub_test.StubWrapperDescriptionTest."
+        "test_call_orig.<locals>.Foo'>",
+        s.call_orig())
+
     s.teardown()
 
   def test_teardown(self):

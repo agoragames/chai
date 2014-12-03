@@ -103,7 +103,6 @@ class StubTest(unittest.TestCase):
     res = stub( Foo )
     self.assertEquals( 1, len(res._expectations) )
 
-  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):
       def bar(self): pass
@@ -113,7 +112,7 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, stub(Foo,'bar') )
     self.assertEquals( res, getattr(Foo,'bar') )
 
-  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods by reference in python 3")
   def test_stub_unbound_method_with_obj_ref(self):
     class Foo(object):
       def bar(self): pass
@@ -488,16 +487,19 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals( orig, Foo.__new__ )
     f2 = Foo('f2')
     self.assertEquals( ('f2',), f2.args )
+<<<<<<< HEAD
+
+=======
+>>>>>>> 19559da90d31150ba33a3a3f98daea64ba4a074a
 
 
-@unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
 class StubUnboundMethodTest(unittest.TestCase):
 
   def test_init(self):
     class Foo(object):
       def bar(self): pass
 
-    s = StubUnboundMethod( Foo.bar )
+    s = StubUnboundMethod( Foo, 'bar' )
     self.assertEquals( s._instance, Foo )
     self.assertEquals( s._attr, 'bar' )
     self.assertEquals( s, getattr(Foo,'bar') )
@@ -506,7 +508,7 @@ class StubUnboundMethodTest(unittest.TestCase):
     class Expect(object):
       def closed(self): return False
 
-    s = StubUnboundMethod(Expect.closed)
+    s = StubUnboundMethod( Expect, 'closed')
     self.assertEquals("Expect.closed", s.name)
     s.teardown()
 
@@ -515,7 +517,7 @@ class StubUnboundMethodTest(unittest.TestCase):
       def bar(self): pass
 
     orig = Foo.bar
-    s = StubUnboundMethod( Foo.bar )
+    s = StubUnboundMethod( Foo, 'bar' )
     s.teardown()
     self.assertEquals( orig, Foo.bar )
 
@@ -529,7 +531,7 @@ class StubUnboundMethodTest(unittest.TestCase):
         self.calls += 1
 
     orig = Foo.bar
-    s = StubIntercept( Foo.bar )
+    s = StubIntercept( Foo, 'bar' )
 
     f1 = Foo()
     f1.bar()
@@ -596,19 +598,14 @@ class StubWrapperDescriptionTest(unittest.TestCase):
     s.teardown()
 
   def test_call_orig(self):
-    class Foo(object):pass
+    class Foo(object): pass
+    if sys.version_info < (3, 3):
+      foo_str = "<class 'tests.stub_test.Foo'>"
+    else:
+      foo_str = "<class 'tests.stub_test.StubWrapperDescriptionTest.test_call_orig.<locals>.Foo'>"
 
     s = StubWrapperDescriptor(Foo, '__str__')
-    f = Foo()
-
-    if sys.version_info.major == 2:
-      self.assertEquals("<class 'tests.stub_test.Foo'>", s.call_orig())
-    else:
-      self.assertEquals(
-        "<class 'tests.stub_test.StubWrapperDescriptionTest."
-        "test_call_orig.<locals>.Foo'>",
-        s.call_orig())
-
+    self.assertEquals(foo_str, s.call_orig())
     s.teardown()
 
   def test_teardown(self):

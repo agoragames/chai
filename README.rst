@@ -136,14 +136,22 @@ In this example, we can reference ``obj.get`` directly because ``get`` is a boun
             assert_raises( UnexpectedCall, obj.get )
 
 Stubbing an unbound method will apply that stub to all future instances of that class. ::
-    
+
     class TestCase(Chai):
         def test_mock_get(self):
             stub(CustomObject.get)
             obj = CustomObject()
             assert_raises( UnexpectedCall, obj.get )
 
-**NOTE** This functionality is unavailable in Python 3 as unbound methods do not have a reference to the class they're defined in, and appear as module functions.
+Unbound methods can also be stubbed by attribute name instead of by reference. ::
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            stub(CustomObject, 'get')
+            obj = CustomObject()
+            assert_raises( UnexpectedCall, obj.get )
+
+**NOTE** Unbound methods can only be stubbed by attribute in Python 3 as unbound methods do not have a reference to the class they're defined in, and appear as module functions.
 
 Some methods cannot be stubbed because it is impossible to call ``setattr`` on the object, typically because it's a C extension. A good example of this is the ``datetime.datetime`` class. In that situation, it is best to mock out the entire module (see below).
 

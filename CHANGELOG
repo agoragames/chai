@@ -1,3 +1,10 @@
+1.0.1
+=====
+
+Fixes tests and unbound method support in Python 3
+https://github.com/agoragames/chai/pull/23 @pypingou
+https://github.com/agoragames/chai/pull/24 @GraylinKim
+
 1.0.0
 =====
 

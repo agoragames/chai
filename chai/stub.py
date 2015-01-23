@@ -127,7 +127,7 @@ def _stub_obj(obj):
     if hasattr(types, 'TypeType') and isinstance(obj, types.TypeType):
         return StubNew(obj)
     elif hasattr(__builtins__, 'type') and \
-            isinstance(obj, __builtins__['type']):
+            isinstance(obj, __builtins__.type):
         return StubNew(obj)
     elif inspect.isclass(obj):
         return StubNew(obj)

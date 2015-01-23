@@ -13,6 +13,11 @@ from chai.exception import *
 import tests.samples as samples
 from tests.samples import SampleBase, SampleChild
 
+try:
+    IS_PYPY = sys.subversion[0]=='PyPy'
+except AttributeError:
+    IS_PYPY = False
+
 class CustomException(Exception): pass
 
 class SampleModuleTest(Chai):
@@ -296,9 +301,6 @@ class SampleBaseTest(Chai):
     assert_equals(['v1','v2'], list(obj._deque))
     assert_equals( 'v2', var('value2').value )
 
-    spy(SampleBase, '__hash__')
-    dict()[obj] = 'hello world'
-
     # Have to use times(0) because we don't actually expect this to be called
     with assert_raises(UnsupportedModifier):
         spy(obj.add_to_list).times(0).side_effect(lambda x: x)
@@ -306,6 +308,12 @@ class SampleBaseTest(Chai):
         spy(obj.add_to_list).times(0).returns(3)
     with assert_raises(UnsupportedModifier):
         spy(obj.add_to_list).times(0).raises(Exception('oops'))
+
+  @unittest.skipIf(IS_PYPY, "can't spy on wrapper-descriptors in PyPy")
+  def test_spy_on_method_wrapper(self):
+    obj = SampleBase()
+    spy(SampleBase, '__hash__')
+    dict()[obj] = 'hello world'
 
 class SampleChildTest(Chai):
 

@@ -7,6 +7,11 @@ from chai.stub import *
 from chai.mock import Mock
 import tests.samples as samples
 
+try:
+    IS_PYPY = sys.subversion[0]=='PyPy'
+except AttributeError:
+    IS_PYPY = False
+
 class StubTest(unittest.TestCase):
   ###
   ### Test the public stub() method
@@ -48,6 +53,7 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res, StubProperty) )
     self.assertTrue( stub(Foo.prop) is res )
 
+  @unittest.skipIf(IS_PYPY, "can't stub property setter in PyPy")
   def test_stub_property_with_obj_ref_for_the_setter(self):
     class Foo(object):
       @property
@@ -57,6 +63,7 @@ class StubTest(unittest.TestCase):
     self.assertTrue( isinstance(res, StubMethod) )
     self.assertTrue( isinstance(Foo.prop, StubProperty) )
 
+  @unittest.skipIf(IS_PYPY, "can't stub property deleter in PyPy")
   def test_stub_property_with_obj_ref_for_the_deleter(self):
     class Foo(object):
       @property
@@ -170,6 +177,7 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, stub(Foo.bar) )
     self.assertEquals( res, getattr(Foo,'bar') )
 
+  @unittest.skipIf(IS_PYPY, "no method-wrapper in PyPy")
   def test_stub_method_wrapper_with_attr_name(self):
     class Foo(object): pass
 
@@ -179,6 +187,7 @@ class StubTest(unittest.TestCase):
     self.assertEquals( res, stub(foo, '__hash__') )
     self.assertEquals( res, getattr(foo, '__hash__') )
 
+  @unittest.skipIf(IS_PYPY, "no method-wrapper in PyPy")
   def test_stub_method_wrapper_with_obj_ref(self):
     class Foo(object): pass
 
@@ -577,6 +586,7 @@ class StubMethodWrapperTest(unittest.TestCase):
     s.teardown()
     self.assertEquals( orig, obj.__hash__)
 
+@unittest.skipIf(IS_PYPY, "no method-wrapper in PyPy")
 class StubWrapperDescriptionTest(unittest.TestCase):
 
   def test_init(self):

@@ -5,7 +5,7 @@
 .. image:: https://travis-ci.org/agoragames/chai.svg?branch=master
     :target: https://travis-ci.org/agoragames/chai
 
-:Version: 1.0.1
+:Version: 1.1.0
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2

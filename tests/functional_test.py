@@ -1,7 +1,14 @@
 # Simple functional tests
+import sys
+import unittest
 
 from chai import Chai
 from chai.exception import UnexpectedCall
+
+try:
+    IS_PYPY = sys.subversion[0]=='PyPy'
+except AttributeError:
+    IS_PYPY = False
 
 class FunctionalTest(Chai):
 
@@ -38,6 +45,7 @@ class FunctionalTest(Chai):
     with assert_raises( UnexpectedCall ):
       Foo().prop
 
+  @unittest.skipIf(IS_PYPY, "can't stub property setter in PyPy")
   def test_properties_using_obj_ref_on_a_class_and_using_set_first(self):
     class Foo(object):
       @property

@@ -151,8 +151,6 @@ Unbound methods can also be stubbed by attribute name instead of by reference. :
             obj = CustomObject()
             assert_raises( UnexpectedCall, obj.get )
 
-**NOTE** Unbound methods can only be stubbed by attribute in Python 3 as unbound methods do not have a reference to the class they're defined in, and appear as module functions.
-
 Some methods cannot be stubbed because it is impossible to call ``setattr`` on the object, typically because it's a C extension. A good example of this is the ``datetime.datetime`` class. In that situation, it is best to mock out the entire module (see below).
 
 Finally, Chai supports stubbing of properties on classes. In all cases, the stub will be applied to a class and individually to each of the 3 property methods. Because the stub is on the class, all instances need to be addressed when you write expectations. The first interface is via the named attribute method which can be used on both classes and instances. ::
@@ -172,6 +170,15 @@ Using the class, you can directly refer to all 3 methods of the property. To ref
         stub( CustomObject.prop )
         stub( CustomObject.prop.deleter )
         assert_raises( UnexpectedCall, lambda: CustomObject().prop )
+
+Python 3
+++++++++
+
+Unbound methods can only be stubbed by attribute in Python 3 as unbound methods do not have a reference to the class they're defined in, and appear as module functions.
+
+PyPy
+++++
+PyPy does not support stubs on the setter and deleter methods of properties. Additionally, it does not support spies on methods such as ``ExampleClass.__hash__`` because it is represented as an unbound method, rather than CPython's ``method-wrapper``, and unbound methods do not support spies.
 
 
 Expectations and Spies

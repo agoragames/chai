@@ -127,7 +127,7 @@ def _stub_obj(obj):
     if hasattr(types, 'TypeType') and isinstance(obj, types.TypeType):
         return StubNew(obj)
     elif hasattr(__builtins__, 'type') and \
-            isinstance(obj, __builtins__['type']):
+            isinstance(obj, __builtins__.type):
         return StubNew(obj)
     elif inspect.isclass(obj):
         return StubNew(obj)
@@ -182,6 +182,15 @@ def _stub_obj(obj):
                     ref.get('__dict__', None), '__objclass__', None)
                 for name, val in getattr(klass, '__dict__', {}).items():
                     if val is obj:
+                        attr = name
+                        break
+            # In the case of PyPy, we have to check all types that refer to
+            # the property, and see if any of their attrs are the property
+            elif isinstance(ref, type):
+                # Use dir as a means to quickly walk through the class tree
+                for name in dir(ref):
+                    if getattr(ref,name)==obj:
+                        klass = ref
                         attr = name
                         break
 

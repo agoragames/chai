@@ -95,9 +95,12 @@ As of 0.3.0, the Chai API has significantly changed such that the default behavi
             obj = CustomObject()
             expect(obj.get).args(5)
             assert_equals( None, obj.get(5) )
+            assert_equals( None, obj.get(5) )
+            assert_equals( None, obj.get(5) )
             expect(obj.get).any_args().returns( 'test' ).times(2)
             assert_equals( 'test', obj.get(5) )
             assert_equals( 'test', obj.get(5) )
+            assert_raises( UnexpectedCall, obj.get )
         
         def test_0_3_0(self):
             obj = CustomObject()
@@ -112,7 +115,7 @@ Stubbing
 
 The simplest mock is to stub a method. This replaces the original method with a subclass of ``chai.Stub``, the main instrumentation class. All additional ``stub`` and ``expect`` calls will re-use this stub, and the stub is responsible for re-installing the original reference when ``Chai.tearDown`` is run.
 
-Stubbing is used for situations when you want to assert that a method is never called. ::
+Stubbing is used for situations when you want to assert that a method is never called, and is equivalent to ``expect(target).times(0)``::
 
     class CustomObject (object): 
         def get(self, arg):
@@ -186,14 +189,27 @@ Expectations and Spies
 
 Expectations are individual test cases that can be applied to a stub. They are expected to be run in order (unless otherwise noted). They are greedy, in that so long as an expectation has not been met and the arguments match, the arguments will be processed by that expectation. This mostly applies to the "at_least" and "any_order" expectations, which (may) stay open throughout the test and will handle any matching call.
 
-Expectations will automatically create a stub if it's not already applied, so no separate call to ``stub`` is necessary. The arguments and edge cases regarding what can and cannot have expectations applied are identical to stubs. The ``expect`` call will return a new ``chai.Expectation`` object which can then be used to modify the expectation. Without any modifiers, an expectation will expect a single call without arguments and return None. ::
+Expectations will automatically create a stub if it's not already applied, so no separate call to ``stub`` is necessary. The arguments and edge cases regarding what can and cannot have expectations applied are identical to stubs. The ``expect`` call will return a new ``chai.Expectation`` object which can then be used to modify the expectation. Without any modifiers, an expectation will expect at least one call with any arguments and return None. ::
 
     class TestCase(Chai):
         def test_mock_get(self):
             obj = CustomObject()
             expect(obj.get)
-            assert_equals( None, obj.get() )
-            assert_raises( UnexpectedCall, obj.get )
+            assert_equals(None, obj.get())
+            assert_equals(None, obj.get())
+
+As noted above, Chai will by default perform a greedy match, closing out an implied ``at_least_once()`` on every expectation when a new expectation is defined. The expectation will be immediately closed if it has already been satisfied when a new expectation is created. ::
+
+    class TestCase(Chai):
+        def test_mock_get(self):
+            obj = CustomObject()
+            expect(obj.get).returns(1)
+            expect(obj.get).returns(2)
+            assert_equals(1, obj.get())
+            assert_equals(2, obj.get())
+            assert_equals(2, obj.get())
+            expect(obj.get).returns(3)
+            assert_equals(3, obj.get())
 
 Modifiers can be applied to the expectation. Each modifier will return a reference to the expectation for easy chaining. In this example, we're going to match a parameter and change the behavior depending on the argument. This also shows the ability to incrementally add expectations throughout the test. ::
 
@@ -201,10 +217,10 @@ Modifiers can be applied to the expectation. Each modifier will return a referen
         def test_mock_get(self):
             obj = CustomObject()
             expect(obj.get).args('foo').returns('hello').times(2)
-            assert_equals( 'hello', obj.get('foo') )
-            assert_equals( 'hello', obj.get('foo') )
+            assert_equals('hello', obj.get('foo') )
+            assert_equals('hello', obj.get('foo') )
             expect(obj.get).args('bar').raises( ValueError )
-            assert_raises( ValueError, obj.get, 'bar' )
+            assert_raises(ValueError, obj.get, 'bar')
 
 It is very common to need to run expectations on the constructor for an object, possibly including returning a mock object. Chai makes this very simple. ::
 

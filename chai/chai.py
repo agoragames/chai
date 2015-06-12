@@ -11,10 +11,7 @@ try:
 except ImportError:
     import unittest
 
-import re
-import sys
 import inspect
-import traceback
 from collections import deque
 
 from .exception import *
@@ -253,15 +250,14 @@ class ChaiBase(unittest.TestCase):
         '''
         Return a mock object that is an instance of a given abc interface.
         '''
-        assert hasattr(interface, '__metaclass__')
-        meta_cls = interface.__metaclass__
+        meta_cls = type(interface)
 
         def _instance_check(cls, instance):
             if type(instance) is Mock:
                 mock_interface = getattr(instance, '_interface', None)
                 if mock_interface is not None:
                     return issubclass(mock_interface, cls)
-            return self._original_instance_checks[cls.__metaclass__](cls, instance)
+            return self._original_instance_checks[type(cls)](cls, instance)
 
         mock = Mock(**kwargs)
         mock._interface = interface

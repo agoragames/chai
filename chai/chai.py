@@ -22,15 +22,6 @@ from .mock import Mock
 from .stub import stub
 from .comparators import *
 
-_original_instance_checks = {}
-
-def _instance_check(cls, instance):
-    if type(instance) is Mock:
-        mock_interface = getattr(instance, '_interface', None)
-        if mock_interface is not None:
-            return issubclass(mock_interface, cls)
-    return _original_instance_checks[cls.__metaclass__](cls, instance)
-
 
 class ChaiTestType(type):
 

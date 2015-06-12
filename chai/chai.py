@@ -22,6 +22,15 @@ from .mock import Mock
 from .stub import stub
 from .comparators import *
 
+_original_instance_checks = {}
+
+def _instance_check(cls, instance):
+    if type(instance) is Mock:
+        mock_interface = getattr(instance, '_interface', None)
+        if mock_interface is not None:
+            return issubclass(mock_interface, cls)
+    return _original_instance_checks[cls.__metaclass__](cls, instance)
+
 
 class ChaiTestType(type):
 
@@ -132,6 +141,7 @@ class ChaiBase(unittest.TestCase):
 
         # Setup mock tracking
         self._mocks = deque()
+        self._original_instance_checks = {}
 
         # Try to load this into the module that the test case is defined in, so
         # that 'self.' can be removed. This has to be done at the start of the
@@ -200,6 +210,7 @@ class ChaiBase(unittest.TestCase):
 
         # Clear out any cached variables
         Variable.clear()
+        self._original_instance_checks = {}
 
     # Because cAmElCaSe sucks
     teardown = tearDown
@@ -246,6 +257,31 @@ class ChaiBase(unittest.TestCase):
                 self._mocks.append((obj, attr))
                 setattr(obj, attr, rval)
         return rval
+
+    def mock_of(self, interface, **kwargs):
+        '''
+        Return a mock object that is an instance of a given abc interface.
+        '''
+        assert hasattr(interface, '__metaclass__')
+        meta_cls = interface.__metaclass__
+
+        def _instance_check(cls, instance):
+            if type(instance) is Mock:
+                mock_interface = getattr(instance, '_interface', None)
+                if mock_interface is not None:
+                    return issubclass(mock_interface, cls)
+            return self._original_instance_checks[cls.__metaclass__](cls, instance)
+
+        mock = Mock(**kwargs)
+        mock._interface = interface
+        if meta_cls not in self._original_instance_checks:
+            self._original_instance_checks[meta_cls] = meta_cls.__instancecheck__
+            if '__instancecheck__' in meta_cls.__dict__:
+                self._mocks.append((meta_cls, '__instancecheck__', meta_cls.__instancecheck__))
+            else:
+                self._mocks.append((meta_cls, '__instancecheck__'))
+            meta_cls.__instancecheck__ = _instance_check
+        return mock
 
 
 Chai = ChaiTestType('Chai', (ChaiBase,), {})

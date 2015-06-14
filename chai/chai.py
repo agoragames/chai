@@ -259,7 +259,7 @@ class ChaiBase(unittest.TestCase):
                     return issubclass(mock_interface, cls)
             return self._original_instance_checks[type(cls)](cls, instance)
 
-        mock = Mock(**kwargs)
+        mock = self.mock(**kwargs)
         mock._interface = interface
         if meta_cls not in self._original_instance_checks:
             self._original_instance_checks[meta_cls] = meta_cls.__instancecheck__

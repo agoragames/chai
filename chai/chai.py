@@ -38,12 +38,10 @@ class ChaiTestType(type):
         # also alias all the cAmElCaSe methods to more helpful ones
         for base in bases:
             for attr_name in dir(base):
-                d[attr_name] = getattr(base, attr_name)
                 if attr_name.startswith('assert') and attr_name != 'assert_':
                     pieces = ['assert'] + \
                         re.findall('[A-Z][a-z]+', attr_name[5:])
                     name = '_'.join([s.lower() for s in pieces])
-                    d[name] = getattr(base, attr_name)
                     setattr(cls, name, getattr(base, attr_name))
 
         for func_name, func in d.items():

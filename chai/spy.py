@@ -8,17 +8,40 @@ https://github.com/agoragames/chai/blob/master/LICENSE.txt
 from .exception import UnsupportedModifier
 from .expectation import Expectation
 
+
 class Spy(Expectation):
 
     def __init__(self, *args, **kwargs):
-        super(Spy,self).__init__(*args, **kwargs)
-        self._side_effect = self._stub.call_orig
+        super(Spy, self).__init__(*args, **kwargs)
+        self._side_effect = self._call_spy
 
-    def side_effect(self, *args, **kwargs):
+        # To support side effects within spies
+        self._spy_side_effect = False
+        self._spy_side_effect_args = None
+        self._spy_side_effect_kwargs = None
+
+    def _call_spy(self, *args, **kwargs):
+      '''
+      Wrapper to call the spied-on function. Operates similar to
+      Expectation.test.
+      '''
+      if self._spy_side_effect:
+          if self._spy_side_effect_args or self._spy_side_effect_kwargs:
+              self._spy_side_effect(
+                  *self._spy_side_effect_args,
+                  **self._spy_side_effect_kwargs)
+          else:
+              self._spy_side_effect(*args, **kwargs)
+      return self._stub.call_orig(*args, **kwargs)
+
+    def side_effect(self, func, *args, **kwargs):
         '''
-        Disable side effects for spies.
+        Wrap side effects for spies.
         '''
-        raise UnsupportedModifier("Can't use side effects on spies")
+        self._spy_side_effect = func
+        self._spy_side_effect_args = args
+        self._spy_side_effect_kwargs = kwargs
+        return self
 
     def returns(self, *args):
         '''

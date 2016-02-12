@@ -301,9 +301,15 @@ class SampleBaseTest(Chai):
     assert_equals(['v1','v2'], list(obj._deque))
     assert_equals( 'v2', var('value2').value )
 
-    # Have to use times(0) because we don't actually expect this to be called
-    with assert_raises(UnsupportedModifier):
-        spy(obj.add_to_list).times(0).side_effect(lambda x: x)
+    data = {'foo':'bar'}
+    def _fx(_data):
+      _data['foo'] = 'bug'
+
+    spy(obj.add_to_list).side_effect(_fx, data)
+    obj.add_to_list('v3')
+    assert_equals(['v1','v2','v3'], list(obj._deque))
+    assert_equals({'foo':'bug'}, data)
+
     with assert_raises(UnsupportedModifier):
         spy(obj.add_to_list).times(0).returns(3)
     with assert_raises(UnsupportedModifier):

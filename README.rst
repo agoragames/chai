@@ -5,7 +5,7 @@
 .. image:: https://travis-ci.org/agoragames/chai.svg?branch=master
     :target: https://travis-ci.org/agoragames/chai
 
-:Version: 1.1.0
+:Version: 1.1.1
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -253,7 +253,7 @@ The arguments modifier supports several matching functions. For simplicity in co
             assert_raises( UnexpectedCall, obj.get, [] )
             assert_equals( 'yes', obj.get(list) )
 
-Lastly, Chai 1.0.0 supports spies. These are an extension of expectations and support most of the same features. The modifiers ``returns``, ``raises`` and ``side_effect`` raise ``UnsupportedModifier`` because the spy passes arguments and returns or raises the results of the stubbed function. Additionally, there are a few types of stubs which are not (currently) supported by spies:
+Lastly, Chai 1.0.0 supports spies. These are an extension of expectations and support most of the same features. The modifiers ``returns`` and ``raises`` raise ``UnsupportedModifier`` because the spy passes arguments and returns or raises the results of the stubbed function. You can make use of ``side_effect`` to inject code just before the spied-on function is executed, however the return value will be ignored. This behavior is especially useful when testing race conditions. Additionally, there are a few types of stubs which are not (currently) supported by spies:
 
 * properties
 * unbound methods

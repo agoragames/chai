@@ -189,7 +189,7 @@ def _stub_obj(obj):
             elif isinstance(ref, type):
                 # Use dir as a means to quickly walk through the class tree
                 for name in dir(ref):
-                    if getattr(ref,name)==obj:
+                    if getattr(ref, name) == obj:
                         klass = ref
                         attr = name
                         break
@@ -411,11 +411,11 @@ class StubMethod(Stub):
         if hasattr(self._obj, '__self__') and \
                 inspect.isclass(self._obj.__self__) and \
                 self._obj.__self__ is self._instance:
-            return classmethod(self._obj.__func__)(self._instance, *args, **kwargs)
+            return self._obj.__func__(self._instance, *args, **kwargs)
         elif hasattr(self._obj, 'im_self') and \
                 inspect.isclass(self._obj.im_self) and \
                 self._obj.im_self is self._instance:
-            return classmethod(self._obj.im_func)(self._instance, *args, **kwargs)
+            return self._obj.im_func(self._instance, *args, **kwargs)
         else:
             return self._obj(*args, **kwargs)
 

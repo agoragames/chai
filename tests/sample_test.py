@@ -311,10 +311,10 @@ class SampleBaseTest(Chai):
 
     capture = [0]
 
-    def _rfx(_deque):
+    def _return_spy(_deque):
       capture.extend(_deque)
 
-    spy(obj.add_to_list).return_effect(_rfx)
+    spy(obj.add_to_list).spy_return(_return_spy)
     obj.add_to_list('v4')
     assert_equals([0, 'v1', 'v2', 'v3', 'v4'], capture)
 

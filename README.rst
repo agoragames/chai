@@ -331,6 +331,9 @@ any_order
 side_effect(callable, \*args, \*\*kwargs)
   Called with a function argument. When the expectation passes a test, the function will be executed. The side effect will be executed even if the expectation is configured to raise an exception. If the side effect is defined with arguments, then those arguments will be passed in when it's called, otherwise the arguments passed in to the expectation will be passed in.
 
+spy_return(callable)
+  [Spies Only] Called with a function argument. When the expectation passes a test, the function will be executed and passed the return value from the function as an argument.
+
 teardown
   Will remove the stub after the expectation has been met. This is useful in cases where you need to mock core methods such as ``open``, but immediately return its original behavior after the mocked call has run.
   

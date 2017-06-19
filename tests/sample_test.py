@@ -1,9 +1,8 @@
-'''
+"""
 Tests for the sample module
-'''
+"""
 
 import os
-import random
 import unittest
 import sys
 
@@ -14,21 +13,25 @@ import tests.samples as samples
 from tests.samples import SampleBase, SampleChild
 
 try:
-    IS_PYPY = sys.subversion[0]=='PyPy'
+    IS_PYPY = sys.subversion[0] == 'PyPy'
 except AttributeError:
     IS_PYPY = False
 
-class CustomException(Exception): pass
+
+class CustomException(Exception):
+    pass
+
 
 class SampleModuleTest(Chai):
 
   def test_mod_func_2_as_obj_name(self):
     expect(samples, 'mod_func_1').args(42, foo='bar')
     samples.mod_func_2(42, foo='bar')
-  
+
   def test_mod_func_2_as_obj_ref(self):
     expect(samples.mod_func_1).args(42, foo='bar')
     samples.mod_func_2(42, foo='bar')
+
 
 class SampleBaseTest(Chai):
 
@@ -41,8 +44,8 @@ class SampleBaseTest(Chai):
     # NOTE: os module is a good example where it binds from another
     # (e.g. posix), so it has to use the named reference or else it
     # stubs the original module
-    expect( os, 'remove' ).args('foo').returns('ok')
-    assert_equals( 'ok', os.remove('foo') )
+    expect(os, 'remove').args('foo').returns('ok')
+    assert_equals('ok', os.remove('foo'))
 
   def test_expects_bound_method_returns(self):
     obj = SampleBase()
@@ -60,7 +63,7 @@ class SampleBaseTest(Chai):
 
     expect(obj.bound_method).args(1, 3).returns(100)
     assert_equals(100, obj.bound_method(1, 3))
-    
+
     assert_raises(UnexpectedCall, obj.bound_method, 1, 2)
 
   def test_expects_bound_method_at_least_with_other_expectation_and_anyorder(self):
@@ -71,7 +74,7 @@ class SampleBaseTest(Chai):
 
     expect(obj.bound_method).args(1, 3).returns(100)
     assert_equals(100, obj.bound_method(1, 3))
-    
+
     assert_equals(12, obj.bound_method(1, 2))
 
   def test_expects_bound_method_at_least_as_last_expectation(self):
@@ -94,30 +97,30 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     expect(obj.bound_method).args(1).returns(2).any_order()
     expect(obj.bound_method).args(3).returns(4).any_order()
-    assert_equals(4, obj.bound_method(3) )
-    assert_equals(2, obj.bound_method(1) )
+    assert_equals(4, obj.bound_method(3))
+    assert_equals(2, obj.bound_method(1))
     assert_raises(UnexpectedCall, obj.bound_method, 1)
 
   def tests_expects_bound_method_any_order_with_mins(self):
     obj = SampleBase()
     expect(obj.bound_method).args(1).returns(2).any_order().at_least_once()
     expect(obj.bound_method).args(3).returns(4).any_order().at_least_once()
-    assert_equals(4, obj.bound_method(3) )
-    assert_equals(2, obj.bound_method(1) )
-    assert_equals(4, obj.bound_method(3) )
-    assert_equals(2, obj.bound_method(1) )
-    assert_equals(2, obj.bound_method(1) )
-    assert_equals(4, obj.bound_method(3) )
-    assert_equals(2, obj.bound_method(1) )
+    assert_equals(4, obj.bound_method(3))
+    assert_equals(2, obj.bound_method(1))
+    assert_equals(4, obj.bound_method(3))
+    assert_equals(2, obj.bound_method(1))
+    assert_equals(2, obj.bound_method(1))
+    assert_equals(4, obj.bound_method(3))
+    assert_equals(2, obj.bound_method(1))
 
   def test_expects_any_order_without_count_modifiers(self):
     obj = SampleBase()
     expect(obj.bound_method).args(3).returns(4)
     expect(obj.bound_method).args(1).returns(2).any_order()
     expect(obj.bound_method).args(3).returns(4)
-    assert_equals(4, obj.bound_method(3) )
-    assert_equals(4, obj.bound_method(3) )
-    assert_equals(2, obj.bound_method(1) )
+    assert_equals(4, obj.bound_method(3))
+    assert_equals(4, obj.bound_method(3))
+    assert_equals(2, obj.bound_method(1))
 
   def test_expects_bound_method_raises(self):
     obj = SampleBase()
@@ -140,65 +143,65 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     stub(obj.bound_method)
     assert_raises(UnexpectedCall, obj.bound_method)
-  
+
   def test_expect_bound_method_with_equals_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( equals(42) )
-    obj.bound_method( 42 )
-    assert_raises(UnexpectedCall, obj.bound_method, 32 )
+    expect(obj.bound_method).args(equals(42))
+    obj.bound_method(42)
+    assert_raises(UnexpectedCall, obj.bound_method, 32)
 
   def test_expect_bound_method_with_is_a_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( is_a(int) )
-    obj.bound_method( 42 )
-    assert_raises(UnexpectedCall, obj.bound_method, '42' )
-  
+    expect(obj.bound_method).args(is_a(int))
+    obj.bound_method(42)
+    assert_raises(UnexpectedCall, obj.bound_method, '42')
+
   def test_expect_bound_method_with_anyof_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).times(4).args( 
-      any_of(int,3.14,'hello',is_a(list)) )
-    obj.bound_method( 42 )
-    obj.bound_method( 3.14 )
-    obj.bound_method( 'hello' )
-    obj.bound_method( [1,2,3] )
-    assert_raises(UnexpectedCall, obj.bound_method, '42' )
+    expect(obj.bound_method).times(4).args(
+      any_of(int, 3.14, 'hello', is_a(list)))
+    obj.bound_method(42)
+    obj.bound_method(3.14)
+    obj.bound_method('hello')
+    obj.bound_method([1, 2, 3])
+    assert_raises(UnexpectedCall, obj.bound_method, '42')
 
   def test_expect_bound_method_with_allof_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( all_of(length(5),'hello') )
-    obj.bound_method( 'hello' )
+    expect(obj.bound_method).args(all_of(length(5), 'hello'))
+    obj.bound_method('hello')
 
-    expect(obj.bound_method).args( all_of(length(3),'hello') ).at_least(0)
-    assert_raises(UnexpectedCall, obj.bound_method, 'hello' )
-  
+    expect(obj.bound_method).args(all_of(length(3), 'hello')).at_least(0)
+    assert_raises(UnexpectedCall, obj.bound_method, 'hello')
+
   def test_expect_bound_method_with_notof_comparator(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( not_of(any_of(float,int)) )
-    obj.bound_method( 'hello' )
+    expect(obj.bound_method).args(not_of(any_of(float, int)))
+    obj.bound_method('hello')
 
   def test_expect_bound_method_with_notof_comparator_using_types(self):
     obj = SampleBase()
-    expect(obj.bound_method).args( not_of(float,int) )
-    obj.bound_method( 'hello' )
+    expect(obj.bound_method).args(not_of(float, int))
+    obj.bound_method('hello')
 
   def test_expect_unbound_method_acts_as_any_instance(self):
-    expect( SampleBase, 'bound_method' ).args('hello').returns('world')
-    expect( SampleBase, 'bound_method' ).args('hello').returns('mars')
+    expect(SampleBase, 'bound_method').args('hello').returns('world')
+    expect(SampleBase, 'bound_method').args('hello').returns('mars')
 
     obj1 = SampleBase()
     obj2 = SampleBase()
-    assert_equals( 'world', obj2.bound_method('hello') )
-    assert_equals( 'mars', obj1.bound_method('hello') )
+    assert_equals('world', obj2.bound_method('hello'))
+    assert_equals('mars', obj1.bound_method('hello'))
     assert_raises(UnexpectedCall, obj2.bound_method)
 
   def test_stub_unbound_method_acts_as_no_instance(self):
-    stub( SampleBase, 'bound_method' )
+    stub(SampleBase, 'bound_method')
 
     obj1 = SampleBase()
     obj2 = SampleBase()
     assert_raises(UnexpectedCall, obj2.bound_method)
     assert_raises(UnexpectedCall, obj1.bound_method)
-  
+
   def test_expects_class_method(self):
     expect(SampleBase.a_classmethod).returns(12)
     assert_equals(12, SampleBase.a_classmethod())
@@ -222,22 +225,17 @@ class SampleBaseTest(Chai):
   def test_add_to_list_with_mock_object(self):
     obj = SampleBase()
     obj._deque = mock()
-    expect( obj._deque.append ).args('value')
+    expect(obj._deque.append).args('value')
     obj.add_to_list('value')
 
   def test_add_to_list_with_module_mock_object(self):
-    mock( samples, 'deque' )
+    mock(samples, 'deque')
     deq = mock()
-    expect( samples.deque.__call__ ).returns( deq )
-    expect( deq.append ).args('value')
+    expect(samples.deque.__call__).returns(deq)
+    expect(deq.append).args('value')
 
     obj = SampleBase()
     obj.add_to_list('value')
-  
-  def test_regex_comparator(self):
-    obj = SampleBase()
-    expect(obj.bound_method).args(matches("name$")).returns(100)
-    assert_equals(obj.bound_method('first_name'), 100)
 
   def test_regex_comparator(self):
     obj = SampleBase()
@@ -258,7 +256,7 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     expect(obj.bound_method).args(contains('name')).returns(100).at_most(3)
     assert_equals(obj.bound_method(['name', 'age']), 100)
-    assert_equals(obj.bound_method({'name' : 'vitaly'}), 100)
+    assert_equals(obj.bound_method({'name': 'vitaly'}), 100)
     assert_equals(obj.bound_method('lasfs-name-asfsad'), 100)
 
   def test_almost_equals_comparator(self):
@@ -273,42 +271,52 @@ class SampleBaseTest(Chai):
 
   def test_var_comparator(self):
     obj = SampleBase()
-    expect(obj.add_to_list).args( var('value1') )
-    expect(obj.add_to_list).args( var('value2') )
-    expect(obj.add_to_list).args( var('value3') ).at_least_once()
+    expect(obj.add_to_list).args(var('value1'))
+    expect(obj.add_to_list).args(var('value2'))
+    expect(obj.add_to_list).args(var('value3')).at_least_once()
 
     obj.add_to_list('v1')
     obj.add_to_list('v2')
     obj.add_to_list('v3')
     obj.add_to_list('v3')
-    self.assertRaises( UnexpectedCall, obj.add_to_list, 'v3a')
+    self.assertRaises(UnexpectedCall, obj.add_to_list, 'v3a')
 
-    assert_equals( 'v1', var('value1').value )
-    assert_equals( 'v2', var('value2').value )
-    assert_equals( 'v3', var('value3').value )
+    assert_equals('v1', var('value1').value)
+    assert_equals('v2', var('value2').value)
+    assert_equals('v3', var('value3').value)
 
   def test_spy(self):
     spy(SampleBase)
     obj = SampleBase()
-    assert_true(isinstance(obj,SampleBase))
+    assert_true(isinstance(obj, SampleBase))
 
     spy(obj.add_to_list)
     obj.add_to_list('v1')
     assert_equals(['v1'], list(obj._deque))
 
-    spy(obj.add_to_list).args( var('value2') )
+    spy(obj.add_to_list).args(var('value2'))
     obj.add_to_list('v2')
-    assert_equals(['v1','v2'], list(obj._deque))
-    assert_equals( 'v2', var('value2').value )
+    assert_equals(['v1', 'v2'], list(obj._deque))
+    assert_equals('v2', var('value2').value)
 
-    data = {'foo':'bar'}
-    def _fx(_data):
+    data = {'foo': 'bar'}
+
+    def _sfx(_data):
       _data['foo'] = 'bug'
 
-    spy(obj.add_to_list).side_effect(_fx, data)
+    spy(obj.add_to_list).side_effect(_sfx, data)
     obj.add_to_list('v3')
-    assert_equals(['v1','v2','v3'], list(obj._deque))
-    assert_equals({'foo':'bug'}, data)
+    assert_equals(['v1', 'v2', 'v3'], list(obj._deque))
+    assert_equals({'foo': 'bug'}, data)
+
+    capture = [0]
+
+    def _rfx(_deque):
+      capture.extend(_deque)
+
+    spy(obj.add_to_list).return_effect(_rfx)
+    obj.add_to_list('v4')
+    assert_equals([0, 'v1', 'v2', 'v3', 'v4'], capture)
 
     with assert_raises(UnsupportedModifier):
         spy(obj.add_to_list).times(0).returns(3)
@@ -320,6 +328,7 @@ class SampleBaseTest(Chai):
     obj = SampleBase()
     spy(SampleBase, '__hash__')
     dict()[obj] = 'hello world'
+
 
 class SampleChildTest(Chai):
 

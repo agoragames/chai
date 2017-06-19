@@ -5,7 +5,7 @@
 .. image:: https://travis-ci.org/agoragames/chai.svg?branch=master
     :target: https://travis-ci.org/agoragames/chai
 
-:Version: 1.1.1
+:Version: 1.1.2
 :Download: http://pypi.python.org/pypi/chai
 :Source: https://github.com/agoragames/chai
 :Keywords: python, mocking, testing, unittest, unittest2
@@ -544,6 +544,7 @@ Special thank you to the following people for contributions to Chai
 
 * Jason Baker (https://github.com/jasonbaker)
 * Pierre-Yves Chibon (https://github.com/pypingou)
+* Graylin Kim (https://github.com/GraylinKim)
 
 .. # vim: syntax=rst expandtab tabstop=4 shiftwidth=4 shiftround
 

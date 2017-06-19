@@ -1,29 +1,36 @@
-'''
+"""
 Contains sample classes and situations that we want to test.
-'''
+"""
 
 # Can test module import
 from collections import deque
 
+
 def mod_func_1(*args, **kwargs):
   pass
+
 
 def mod_func_2(*args, **kwargs):
   mod_func_1(*args, **kwargs)
 
+
 def mod_func_3(val):
-  return 3*val
+  return 3 * val
+
 
 def mod_func_4(val):
-  return 3*mod_func_3(val)
+  return 3 * mod_func_3(val)
+
 
 # For testing when the module has an instance's classmethod bound
 class ModInstance(object):
   @classmethod
-  def foo(self): pass
+  def foo(cls):
+    pass
 
 mod_instance = ModInstance()
 mod_instance_foo = mod_instance.foo
+
 
 class SampleBase(object):
 
@@ -63,7 +70,8 @@ class SampleBase(object):
     return cls.a_class_value
 
   def add_to_list(self, value):
-    self._deque.append( value )
+    self._deque.append(value)
+    return self._deque
 
   # Can test a bound method
   def bound_method(self, arg1, arg2='two'):
@@ -73,6 +81,7 @@ class SampleBase(object):
   # Can test that we call another method
   def callback_source(self):
     self.callback_target()
+
   def callback_target(self):
     self._cb_target = 'called'
 
@@ -82,7 +91,7 @@ class SampleChild(SampleBase):
   # Can test calling super
   # Can test when bound method is overloaded
   def bound_method(self, arg1, arg2='two', arg3='three'):
-    super(SampleBase,self).bound_method(arg1, arg2)
+    super(SampleBase, self).bound_method(arg1, arg2)
     self._arg3 = arg3
 
   # Can test overloading classmethod

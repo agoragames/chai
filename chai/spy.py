@@ -19,6 +19,9 @@ class Spy(Expectation):
         self._spy_side_effect = False
         self._spy_side_effect_args = None
         self._spy_side_effect_kwargs = None
+        self._spy_return_effect = False
+        self._spy_return_effect_args = dict()
+        self._spy_return_effect_kwargs = dict()
 
     def _call_spy(self, *args, **kwargs):
       '''
@@ -32,7 +35,15 @@ class Spy(Expectation):
                   **self._spy_side_effect_kwargs)
           else:
               self._spy_side_effect(*args, **kwargs)
-      return self._stub.call_orig(*args, **kwargs)
+
+      return_value = self._stub.call_orig(*args, **kwargs)
+
+      if self._spy_return_effect:
+          self._spy_return_effect(return_value,
+              *self._spy_return_effect_args,
+              **self._spy_return_effect_kwargs)
+
+      return return_value
 
     def side_effect(self, func, *args, **kwargs):
         '''
@@ -41,6 +52,15 @@ class Spy(Expectation):
         self._spy_side_effect = func
         self._spy_side_effect_args = args
         self._spy_side_effect_kwargs = kwargs
+        return self
+
+    def return_effect(self, func, *args, **kwargs):
+        '''
+        Allow spies to react to return values.
+        '''
+        self._spy_return_effect = func
+        self._spy_return_effect_args = args
+        self._spy_return_effect_kwargs = kwargs
         return self
 
     def returns(self, *args):

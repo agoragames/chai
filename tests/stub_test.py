@@ -94,6 +94,7 @@ class StubTest(unittest.TestCase):
     self.assertEquals(res, f.bar.__call__)
     self.assertEquals(res, stub(f.bar))
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods by reference in python 3")
   def test_stub_type_with_obj_ref(self):
     class Foo(object):
       def bar(self): pass
@@ -421,16 +422,29 @@ class StubFunctionTest(unittest.TestCase):
 
 class StubNewTest(unittest.TestCase):
 
-  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_new(self):
     class Foo(object): pass
 
+    f1 = Foo()
     self.assertEquals(0, len(StubNew._cache))
-    x = StubNew(Foo)
-    self.assertTrue(x is StubNew(Foo))
-    self.assertEquals(1, len(StubNew._cache))
-    StubNew._cache.clear()
+    stub = StubNew(Foo)
+    stub.expect()
 
+    # Due to the changes to support Py3, assert that we're no longer sharing
+    # the StubNew object itself, but we are sharing the expectations object
+    self.assertFalse(stub is Foo())
+    self.assertTrue(stub.expectations is Foo().expectations)
+
+    self.assertEquals(1, len(StubNew._cache))
+    stub.teardown()
+    self.assertEquals(0, len(StubNew._cache))
+
+    f2 = Foo()
+    self.assertTrue(isinstance(f2, Foo))
+    self.assertFalse(isinstance(f2, StubNew))
+    self.assertFalse(f1 is f2)
+
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_init(self):
     class Foo(object): pass
 
@@ -440,6 +454,7 @@ class StubNewTest(unittest.TestCase):
     self.assertEquals(s, Foo.__new__)
     s.teardown()
 
+  @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_call(self):
     class Foo(object): pass
     class Expect(object):

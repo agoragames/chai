@@ -525,7 +525,7 @@ class StubFunction(Stub):
             delattr(self._instance, self._attr)
 
 
-class StubNew(StubFunction):
+class StubNew(Stub):
 
     '''
     Stub out the constructor, but hide the fact that we're stubbing "__new__"
@@ -539,23 +539,28 @@ class StubNew(StubFunction):
         Because we're not saving the stub into any attribute, then we have
         to do some faking here to return the same handle.
         '''
-        rval = self._cache.get(klass)
-        if not rval:
-            rval = self._cache[klass] = super(
-                StubNew, self).__new__(self, *args)
-            rval._allow_init = True
-        else:
-            rval._allow_init = False
-        return rval
+        cache = self._cache.get(klass)
+        if not cache:
+            rval = super(StubNew, self).__new__(self, *args)
+            rval._expectations = []
+            rval._torn = False
+            rval._type = klass
 
-    def __init__(self, obj):
-        '''
-        Overload the initialization so that we can hack access to __new__.
-        '''
-        if self._allow_init:
-            self._new = obj.__new__
-            super(StubNew, self).__init__(obj, '__new__')
-            self._type = obj
+            self._cache[klass] = {
+              'stub': rval,
+              'init': getattr(klass, '__init__'),
+              'class': klass,
+            }
+
+            # Change __class__ to pretend it's a different type, and link
+            # the expectations references
+            def stub_init(stub_self, *args, **kwargs):
+              stub_self.__class__ = StubNew
+              stub_self._expectations = rval._expectations
+            setattr(klass, '__init__', stub_init)
+        else:
+            rval = cache['stub']
+        return rval
 
     def __call__(self, *args, **kwargs):
         '''
@@ -583,7 +588,8 @@ class StubNew(StubFunction):
         # function). That confuses the "was_object_method" logic in
         # StubFunction which then fails to delattr and from then on the class
         # is corrupted. So skip that teardown and use a __new__-specific case.
-        setattr(self._instance, self._attr, staticmethod(self._new))
+
+        setattr(self._type, '__init__', self._cache[self._type]['init'])
         StubNew._cache.pop(self._type)
 
 

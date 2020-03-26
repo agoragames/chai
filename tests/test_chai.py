@@ -59,8 +59,8 @@ class ChaiTest(unittest.TestCase):
   def test_setup(self):
     case = CupOf()
     case.setup()
-    self.assertEquals( deque(), case._stubs )
-    self.assertEquals( deque(), case._mocks )
+    self.assertEqual( deque(), case._stubs )
+    self.assertEqual( deque(), case._mocks )
 
   def test_teardown_closes_out_stubs_and_mocks(self):
       class Stub(object):
@@ -76,8 +76,8 @@ class ChaiTest(unittest.TestCase):
       case._stubs = deque([stub])
       case._mocks = deque([(obj,'mock1','fee'), (obj,'mock2')])
       case.teardown()
-      self.assertEquals( 1, stub.calls )
-      self.assertEquals( 'fee', obj.mock1 )
+      self.assertEqual( 1, stub.calls )
+      self.assertEqual( 'fee', obj.mock1 )
       self.assertFalse( hasattr(obj, 'mock2') )
 
   def test_stub(self):
@@ -87,14 +87,14 @@ class ChaiTest(unittest.TestCase):
     case = CupOf()
     milk = Milk()
     case.setup()
-    self.assertEquals( deque(), case._stubs )
+    self.assertEqual( deque(), case._stubs )
     case.stub( milk.pour )
     self.assertTrue( isinstance(milk.pour, Stub) )
-    self.assertEquals( deque([milk.pour]), case._stubs )
+    self.assertEqual( deque([milk.pour]), case._stubs )
 
     # Test it's only added once
     case.stub( milk, 'pour' )
-    self.assertEquals( deque([milk.pour]), case._stubs )
+    self.assertEqual( deque([milk.pour]), case._stubs )
 
   def test_expect(self):
     class Milk(object):
@@ -103,27 +103,27 @@ class ChaiTest(unittest.TestCase):
     case = CupOf()
     milk = Milk()
     case.setup()
-    self.assertEquals( deque(), case._stubs )
+    self.assertEqual( deque(), case._stubs )
     case.expect( milk.pour )
-    self.assertEquals( deque([milk.pour]), case._stubs )
+    self.assertEqual( deque([milk.pour]), case._stubs )
 
     # Test it's only added once
     case.expect( milk, 'pour' )
-    self.assertEquals( deque([milk.pour]), case._stubs )
+    self.assertEqual( deque([milk.pour]), case._stubs )
 
-    self.assertEquals( 2, len(milk.pour._expectations) )
+    self.assertEqual( 2, len(milk.pour._expectations) )
 
   def test_mock_no_binding(self):
     case = CupOf()
     case.setup()
 
-    self.assertEquals( deque(), case._mocks )
+    self.assertEqual( deque(), case._mocks )
     mock1 = case.mock()
     self.assertTrue( isinstance(mock1, Mock) )
-    self.assertEquals( deque(), case._mocks )
+    self.assertEqual( deque(), case._mocks )
     mock2 = case.mock()
     self.assertTrue( isinstance(mock2, Mock) )
-    self.assertEquals( deque(), case._mocks )
+    self.assertEqual( deque(), case._mocks )
     self.assertNotEqual( mock1, mock2 )
 
   def test_mock_with_attr_binding(self):
@@ -136,18 +136,18 @@ class ChaiTest(unittest.TestCase):
     milk = Milk()
     orig_pour = milk.pour
 
-    self.assertEquals( deque(), case._mocks )
+    self.assertEqual( deque(), case._mocks )
     mock1 = case.mock( milk, 'pour' )
     self.assertTrue( isinstance(mock1, Mock) )
-    self.assertEquals( deque([(milk,'pour',orig_pour)]), case._mocks )
+    self.assertEqual( deque([(milk,'pour',orig_pour)]), case._mocks )
     mock2 = case.mock( milk, 'pour' )
     self.assertTrue( isinstance(mock2, Mock) )
-    self.assertEquals( deque([(milk,'pour',orig_pour),(milk,'pour',mock1)]), case._mocks )
+    self.assertEqual( deque([(milk,'pour',orig_pour),(milk,'pour',mock1)]), case._mocks )
     self.assertNotEqual( mock1, mock2 )
 
     mock3 = case.mock( milk, 'foo' )
     self.assertTrue( isinstance(mock3, Mock) )
-    self.assertEquals( deque([(milk,'pour',orig_pour),(milk,'pour',mock1),(milk,'foo')]), case._mocks )
+    self.assertEqual( deque([(milk,'pour',orig_pour),(milk,'pour',mock1),(milk,'foo')]), case._mocks )
     
   def test_chai_class_use_metaclass(self):
     obj = CupOf()    
@@ -169,8 +169,8 @@ class ChaiTest(unittest.TestCase):
     case._stubs = deque([stub])
     
     case.test_local_definitions_work_and_are_global()
-    self.assertEquals(1, stub.unmet_calls)
-    self.assertEquals(1, stub.teardown_calls)
+    self.assertEqual(1, stub.unmet_calls)
+    self.assertEqual(1, stub.teardown_calls)
 
   def test_raises_if_unmet_expectations(self):
     class Milk(object):

@@ -87,45 +87,45 @@ class ExpectationRule(unittest.TestCase):
 
   def test_times(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.times(3) )
-    self.assertEquals( 3, exp._min_count )
-    self.assertEquals( 3, exp._max_count )
+    self.assertEqual( exp, exp.times(3) )
+    self.assertEqual( 3, exp._min_count )
+    self.assertEqual( 3, exp._max_count )
   
   def test_at_least_once(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.at_least_once() )
+    self.assertEqual( exp, exp.at_least_once() )
     exp.test()
     self.assertTrue(exp.closed(with_counts=True))
 
   def test_at_least(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.at_least(10) )
+    self.assertEqual( exp, exp.at_least(10) )
     for x in range(10):
       exp.test()
     self.assertTrue(exp.closed(with_counts=True))
 
   def test_at_most_once(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.args(1).at_most_once() )
+    self.assertEqual( exp, exp.args(1).at_most_once() )
     exp.test(1)
     self.assertTrue(exp.closed(with_counts=True))
 
   def test_at_most(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.args(1).at_most(10) )
+    self.assertEqual( exp, exp.args(1).at_most(10) )
     for x in range(10):
       exp.test(1)
     self.assertTrue(exp.closed(with_counts=True))
   
   def test_once(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.args(1).once() )
+    self.assertEqual( exp, exp.args(1).once() )
     exp.test(1)
     self.assertTrue(exp.closed())
 
   def test_any_order(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.any_order().times(1) )
+    self.assertEqual( exp, exp.any_order().times(1) )
     self.assertFalse( exp.closed() )
     exp.close()
     self.assertFalse( exp.closed() )
@@ -136,7 +136,7 @@ class ExpectationRule(unittest.TestCase):
 
   def test_any_order_with_no_max(self):
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.any_order().at_least_once() )
+    self.assertEqual( exp, exp.any_order().at_least_once() )
     self.assertFalse( exp.closed() )
     exp.close()
     self.assertFalse( exp.closed() )
@@ -151,9 +151,9 @@ class ExpectationRule(unittest.TestCase):
       foo.append('foo')
 
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.side_effect(effect) )
+    self.assertEqual( exp, exp.side_effect(effect) )
     exp.test()
-    self.assertEquals( ['foo'], called )
+    self.assertEqual( ['foo'], called )
 
   def test_side_effect_with_args(self):
     called = []
@@ -162,9 +162,9 @@ class ExpectationRule(unittest.TestCase):
         called.append('foo')
 
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.side_effect(effect, 'a', b='c') )
+    self.assertEqual( exp, exp.side_effect(effect, 'a', b='c') )
     exp.test()
-    self.assertEquals( ['foo'], called )
+    self.assertEqual( ['foo'], called )
 
   def test_side_effect_with_passed_args(self):
     called = []
@@ -174,9 +174,9 @@ class ExpectationRule(unittest.TestCase):
 
     exp = Expectation(self.stub)
     exp.args('a', b='c')
-    self.assertEquals( exp, exp.side_effect(effect) )
+    self.assertEqual( exp, exp.side_effect(effect) )
     exp.test('a', b='c')
-    self.assertEquals( ['foo'], called )
+    self.assertEqual( ['foo'], called )
 
   def test_side_effect_with_an_exception(self):
     called = []
@@ -185,9 +185,9 @@ class ExpectationRule(unittest.TestCase):
     class Zono(Exception): pass
 
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.side_effect(effect).raises(Zono) )
+    self.assertEqual( exp, exp.side_effect(effect).raises(Zono) )
     self.assertRaises( Zono, exp.test )
-    self.assertEquals( ['foo'], called )
+    self.assertEqual( ['foo'], called )
 
   def test_teardown(self):
     called = []
@@ -199,7 +199,7 @@ class ExpectationRule(unittest.TestCase):
     exp = Expectation( notastub() )
     exp.teardown()
     exp.test()
-    self.assertEquals( ['foo'], called )
+    self.assertEqual( ['foo'], called )
 
   def test_closed(self):
     exp = Expectation(self.stub)
@@ -223,7 +223,7 @@ class ExpectationRule(unittest.TestCase):
     exp = Expectation(self.stub)
     exp.returns(123)
     
-    self.assertEquals(exp.test(), 123)
+    self.assertEqual(exp.test(), 123)
 
   def test_return_value_with_variable(self):
     exp = Expectation(self.stub)
@@ -231,7 +231,7 @@ class ExpectationRule(unittest.TestCase):
     Variable._cache['test'] = 123
     exp.returns( var )
     
-    self.assertEquals(exp.test(), 123)
+    self.assertEqual(exp.test(), 123)
     Variable.clear()
 
   def test_return_value_with_variable_in_tuple(self):
@@ -240,13 +240,13 @@ class ExpectationRule(unittest.TestCase):
     Variable._cache['test'] = 123
     exp.returns( (var,'foo') )
     
-    self.assertEquals(exp.test(), (123,'foo'))
+    self.assertEqual(exp.test(), (123,'foo'))
     Variable.clear()
 
   def test_with_returns_return_value(self):
     exp = Expectation(self.stub)
     with exp.returns(123) as num:
-      self.assertEquals(num, 123)
+      self.assertEqual(num, 123)
 
   def test_with_raises_exceptions(self):
     exp = Expectation(self.stub)
@@ -261,7 +261,7 @@ class ExpectationRule(unittest.TestCase):
     class CustomException(Exception): pass
     
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.raises(CustomException) )
+    self.assertEqual( exp, exp.raises(CustomException) )
     
     self.assertRaises(CustomException, exp.test)
 
@@ -269,7 +269,7 @@ class ExpectationRule(unittest.TestCase):
     class CustomException(Exception): pass
     
     exp = Expectation(self.stub)
-    self.assertEquals( exp, exp.raises(CustomException()) )
+    self.assertEqual( exp, exp.raises(CustomException()) )
     
     self.assertRaises(CustomException, exp.test)
   

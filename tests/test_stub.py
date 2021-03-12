@@ -80,8 +80,8 @@ class StubTest(unittest.TestCase):
     f.bar = Mock()
     res = stub(f, 'bar')
     self.assertTrue(isinstance(res, StubMethod))
-    self.assertEquals(res, f.bar.__call__)
-    self.assertEquals(res, stub(f, 'bar'))
+    self.assertEqual(res, f.bar.__call__)
+    self.assertEqual(res, stub(f, 'bar'))
 
   def test_stub_mock_with_obj_ref(self):
     class Foo(object):
@@ -91,8 +91,8 @@ class StubTest(unittest.TestCase):
     f.bar = Mock()
     res = stub(f.bar)
     self.assertTrue(isinstance(res, StubMethod))
-    self.assertEquals(res, f.bar.__call__)
-    self.assertEquals(res, stub(f.bar))
+    self.assertEqual(res, f.bar.__call__)
+    self.assertEqual(res, stub(f.bar))
 
   def test_stub_type_with_obj_ref(self):
     class Foo(object):
@@ -100,14 +100,14 @@ class StubTest(unittest.TestCase):
 
     res = stub(Foo)
     self.assertTrue(isinstance(res, StubNew))
-    self.assertEquals(res, Foo.__new__)
-    self.assertEquals(res, stub(Foo))
+    self.assertEqual(res, Foo.__new__)
+    self.assertEqual(res, stub(Foo))
 
     # test that __init__ called only once
     res.expect()
-    self.assertEquals(1, len(res._expectations))
+    self.assertEqual(1, len(res._expectations))
     res = stub(Foo)
-    self.assertEquals(1, len(res._expectations))
+    self.assertEqual(1, len(res._expectations))
 
   def test_stub_unbound_method_with_attr_name(self):
     class Foo(object):
@@ -115,8 +115,8 @@ class StubTest(unittest.TestCase):
 
     res = stub(Foo, 'bar')
     self.assertTrue(isinstance(res,StubUnboundMethod))
-    self.assertEquals(res, stub(Foo,'bar'))
-    self.assertEquals(res, getattr(Foo,'bar'))
+    self.assertEqual(res, stub(Foo,'bar'))
+    self.assertEqual(res, getattr(Foo,'bar'))
 
   @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods by reference in python 3")
   def test_stub_unbound_method_with_obj_ref(self):
@@ -125,8 +125,8 @@ class StubTest(unittest.TestCase):
 
     res = stub(Foo.bar)
     self.assertTrue(isinstance(res,StubUnboundMethod))
-    self.assertEquals(res, stub(Foo.bar))
-    self.assertEquals(res, getattr(Foo,'bar'))
+    self.assertEqual(res, stub(Foo.bar))
+    self.assertEqual(res, getattr(Foo,'bar'))
 
   def test_stub_bound_method_for_instance_with_attr_name(self):
     class Foo(object):
@@ -136,11 +136,11 @@ class StubTest(unittest.TestCase):
     orig = foo.bar
     res = stub(foo, 'bar')
     self.assertTrue(isinstance(res,StubMethod))
-    self.assertEquals(res._instance, foo)
-    self.assertEquals(res._obj, orig)
-    self.assertEquals(res._attr, 'bar')
-    self.assertEquals(res, stub(foo,'bar'))
-    self.assertEquals(res, getattr(foo,'bar'))
+    self.assertEqual(res._instance, foo)
+    self.assertEqual(res._obj, orig)
+    self.assertEqual(res._attr, 'bar')
+    self.assertEqual(res, stub(foo,'bar'))
+    self.assertEqual(res, getattr(foo,'bar'))
 
   def test_stub_bound_method_for_instance_with_obj_ref(self):
     class Foo(object):
@@ -150,11 +150,11 @@ class StubTest(unittest.TestCase):
     orig = foo.bar
     res = stub(foo.bar)
     self.assertTrue(isinstance(res,StubMethod))
-    self.assertEquals(res._instance, foo)
-    self.assertEquals(res._obj, orig)
-    self.assertEquals(res._attr, 'bar')
-    self.assertEquals(res, stub(foo.bar))
-    self.assertEquals(res, getattr(foo,'bar'))
+    self.assertEqual(res._instance, foo)
+    self.assertEqual(res._obj, orig)
+    self.assertEqual(res._attr, 'bar')
+    self.assertEqual(res, stub(foo.bar))
+    self.assertEqual(res, getattr(foo,'bar'))
 
   def test_stub_bound_method_for_classmethod_with_attr_name(self):
     class Foo(object):
@@ -163,8 +163,8 @@ class StubTest(unittest.TestCase):
 
     res = stub(Foo, 'bar')
     self.assertTrue(isinstance(res,StubMethod))
-    self.assertEquals(res, stub(Foo,'bar'))
-    self.assertEquals(res, getattr(Foo,'bar'))
+    self.assertEqual(res, stub(Foo,'bar'))
+    self.assertEqual(res, getattr(Foo,'bar'))
 
   def test_stub_bound_method_for_classmethod_with_obj_ref(self):
     class Foo(object):
@@ -173,8 +173,8 @@ class StubTest(unittest.TestCase):
 
     res = stub(Foo.bar)
     self.assertTrue(isinstance(res,StubMethod))
-    self.assertEquals(res, stub(Foo.bar))
-    self.assertEquals(res, getattr(Foo,'bar'))
+    self.assertEqual(res, stub(Foo.bar))
+    self.assertEqual(res, getattr(Foo,'bar'))
 
   @unittest.skipIf(IS_PYPY, "no method-wrapper in PyPy")
   def test_stub_method_wrapper_with_attr_name(self):
@@ -183,8 +183,8 @@ class StubTest(unittest.TestCase):
     foo = Foo()
     res = stub(foo, '__hash__')
     self.assertTrue(isinstance(res,StubMethodWrapper))
-    self.assertEquals(res, stub(foo, '__hash__'))
-    self.assertEquals(res, getattr(foo, '__hash__'))
+    self.assertEqual(res, stub(foo, '__hash__'))
+    self.assertEqual(res, getattr(foo, '__hash__'))
 
   @unittest.skipIf(IS_PYPY, "no method-wrapper in PyPy")
   def test_stub_method_wrapper_with_obj_ref(self):
@@ -193,22 +193,22 @@ class StubTest(unittest.TestCase):
     foo = Foo()
     res = stub(foo.__hash__)
     self.assertTrue(isinstance(res,StubMethodWrapper))
-    self.assertEquals(res, stub(foo.__hash__))
-    self.assertEquals(res, getattr(foo, '__hash__'))
+    self.assertEqual(res, stub(foo.__hash__))
+    self.assertEqual(res, getattr(foo, '__hash__'))
 
   def test_stub_module_function_with_attr_name(self):
     res = stub(samples, 'mod_func_1')
     self.assertTrue(isinstance(res,StubFunction))
-    self.assertEquals(res, getattr(samples,'mod_func_1'))
-    self.assertEquals(res, stub(samples,'mod_func_1'))
+    self.assertEqual(res, getattr(samples,'mod_func_1'))
+    self.assertEqual(res, stub(samples,'mod_func_1'))
     res.teardown()
 
   def test_stub_module_function_with_obj_ref(self):
     res = stub(samples.mod_func_1)
     self.assertTrue(isinstance(res,StubFunction))
-    self.assertEquals(res, getattr(samples,'mod_func_1'))
-    self.assertEquals(res, samples.mod_func_1)
-    self.assertEquals(res, stub(samples.mod_func_1))
+    self.assertEqual(res, getattr(samples,'mod_func_1'))
+    self.assertEqual(res, samples.mod_func_1)
+    self.assertEqual(res, stub(samples.mod_func_1))
     res.teardown()
 
 class StubClassTest(unittest.TestCase):
@@ -217,9 +217,9 @@ class StubClassTest(unittest.TestCase):
   ###
   def test_init(self):
     s = Stub('obj','attr')
-    self.assertEquals('obj', s._obj)
-    self.assertEquals('attr', s._attr)
-    self.assertEquals([], s._expectations)
+    self.assertEqual('obj', s._obj)
+    self.assertEqual('attr', s._attr)
+    self.assertEqual([], s._expectations)
 
   def test_unment_expectations(self):
     s = Stub('obj', 'attr')
@@ -231,15 +231,15 @@ class StubClassTest(unittest.TestCase):
     s = Stub('obj')
     s._expections = ['1','2']
     s.teardown()
-    self.assertEquals([], s._expectations)
+    self.assertEqual([], s._expectations)
 
   def test_expect(self):
     s = Stub('obj')
 
-    self.assertEquals([], s._expectations)
+    self.assertEqual([], s._expectations)
     e = s.expect()
-    self.assertEquals([e], s._expectations)
-    self.assertEquals(s, e._stub)
+    self.assertEqual([e], s._expectations)
+    self.assertEqual(s, e._stub)
 
   def test_call_orig_raises_notimplemented(self):
     s = Stub('obj')
@@ -259,7 +259,7 @@ class StubClassTest(unittest.TestCase):
 
     s = Stub('obj')
     s._expectations = [ Expect() ]
-    self.assertEquals('success', s('foo'))
+    self.assertEqual('success', s('foo'))
 
   def test_call_raises_unexpected_call_when_all_expectations_closed(self):
     class Expect(object):
@@ -291,10 +291,10 @@ class StubClassTest(unittest.TestCase):
     s = Stub('obj')
     s._expectations = [ Expect(True), Expect(False) ]
     self.assertRaises(UnexpectedCall, s, 'foo')
-    self.assertEquals(0, s._expectations[0]._match_count)
-    self.assertEquals(1, s._expectations[1]._match_count)
-    self.assertEquals(0, s._expectations[0]._close_count)
-    self.assertEquals(0, s._expectations[1]._close_count)
+    self.assertEqual(0, s._expectations[0]._match_count)
+    self.assertEqual(1, s._expectations[1]._match_count)
+    self.assertEqual(0, s._expectations[0]._close_count)
+    self.assertEqual(0, s._expectations[1]._close_count)
 
 class StubPropertyTest(unittest.TestCase):
   # FIXME: Need to test teardown and init, these test might be in the base stub tests.
@@ -305,7 +305,7 @@ class StubPropertyTest(unittest.TestCase):
       def prop(self): return 3
 
     s = StubProperty(Foo, 'prop')
-    self.assertEquals(s.name, 'Foo.prop')
+    self.assertEqual(s.name, 'Foo.prop')
 
 class StubMethodTest(unittest.TestCase):
 
@@ -316,29 +316,29 @@ class StubMethodTest(unittest.TestCase):
     f = Foo()
     orig = f.bar
     s = StubMethod(f.bar)
-    self.assertEquals(s._obj, orig)
-    self.assertEquals(s._instance, f)
-    self.assertEquals(s._attr, 'bar')
-    self.assertEquals(s, getattr(f,'bar'))
+    self.assertEqual(s._obj, orig)
+    self.assertEqual(s._instance, f)
+    self.assertEqual(s._attr, 'bar')
+    self.assertEqual(s, getattr(f,'bar'))
 
     f = Foo()
     orig = f.bar
     s = StubMethod(f, 'bar')
-    self.assertEquals(s._obj, orig)
-    self.assertEquals(s._instance, f)
-    self.assertEquals(s._attr, 'bar')
-    self.assertEquals(s, getattr(f,'bar'))
+    self.assertEqual(s._obj, orig)
+    self.assertEqual(s._instance, f)
+    self.assertEqual(s._attr, 'bar')
+    self.assertEqual(s, getattr(f,'bar'))
 
   def test_name(self):
     class Expect(object):
       def closed(self): return False
     obj = Expect()
     s = StubMethod(obj.closed)
-    self.assertEquals("Expect.closed", s.name)
+    self.assertEqual("Expect.closed", s.name)
     s.teardown()
 
     s = StubMethod(obj, 'closed')
-    self.assertEquals("Expect.closed", s.name)
+    self.assertEqual("Expect.closed", s.name)
     s.teardown()
 
   def test_call_orig(self):
@@ -350,9 +350,9 @@ class StubMethodTest(unittest.TestCase):
     f = Foo(3)
     sa = StubMethod(f.a)
     sb = StubMethod(f.b)
-    self.assertEquals(3, sa.call_orig())
+    self.assertEqual(3, sa.call_orig())
     sb.call_orig(5)
-    self.assertEquals(5, sa.call_orig())
+    self.assertEqual(5, sa.call_orig())
 
   def test_teardown(self):
     class Foo(object):
@@ -362,7 +362,7 @@ class StubMethodTest(unittest.TestCase):
     orig = f.bar
     s = StubMethod(f.bar)
     s.teardown()
-    self.assertEquals(orig, f.bar)
+    self.assertEqual(orig, f.bar)
 
   def test_teardown_of_classmethods(self):
     class Foo(object):
@@ -378,46 +378,46 @@ class StubMethodTest(unittest.TestCase):
     orig = samples.mod_instance_foo
     s = StubMethod(samples, 'mod_instance_foo')
     s.teardown()
-    self.assertEquals(orig, samples.mod_instance_foo)
+    self.assertEqual(orig, samples.mod_instance_foo)
 
 class StubFunctionTest(unittest.TestCase):
 
   def test_init(self):
     s = StubFunction(samples.mod_func_1)
-    self.assertEquals(s._instance, samples)
-    self.assertEquals(s._attr, 'mod_func_1')
-    self.assertEquals(s, samples.mod_func_1)
-    self.assertEquals(False, s._was_object_method)
+    self.assertEqual(s._instance, samples)
+    self.assertEqual(s._attr, 'mod_func_1')
+    self.assertEqual(s, samples.mod_func_1)
+    self.assertEqual(False, s._was_object_method)
     s.teardown()
 
   def test_init_with_object_method(self):
     x = samples.SampleBase()
     s = StubFunction(x, '__new__')
-    self.assertEquals(True, s._was_object_method)
+    self.assertEqual(True, s._was_object_method)
 
   def test_name(self):
     s = StubFunction(samples.mod_func_1)
-    self.assertEquals('tests.samples.mod_func_1', s.name)
+    self.assertEqual('tests.samples.mod_func_1', s.name)
     s.teardown()
 
   def test_call_orig(self):
     s = StubFunction(samples.mod_func_3)
-    self.assertEquals(12, s.call_orig(4))
+    self.assertEqual(12, s.call_orig(4))
     s.teardown()
 
   def test_teardown(self):
     orig = samples.mod_func_1
     s = StubFunction(samples.mod_func_1)
     s.teardown()
-    self.assertEquals(orig, samples.mod_func_1)
+    self.assertEqual(orig, samples.mod_func_1)
 
   def test_teardown_on_object_method(self):
     x = samples.SampleBase()
-    self.assertEquals(object.__new__, getattr(x, '__new__'))
+    self.assertEqual(object.__new__, getattr(x, '__new__'))
     s = StubFunction(x, '__new__')
-    self.assertNotEquals(object.__new__, getattr(x, '__new__'))
+    self.assertNotEqual(object.__new__, getattr(x, '__new__'))
     s.teardown()
-    self.assertEquals(object.__new__, getattr(x, '__new__'))
+    self.assertEqual(object.__new__, getattr(x, '__new__'))
 
 class StubNewTest(unittest.TestCase):
 
@@ -425,19 +425,19 @@ class StubNewTest(unittest.TestCase):
   def test_new(self):
     class Foo(object): pass
 
-    self.assertEquals(0, len(StubNew._cache))
+    self.assertEqual(0, len(StubNew._cache))
     x = StubNew(Foo)
     self.assertTrue(x is StubNew(Foo))
-    self.assertEquals(1, len(StubNew._cache))
+    self.assertEqual(1, len(StubNew._cache))
     StubNew._cache.clear()
 
   def test_init(self):
     class Foo(object): pass
 
     s = StubNew(Foo)
-    self.assertEquals(s._instance, Foo)
-    self.assertEquals(s._attr, '__new__')
-    self.assertEquals(s, Foo.__new__)
+    self.assertEqual(s._instance, Foo)
+    self.assertEqual(s._attr, '__new__')
+    self.assertEqual(s, Foo.__new__)
     s.teardown()
 
   def test_call(self):
@@ -449,7 +449,7 @@ class StubNewTest(unittest.TestCase):
 
     s = StubNew(Foo)
     s._expectations = [ Expect() ]
-    self.assertEquals('success', Foo('state', a='b'))
+    self.assertEqual('success', Foo('state', a='b'))
     s.teardown()
 
   @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
@@ -462,7 +462,7 @@ class StubNewTest(unittest.TestCase):
     s = StubNew(Foo)
     f = s.call_orig(3)
     self.assertTrue(isinstance(f,Foo))
-    self.assertEquals(3, f._val)
+    self.assertEqual(3, f._val)
     s.teardown()
     StubNew._cache.clear()
 
@@ -471,12 +471,12 @@ class StubNewTest(unittest.TestCase):
     class Foo(object): pass
 
     orig = Foo.__new__
-    self.assertEquals(0, len(StubNew._cache))
+    self.assertEqual(0, len(StubNew._cache))
     x = StubNew(Foo)
-    self.assertEquals(1, len(StubNew._cache))
+    self.assertEqual(1, len(StubNew._cache))
     x.teardown()
-    self.assertEquals(0, len(StubNew._cache))
-    self.assertEquals(orig, Foo.__new__)
+    self.assertEqual(0, len(StubNew._cache))
+    self.assertEqual(orig, Foo.__new__)
 
   @unittest.skipIf(sys.version_info.major==3, "can't stub unbound methods in python 3")
   def test_teardown_on_custom_new(self):
@@ -487,16 +487,16 @@ class StubNewTest(unittest.TestCase):
         return rval
 
     f1 = Foo('f1')
-    self.assertEquals(('f1',), f1.args)
+    self.assertEqual(('f1',), f1.args)
     orig = Foo.__new__
-    self.assertEquals(0, len(StubNew._cache))
+    self.assertEqual(0, len(StubNew._cache))
     x = StubNew(Foo)
-    self.assertEquals(1, len(StubNew._cache))
+    self.assertEqual(1, len(StubNew._cache))
     x.teardown()
-    self.assertEquals(0, len(StubNew._cache))
-    self.assertEquals(orig, Foo.__new__)
+    self.assertEqual(0, len(StubNew._cache))
+    self.assertEqual(orig, Foo.__new__)
     f2 = Foo('f2')
-    self.assertEquals(('f2',), f2.args)
+    self.assertEqual(('f2',), f2.args)
 
 
 class StubUnboundMethodTest(unittest.TestCase):
@@ -506,16 +506,16 @@ class StubUnboundMethodTest(unittest.TestCase):
       def bar(self): pass
 
     s = StubUnboundMethod(Foo, 'bar')
-    self.assertEquals(s._instance, Foo)
-    self.assertEquals(s._attr, 'bar')
-    self.assertEquals(s, getattr(Foo,'bar'))
+    self.assertEqual(s._instance, Foo)
+    self.assertEqual(s._attr, 'bar')
+    self.assertEqual(s, getattr(Foo,'bar'))
 
   def test_name(self):
     class Expect(object):
       def closed(self): return False
 
     s = StubUnboundMethod(Expect, 'closed')
-    self.assertEquals("Expect.closed", s.name)
+    self.assertEqual("Expect.closed", s.name)
     s.teardown()
 
   def test_teardown(self):
@@ -525,7 +525,7 @@ class StubUnboundMethodTest(unittest.TestCase):
     orig = Foo.bar
     s = StubUnboundMethod(Foo, 'bar')
     s.teardown()
-    self.assertEquals(orig, Foo.bar)
+    self.assertEqual(orig, Foo.bar)
 
   def test_call_acts_as_any_instance(self):
     class Foo(object):
@@ -544,7 +544,7 @@ class StubUnboundMethodTest(unittest.TestCase):
     f2 = Foo()
     f2.bar()
 
-    self.assertEquals(2, s.calls)
+    self.assertEqual(2, s.calls)
 
 class StubMethodWrapperTest(unittest.TestCase):
 
@@ -553,16 +553,16 @@ class StubMethodWrapperTest(unittest.TestCase):
     foo = Foo()
 
     s = StubMethodWrapper(foo.__hash__)
-    self.assertEquals(s._instance, foo)
-    self.assertEquals(s._attr, '__hash__')
-    self.assertEquals(s, getattr(foo,'__hash__'))
+    self.assertEqual(s._instance, foo)
+    self.assertEqual(s._attr, '__hash__')
+    self.assertEqual(s, getattr(foo,'__hash__'))
 
   def test_name(self):
     class Foo(object):pass
     foo = Foo()
 
     s = StubMethodWrapper(foo.__hash__)
-    self.assertEquals("Foo.__hash__", s.name)
+    self.assertEqual("Foo.__hash__", s.name)
     s.teardown()
 
   def test_call_orig(self):
@@ -575,9 +575,9 @@ class StubMethodWrapperTest(unittest.TestCase):
     sg = StubMethodWrapper(f.get)
     ss = StubMethodWrapper(f.set)
 
-    self.assertEquals(3, sg.call_orig())
+    self.assertEqual(3, sg.call_orig())
     ss.call_orig(5)
-    self.assertEquals(5, sg.call_orig())
+    self.assertEqual(5, sg.call_orig())
 
   def test_teardown(self):
     class Foo(object):pass
@@ -585,7 +585,7 @@ class StubMethodWrapperTest(unittest.TestCase):
     orig = obj.__hash__
     s = StubMethodWrapper(obj.__hash__)
     s.teardown()
-    self.assertEquals(orig, obj.__hash__)
+    self.assertEqual(orig, obj.__hash__)
 
 @unittest.skipIf(IS_PYPY, "no method-wrapper in PyPy")
 class StubWrapperDescriptionTest(unittest.TestCase):
@@ -593,26 +593,26 @@ class StubWrapperDescriptionTest(unittest.TestCase):
   def test_init(self):
     class Foo(object):pass
     s = StubWrapperDescriptor(Foo, '__hash__')
-    self.assertEquals(s._obj, Foo)
-    self.assertEquals(s._attr, '__hash__')
-    self.assertEquals(s, getattr(Foo,'__hash__'))
+    self.assertEqual(s._obj, Foo)
+    self.assertEqual(s._attr, '__hash__')
+    self.assertEqual(s, getattr(Foo,'__hash__'))
 
   def test_name(self):
     class Foo(object):pass
 
     s = StubWrapperDescriptor(Foo, '__hash__')
-    self.assertEquals("Foo.__hash__", s.name)
+    self.assertEqual("Foo.__hash__", s.name)
     s.teardown()
 
   def test_call_orig(self):
     class Foo(object): pass
     if sys.version_info < (3, 3):
-      foo_str = "<class 'tests.stub_test.Foo'>"
+      foo_str = "<class 'test_stub.Foo'>"
     else:
-      foo_str = "<class 'tests.stub_test.StubWrapperDescriptionTest.test_call_orig.<locals>.Foo'>"
+      foo_str = "<class 'test_stub.StubWrapperDescriptionTest.test_call_orig.<locals>.Foo'>"
 
     s = StubWrapperDescriptor(Foo, '__str__')
-    self.assertEquals(foo_str, s.call_orig())
+    self.assertEqual(foo_str, s.call_orig())
     s.teardown()
 
   def test_teardown(self):
@@ -620,4 +620,4 @@ class StubWrapperDescriptionTest(unittest.TestCase):
     orig = Foo.__hash__
     s = StubWrapperDescriptor(Foo, '__hash__')
     s.teardown()
-    self.assertEquals(orig, Foo.__hash__)
+    self.assertEqual(orig, Foo.__hash__)

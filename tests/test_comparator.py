@@ -43,11 +43,11 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_equals_repr(self):
       comp = Equals(3)
-      self.assertEquals(str(comp), "3")
+      self.assertEqual(str(comp), "3")
 
   def test_eq(self):
     comp = Equals(3)
-    self.assertEquals( comp, 3 )
+    self.assertEqual( comp, 3 )
 
   def test_is_a(self):
     comp = IsA(str)
@@ -64,13 +64,13 @@ class ComparatorsTest(unittest.TestCase):
 
   def test_is_a_repr(self):
     comp = IsA(str)
-    self.assertEquals(repr(comp), "IsA(str)")
+    self.assertEqual(repr(comp), "IsA(str)")
     
   def test_is_a_format_name(self):
     comp = IsA(str)
-    self.assertEquals(comp._format_name(), "str")
+    self.assertEqual(comp._format_name(), "str")
     comp = IsA((str, list))
-    self.assertEquals(comp._format_name(), "['str', 'list']")
+    self.assertEqual(comp._format_name(), "['str', 'list']")
 
   def test_is(self):
     class Test(object):
@@ -79,7 +79,7 @@ class ComparatorsTest(unittest.TestCase):
     obj1 = Test()
     obj2 = Test()
     comp = Is(obj1)
-    self.assertEquals( obj1, obj2 )
+    self.assertEqual( obj1, obj2 )
     self.assertTrue( comp.test(obj1) )
     self.assertFalse( comp.test(obj2) )
   
@@ -90,7 +90,7 @@ class ComparatorsTest(unittest.TestCase):
         return "An Object"
     
     obj = TestObj()
-    self.assertEquals(repr(Is(obj)), "Is(An Object)" )
+    self.assertEqual(repr(Is(obj)), "Is(An Object)" )
 
   def test_almost_equal(self):
     comp = AlmostEqual(3.14159265, 3)
@@ -99,7 +99,7 @@ class ComparatorsTest(unittest.TestCase):
   
   def test_almost_equal_repr(self):
     comp = AlmostEqual(3.14159265, 3)
-    self.assertEquals(repr(comp), "AlmostEqual(value: 3.14159265, places: 3)")
+    self.assertEqual(repr(comp), "AlmostEqual(value: 3.14159265, places: 3)")
   
   def test_regex(self):
     comp = Regex('[wf][io]{2}')
@@ -109,7 +109,7 @@ class ComparatorsTest(unittest.TestCase):
 
   def test_regex_repr(self):
     comp = Regex('[wf][io]{2}')
-    self.assertEquals(repr(comp), "Regex(pattern: [wf][io]{2}, flags: 0)")
+    self.assertEqual(repr(comp), "Regex(pattern: [wf][io]{2}, flags: 0)")
 
   def test_any(self):
     comp = Any(1,2.3,str)
@@ -120,9 +120,9 @@ class ComparatorsTest(unittest.TestCase):
   def test_any_repr(self):
     comp = Any(1,2,3,str)
     if sys.version_info.major==2:
-      self.assertEquals(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<type 'str'>)])])")
+      self.assertEqual(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<type 'str'>)])])")
     else:
-      self.assertEquals(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<class 'str'>)])])")
+      self.assertEqual(repr(comp), "Any([1, 2, 3, Any([IsA(str), Is(<class 'str'>)])])")
   
   def test_in(self):
     comp = In(['foo', 'bar'])
@@ -149,7 +149,7 @@ class ComparatorsTest(unittest.TestCase):
     comp = All(IsA(bytearray), Equals('foo'.encode('ascii')))
     self.assertTrue( comp.test(bytearray('foo'.encode('ascii'))) )
     self.assertFalse( comp.test('foo') )
-    self.assertEquals( 'foo'.encode('ascii'), bytearray('foo'.encode('ascii')) )
+    self.assertEqual( 'foo'.encode('ascii'), bytearray('foo'.encode('ascii')) )
   
   def test_all_repr(self):
     comp = All(IsA(bytearray), Equals('foobar'))
@@ -186,38 +186,38 @@ class ComparatorsTest(unittest.TestCase):
 
   def test_variable(self):
     comp = Variable('foo')
-    self.assertEquals( 0, len(Variable._cache) )
+    self.assertEqual( 0, len(Variable._cache) )
     self.assertTrue( comp.test('bar') )
-    self.assertEquals( 1, len(Variable._cache) )
+    self.assertEqual( 1, len(Variable._cache) )
     self.assertTrue( comp.test('bar') )
     self.assertFalse( comp.test('bar2') )
     
     self.assertTrue( Variable('foo').test('bar') )
     self.assertFalse( Variable('foo').test('bar2') )
-    self.assertEquals( 1, len(Variable._cache) )
+    self.assertEqual( 1, len(Variable._cache) )
 
-    self.assertEquals( 'bar', comp.value )
-    self.assertEquals( 'bar', Variable('foo').value )
+    self.assertEqual( 'bar', comp.value )
+    self.assertEqual( 'bar', Variable('foo').value )
 
     v = Variable('foo2')
-    self.assertEquals( 1, len(Variable._cache) )
+    self.assertEqual( 1, len(Variable._cache) )
     v.test('dog')
-    self.assertEquals( 'dog', v.value )
-    self.assertEquals( 2, len(Variable._cache) )
+    self.assertEqual( 'dog', v.value )
+    self.assertEqual( 2, len(Variable._cache) )
 
     Variable.clear()
-    self.assertEquals( 0, len(Variable._cache) )
+    self.assertEqual( 0, len(Variable._cache) )
 
   def test_variable_repr(self):
     v = Variable('foo')
-    self.assertEquals( repr(v), "Variable('foo')" )
+    self.assertEqual( repr(v), "Variable('foo')" )
 
   def test_like_init(self):
     c = Like({'foo':'bar'})
-    self.assertEquals( {'foo':'bar'}, c._src )
+    self.assertEqual( {'foo':'bar'}, c._src )
 
     c = Like(['foo', 'bar'])
-    self.assertEquals( ['foo','bar'], c._src )
+    self.assertEqual( ['foo','bar'], c._src )
 
   def test_like_test(self):
     c = Like({'foo':'bar'})
@@ -232,4 +232,4 @@ class ComparatorsTest(unittest.TestCase):
 
   def test_like_repr(self):
     c = Like({'foo':'bar'})
-    self.assertEquals( repr(c), "Like({'foo': 'bar'})" )
+    self.assertEqual( repr(c), "Like({'foo': 'bar'})" )

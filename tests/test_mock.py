@@ -17,10 +17,10 @@ class MockTest(unittest.TestCase):
  #   self.assertTrue( isinstance(m.foo, types.MethodType) )
   def test_get_attribute_creates_a_mock_method(self):
     m = Mock()
-    self.assertEquals( 'mock', m._name )
+    self.assertEqual( 'mock', m._name )
     self.assertTrue( isinstance(m.foo, Mock) )
     self.assertFalse( m.foo is m )
-    self.assertEquals( 'mock.foo', m.foo._name )
+    self.assertEqual( 'mock.foo', m.foo._name )
 
   def test_get_attribute_caches_auto_methods(self):
     m = Mock()
@@ -42,17 +42,17 @@ class MockTest(unittest.TestCase):
   def test_get_attribute_auto_method_not_raises_unexpectedcall_when_stubbed(self):
     m = Mock()
     stub(m.foo).expect().returns('success')
-    self.assertEquals( 'success', m.foo() )
+    self.assertEqual( 'success', m.foo() )
 
   def test_get_attribute_auto_method_not_raises_unexpectedcall_multiple_depths(self):
     m = Mock()
     stub(m.foo.bar).expect().returns('success')
-    self.assertEquals( 'success', m.foo.bar() )
+    self.assertEqual( 'success', m.foo.bar() )
 
   def test_get_attribute_does_not_overwrite_existing_attr(self):
     m = Mock()
     m.foo = 42
-    self.assertEquals( 42, m.foo )
+    self.assertEqual( 42, m.foo )
 
   def test_call_raises_unexpectedcall_when_unstubbed(self):
     m = Mock()
@@ -61,7 +61,7 @@ class MockTest(unittest.TestCase):
   def test_call_not_raises_unexpectedcall_when_stubbed(self):
     m = Mock()
     stub(m).expect().returns('success')
-    self.assertEquals( 'success', m() )
+    self.assertEqual( 'success', m() )
 
   def test_nonzero_returns_true_when_unstubbed(self):
     m = Mock()
@@ -97,13 +97,13 @@ class MockTest(unittest.TestCase):
     stub( m.__reversed__ ).expect().returns( 'backwards' )
     stub( m.__contains__ ).expect().args('foo').returns( True )
 
-    self.assertEquals( 42, len(m) )
-    self.assertEquals( 'getitem', m['foo'] )
+    self.assertEqual( 42, len(m) )
+    self.assertEqual( 'getitem', m['foo'] )
     m['foo']='bar'
     del m['foo']
-    self.assertEquals( i, iter(m) )
-    self.assertEquals( 'backwards', reversed(m) )
-    self.assertEquals( True, 'foo' in m )
+    self.assertEqual( i, iter(m) )
+    self.assertEqual( 'backwards', reversed(m) )
+    self.assertEqual( True, 'foo' in m )
 
   def test_context_manager_interface_when_unstubbed(self):
     m = Mock()

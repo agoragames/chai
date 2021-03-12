@@ -65,7 +65,7 @@ class FunctionalTest(Chai):
         return x
     f = Foo()
 
-    assert_equals( 3, f.bar(3) )
+    assert_equals(3, f.bar(3))
 
     expect( f.bar )
     assert_equals( None, f.bar() )

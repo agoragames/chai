@@ -260,7 +260,7 @@ class Expectation(object):
 
     def counts_met(self):
         return self._run_count >= self._min_count and not (
-            self._max_count and not self._max_count == self._run_count)
+            self._max_count is not None and not self._max_count == self._run_count)
 
     def match(self, *args, **kwargs):
         """
